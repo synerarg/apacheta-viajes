@@ -1,51 +1,43 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono, Playfair_Display, Lato, JetBrains_Mono } from "next/font/google";
-import "./globals.css";
-import { cn } from "@/lib/utils";
-
-const jetbrainsMono = JetBrains_Mono({subsets:['latin'],variable:'--font-mono'});
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
+import type { Metadata } from "next"
+import { Playfair_Display, Lato } from "next/font/google"
+import "./globals.css"
+import { Navbar } from "@/components/layout/navbar"
+import { Footer } from "@/components/layout/footer"
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  display: "swap",
+  weight: ["400", "500", "600", "700"],
   style: ["normal", "italic"],
-});
+})
 
 const lato = Lato({
-  variable: "--font-lato-sans",
   subsets: ["latin"],
-  weight: ["300", "400", "700"],
-});
+  display: "swap",
+  weight: ["100", "300", "400", "700", "900"],
+})
 
 export const metadata: Metadata = {
   title: "Apacheta Viajes — Operador Turístico del Norte Argentino",
   description:
     "DMC especializado en el NOA. Flota propia, diseño a medida y 25 años de experiencia en Salta y Jujuy.",
-};
+}
 
 export default function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
-    <html lang="es" className={cn("font-mono", jetbrainsMono.variable)}>
+    <html lang="es">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${playfairDisplay.variable} ${lato.variable} antialiased`}
+        className={`${playfairDisplay.variable} ${lato.className} antialiased`}
       >
+        <Navbar />
         {children}
+        <Footer />
       </body>
     </html>
-  );
+  )
 }

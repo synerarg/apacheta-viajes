@@ -1,7 +1,5 @@
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { HeroBanner } from "@/components/ui/hero-banner.component";
-import { DestinationCard } from "@/components/ui/destination-card.component";
+import { HeroBanner } from "@/components/ui/hero-banner.component"
+import { DestinationCard } from "@/components/ui/destination-card.component"
 
 const destinosEmisivos = [
   {
@@ -32,13 +30,11 @@ const destinosEmisivos = [
       "Nueva York, Miami, Las Vegas y los grandes parques. Circuitos flexibles con acompañamiento desde Salta.",
     dataSlot: "destino-eeuu",
   },
-];
+]
 
 export default function EmisivoPage() {
   return (
     <main className="bg-off-white min-h-screen">
-      <Navbar />
-
       {/* ── Hero ─────────────────────────────────────────────────────── */}
       <HeroBanner
         label="Salidas Grupales & Individuales"
@@ -80,7 +76,8 @@ export default function EmisivoPage() {
             ¿Tenés otro destino en mente?
           </h2>
           <p className="font-lato text-[20px] text-body-text mb-12 max-w-2xl mx-auto leading-relaxed">
-            Diseñamos experiencias a medida para viajeros exigentes. Contanos tu idea y nuestro equipo de emisivo se encargará de la logística.
+            Diseñamos experiencias a medida para viajeros exigentes. Contanos tu
+            idea y nuestro equipo de emisivo se encargará de la logística.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5">
             <a
@@ -100,8 +97,6 @@ export default function EmisivoPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
-  );
+  )
 }

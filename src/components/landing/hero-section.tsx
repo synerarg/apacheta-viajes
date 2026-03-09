@@ -4,13 +4,13 @@ export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
-      <div 
+      <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
-          backgroundImage: `url('https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-Tzp9clV9wnfJLZZyc2CjE7gMN2emOA.png')`,
+          backgroundImage: `url('/landing/hero.jpg')`,
         }}
       />
-      
+
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/40" />
 
@@ -32,20 +32,22 @@ export function HeroSection() {
 
         {/* Subtitle */}
         <p className="text-white/90 text-base sm:text-lg max-w-2xl mb-10 leading-relaxed">
-          Nosotros cuidamos todo para que vos solo disfrutes. Diseñamos experiencias a medida por Salta, Jujuy, Tucumán y todo el NOA, con flota propia y más de 25 años en destino.
+          Nosotros cuidamos todo para que vos solo disfrutes. Diseñamos
+          experiencias a medida por Salta, Jujuy, Tucumán y todo el NOA, con
+          flota propia y más de 25 años en destino.
         </p>
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button 
-            size="lg" 
+          <Button
+            size="lg"
             className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-base"
           >
             Explorar Paquetes
           </Button>
-          <Button 
-            size="lg" 
-            variant="outline" 
+          <Button
+            size="lg"
+            variant="outline"
             className="border-white text-white hover:bg-white/10 bg-transparent px-8 py-6 text-base"
           >
             Armar mi viaje

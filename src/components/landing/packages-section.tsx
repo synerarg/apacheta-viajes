@@ -7,28 +7,28 @@ const packages = [
     name: "Nombre Paquete 1",
     description: "Breve descripción del paquete",
     price: "XXX.XXX",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-gQ7bwkD6cnSeat5oL1oUrZg2Y0dKq6.png",
+    image: "/landing/placeholder.png",
   },
   {
     id: 2,
     name: "Nombre Paquete 2",
     description: "Breve descripción del paquete",
     price: "XXX.XXX",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-gQ7bwkD6cnSeat5oL1oUrZg2Y0dKq6.png",
+    image: "/landing/placeholder.png",
   },
   {
     id: 3,
     name: "Nombre Paquete 3",
     description: "Breve descripción del paquete",
     price: "XXX.XXX",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-gQ7bwkD6cnSeat5oL1oUrZg2Y0dKq6.png",
+    image: "/landing/placeholder.png",
   },
 ]
 
 export function PackagesSection() {
   return (
     <section className="bg-background py-16 md:py-24">
-      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">
@@ -44,7 +44,7 @@ export function PackagesSection() {
           {packages.map((pkg) => (
             <div key={pkg.id} className="group">
               {/* Image */}
-              <div className="relative mb-4 aspect-[4/5] overflow-hidden rounded-lg">
+              <div className="relative mb-4 aspect-4/5 overflow-hidden rounded-lg">
                 <Image
                   src={pkg.image}
                   alt={pkg.name}
@@ -52,7 +52,7 @@ export function PackagesSection() {
                   className="object-cover transition-transform duration-300 group-hover:scale-105"
                 />
               </div>
-              
+
               {/* Content */}
               <div className="flex flex-col gap-1">
                 <h3 className="text-lg font-medium text-foreground">
@@ -78,7 +78,11 @@ export function PackagesSection() {
 
         {/* CTA Button */}
         <div className="mt-12 flex justify-center">
-          <Button className="bg-primary px-8 text-primary-foreground hover:bg-primary/90">
+          <Button
+            variant="default"
+            size="lg"
+            className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
+          >
             Ver Todos Los Paquetes
           </Button>
         </div>

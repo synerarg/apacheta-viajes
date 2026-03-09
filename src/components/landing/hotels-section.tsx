@@ -8,21 +8,21 @@ const hotels = [
     id: 1,
     name: "Nombre Hotel 1",
     location: "Ubicación del Hotel",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-HPq8iEowKwgV3oFMlY4me9iBOJey2B.png",
+    image: "/landing/placeholder-2.png",
     stars: 4,
   },
   {
     id: 2,
     name: "Nombre Hotel 2",
     location: "Ubicación del Hotel",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-HPq8iEowKwgV3oFMlY4me9iBOJey2B.png",
+    image: "/landing/placeholder-2.png",
     stars: 5,
   },
   {
     id: 3,
     name: "Nombre Hotel 3",
     location: "Ubicación del Hotel",
-    image: "https://hebbkx1anhila5yf.public.blob.vercel-storage.com/image-HPq8iEowKwgV3oFMlY4me9iBOJey2B.png",
+    image: "/landing/placeholder-2.png",
     stars: 3,
   },
 ]
@@ -34,9 +34,7 @@ function StarRating({ count }: { count: number }) {
         <Star
           key={i}
           className={`h-4 w-4 ${
-            i < count 
-              ? "fill-primary text-primary" 
-              : "fill-muted text-muted"
+            i < count ? "fill-primary text-primary" : "fill-muted text-muted"
           }`}
         />
       ))}
@@ -46,8 +44,8 @@ function StarRating({ count }: { count: number }) {
 
 export function HotelsSection() {
   return (
-    <section className="bg-muted/50 py-16 md:py-24">
-      <div className="container mx-auto px-4">
+    <section className="py-16 md:py-24">
+      <div className="mx-auto max-w-[1440px] px-4">
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">
@@ -59,14 +57,10 @@ export function HotelsSection() {
         </div>
 
         {/* Hotels Grid */}
-        <div className="mx-auto grid max-w-5xl gap-8 md:grid-cols-3">
+        <div className="mx-auto grid gap-8 md:grid-cols-3">
           {hotels.map((hotel) => (
-            <Link 
-              key={hotel.id} 
-              href="#"
-              className="group block"
-            >
-              <div className="mb-4 aspect-[4/5] overflow-hidden rounded-lg">
+            <Link key={hotel.id} href="#" className="group block">
+              <div className="mb-4 aspect-4/5 overflow-hidden rounded-lg">
                 <Image
                   src={hotel.image}
                   alt={hotel.name}
@@ -88,12 +82,15 @@ export function HotelsSection() {
 
         {/* CTA Button */}
         <div className="mt-12 text-center">
-          <Button 
-            asChild
-            className="rounded-full bg-primary px-8 text-primary-foreground hover:bg-primary/90"
-          >
-            <Link href="#">Ver Hotelería Completa</Link>
-          </Button>
+          <Link href="#hotelería">
+            <Button
+              variant="default"
+              size="lg"
+              className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
+            >
+              Ver Hotelería Completa
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

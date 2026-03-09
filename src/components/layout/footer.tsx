@@ -1,5 +1,5 @@
-import Link from "next/link";
-import { MapPin, Mail, Phone } from "lucide-react";
+import Link from "next/link"
+import { MapPin, Mail, Phone } from "lucide-react"
 
 const footerColumns = [
   {
@@ -19,7 +19,7 @@ const footerColumns = [
       { label: "Contacto", href: "/contacto" },
     ],
   },
-];
+]
 
 export function Footer() {
   return (
@@ -33,7 +33,8 @@ export function Footer() {
               APACHETA VIAJES
             </p>
             <p className="font-lato text-[15px] text-off-white/70 font-light leading-relaxed">
-              Operador turístico boutique especializado en el Norte Argentino. Logística experta y experiencias auténticas desde 1997.
+              Operador turístico boutique especializado en el Norte Argentino.
+              Logística experta y experiencias auténticas desde 1997.
             </p>
           </div>
 
@@ -65,7 +66,10 @@ export function Footer() {
             </p>
             <ul className="flex flex-col gap-4">
               <li className="flex items-start gap-3">
-                <MapPin size={16} className="text-off-white/60 mt-0.5 shrink-0" />
+                <MapPin
+                  size={16}
+                  className="text-off-white/60 mt-0.5 shrink-0"
+                />
                 <span className="font-lato text-[15px] text-off-white/70">
                   Caseros 450, Salta Capital
                 </span>
@@ -98,11 +102,10 @@ export function Footer() {
             © 2025 Apacheta Viajes. Todos los derechos reservados.
           </p>
           <p className="font-lato text-[13px] text-off-white/40">
-            Desarrollado por{" "}
-            <span className="text-accent">Synera</span>
+            Desarrollado por <span className="text-accent">Synera</span>
           </p>
         </div>
       </div>
     </footer>
-  );
+  )
 }

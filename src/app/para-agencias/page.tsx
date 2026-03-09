@@ -7,8 +7,6 @@ import {
   Phone,
   CheckCircle,
 } from "lucide-react"
-import { Navbar } from "../../components/layout/navbar"
-import { Footer } from "../../components/layout/footer"
 import { HeroBanner } from "../../components/ui/hero-banner.component"
 import { ServiceCard } from "../../components/ui/service-card.component"
 import { ContactForm } from "../../components/ui/contact-form.component"
@@ -85,8 +83,6 @@ const MAP_EMBED =
 export default function ParaAgenciasPage() {
   return (
     <main className="bg-off-white min-h-screen">
-      <Navbar />
-
       <HeroBanner
         label="Portal Exclusivo B2B"
         title="Tu Partner Operativo en el Norte Argentino"
@@ -254,8 +250,6 @@ export default function ParaAgenciasPage() {
           </div>
         </div>
       </section>
-
-      <Footer />
     </main>
   )
 }
