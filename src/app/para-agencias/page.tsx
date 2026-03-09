@@ -1,16 +1,24 @@
-import { Truck, Users, Clock, MapPin, Mail, Phone, CheckCircle } from "lucide-react";
-import { Navbar } from "@/components/layout/navbar";
-import { Footer } from "@/components/layout/footer";
-import { HeroBanner } from "@/components/ui/hero-banner.component";
-import { ServiceCard } from "@/components/ui/service-card.component";
-import { ContactForm } from "@/components/ui/contact-form.component";
-import type { LucideIcon } from "lucide-react";
+import {
+  Truck,
+  Users,
+  Clock,
+  MapPin,
+  Mail,
+  Phone,
+  CheckCircle,
+} from "lucide-react"
+import { Navbar } from "../../components/layout/navbar"
+import { Footer } from "../../components/layout/footer"
+import { HeroBanner } from "../../components/ui/hero-banner.component"
+import { ServiceCard } from "../../components/ui/service-card.component"
+import { ContactForm } from "../../components/ui/contact-form.component"
+import type { LucideIcon } from "lucide-react"
 
 const serviceIcons: Record<string, LucideIcon> = {
   "logistica-integral": Truck,
   "flota-propia": Users,
   "soporte-247": Clock,
-};
+}
 
 const serviciosDmc = [
   {
@@ -46,7 +54,7 @@ const serviciosDmc = [
       "Gestión de contingencias en destino",
     ],
   },
-];
+]
 
 const porQueElegirBullets = [
   {
@@ -69,10 +77,10 @@ const porQueElegirBullets = [
     description:
       "Nos encargamos de cada detalle: transfers, hotelería, guías, permisos y contingencias. Usted vende, nosotros ejecutamos con precisión.",
   },
-];
+]
 
 const MAP_EMBED =
-  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.512!2d-65.4117!3d-24.7859!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941bc2e53d2b1f57%3A0x4a956792c26e1ede!2sCaseros%20450%2C%20A4400%20Salta!5e0!3m2!1ses!2sar!4v1709900000000!5m2!1ses!2sar";
+  "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3614.512!2d-65.4117!3d-24.7859!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941bc2e53d2b1f57%3A0x4a956792c26e1ede!2sCaseros%20450%2C%20A4400%20Salta!5e0!3m2!1ses!2sar!4v1709900000000!5m2!1ses!2sar"
 
 export default function ParaAgenciasPage() {
   return (
@@ -95,12 +103,13 @@ export default function ParaAgenciasPage() {
             Servicios DMC
           </h2>
           <p className="font-lato text-[20px] text-body-text mb-16 max-w-xl leading-relaxed">
-            Excelencia operativa diseñada para integrarse invisiblemente con su agencia.
+            Excelencia operativa diseñada para integrarse invisiblemente con su
+            agencia.
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {serviciosDmc.map((service) => {
-              const Icon = serviceIcons[service.id] ?? Truck;
+              const Icon = serviceIcons[service.id] ?? Truck
               return (
                 <ServiceCard
                   key={service.id}
@@ -109,7 +118,7 @@ export default function ParaAgenciasPage() {
                   description={service.description}
                   bullets={service.bullets}
                 />
-              );
+              )
             })}
           </div>
         </div>
@@ -237,7 +246,8 @@ export default function ParaAgenciasPage() {
                 Envianos un mensaje
               </h3>
               <p className="font-lato text-[18px] text-body-text mb-10 leading-relaxed">
-                Cuéntenos sobre sus grupos y diseñaremos una propuesta operativa a medida.
+                Cuéntenos sobre sus grupos y diseñaremos una propuesta operativa
+                a medida.
               </p>
               <ContactForm />
             </div>
@@ -247,5 +257,5 @@ export default function ParaAgenciasPage() {
 
       <Footer />
     </main>
-  );
+  )
 }
