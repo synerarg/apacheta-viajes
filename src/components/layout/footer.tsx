@@ -25,9 +25,7 @@ export function Footer() {
   return (
     <footer className="w-full bg-dark-brown">
       <div className="max-w-[1440px] mx-auto px-8 pt-20 pb-8">
-        {/* Main grid */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-off-white/20">
-          {/* Brand + description */}
           <div className="md:col-span-1">
             <p className="font-playfair text-xl text-off-white font-normal tracking-widest mb-5">
               APACHETA VIAJES
@@ -59,7 +57,6 @@ export function Footer() {
             </div>
           ))}
 
-          {/* Contact column */}
           <div>
             <p className="font-lato text-[13px] text-off-white uppercase tracking-[1.6px] font-medium mb-6">
               CONTACTO
@@ -96,13 +93,12 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Bottom bar */}
         <div className="flex flex-col sm:flex-row items-center justify-between pt-8 gap-3">
           <p className="font-lato text-[13px] text-off-white/40">
-            © 2025 Apacheta Viajes. Todos los derechos reservados.
+            © 2026 Apacheta Viajes. Todos los derechos reservados.
           </p>
           <p className="font-lato text-[13px] text-off-white/40">
-            Desarrollado por <span className="text-accent">Synera</span>
+            Desarrollado por <Link href="https://synera.com.ar" target="_blank" className="text-accent">Synera</Link>
           </p>
         </div>
       </div>

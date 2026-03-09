@@ -20,8 +20,8 @@ const navLinks = [
   { href: "#paquetes", label: "Paquetes NOA" },
   { href: "#experiencias", label: "Experiencias" },
   { href: "#hoteleria", label: "Hotelería" },
-  { href: "#agencias", label: "Para Agencias" },
-  { href: "#emisivo", label: "Emisivo" },
+  { href: "para-agencias", label: "Para Agencias" },
+  { href: "emisivo", label: "Emisivo" },
 ]
 
 export function Navbar() {
