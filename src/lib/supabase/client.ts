@@ -1,10 +1,7 @@
 import { createBrowserClient } from "@supabase/ssr"
 
-import { getSupabaseCredentials } from "@/lib/supabase/config"
-import type { Database } from "@/types/database/database.types"
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_DEFAULT_KEY
 
-export function createClient() {
-  const { url, publishableKey } = getSupabaseCredentials()
-
-  return createBrowserClient<Database>(url, publishableKey)
-}
+export const createClient = () =>
+  createBrowserClient(supabaseUrl!, supabaseKey!)

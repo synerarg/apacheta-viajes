@@ -1,5 +1,6 @@
 import type { Metadata } from "next"
 import { Playfair_Display, Lato } from "next/font/google"
+import { Toaster } from "sonner"
 
 import { AuthSessionSync } from "@/components/auth/auth-session-sync"
 import { Navbar } from "@/components/layout/navbar"
@@ -38,6 +39,7 @@ export default function RootLayout({
         className={`${playfairDisplay.variable} ${lato.className} antialiased`}
       >
         <AuthSessionSync />
+        <Toaster richColors position="top-right" />
         <Navbar />
         {children}
         <Footer />

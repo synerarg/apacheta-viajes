@@ -95,9 +95,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
           <div className="flex items-center gap-6 text-white/90">
             {user ? (
               <>
-                <span className="max-w-[200px] truncate text-sm text-white">
-                  {displayName}
-                </span>
                 <button
                   type="button"
                   className="flex items-center gap-2 transition-colors hover:text-white"
@@ -147,7 +144,9 @@ export function NavbarClient({ user }: NavbarClientProps) {
           >
             <SheetHeader className="sr-only">
               <SheetTitle>Menú de navegación</SheetTitle>
-              <SheetDescription>Navegación principal del sitio</SheetDescription>
+              <SheetDescription>
+                Navegación principal del sitio
+              </SheetDescription>
             </SheetHeader>
 
             <nav className="mt-8 flex flex-col gap-2">
