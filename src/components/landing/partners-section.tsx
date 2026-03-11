@@ -22,7 +22,7 @@ const destinations = [
 
 export function PartnersSection() {
   return (
-    <section className="bg-[#2d2a26] py-16 md:py-24">
+    <section className="bg-dark-brown py-16 md:py-24">
       <div className="mx-auto max-w-[1440px] px-4">
         {/* Para Agencias y Operadores */}
         <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-start mb-20">

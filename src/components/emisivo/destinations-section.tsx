@@ -30,7 +30,7 @@ export function DestinationsSection() {
   const [activeDestination, setActiveDestination] = useState(destinations[0])
 
   return (
-    <section className="py-20 lg:py-28 bg-[#f2f2f2]">
+    <section className="py-20 lg:py-28 bg-off-white">
       <div className="container mx-auto px-4">
         <div className="grid lg:grid-cols-[55fr_45fr] gap-8 lg:gap-12">
           {/* Left Column - Destination List */}
@@ -47,8 +47,8 @@ export function DestinationsSection() {
                   onClick={() => setActiveDestination(destination)}
                   className={`whitespace-nowrap px-4 py-2 border transition-all text-sm ${
                     activeDestination.id === destination.id
-                      ? "bg-[#8b1a1a] text-white border-[#8b1a1a]"
-                      : "bg-transparent text-muted-foreground border-border hover:border-[#8b1a1a] hover:text-foreground"
+                      ? "bg-primary text-white border-primary"
+                      : "bg-transparent text-muted-foreground border-border hover:border-primary hover:text-foreground"
                   }`}
                 >
                   {destination.name}
@@ -62,18 +62,18 @@ export function DestinationsSection() {
                 <button
                   key={destination.id}
                   onClick={() => setActiveDestination(destination)}
-                  className={`text-left py-5 border-b border-[#2c2621]/20 transition-all duration-300 ${
+                  className={`text-left py-5 border-b border-dark-brown/20 transition-all duration-300 ${
                     activeDestination.id === destination.id
                       ? "opacity-100"
                       : "opacity-30 hover:opacity-60"
                   }`}
                 >
-                  <span className="font-serif italic text-2xl xl:text-3xl text-[#2e2726]">
+                  <span className="font-serif italic text-2xl xl:text-3xl text-dark-brown">
                     {destination.name}
                   </span>
                 </button>
               ))}
-              <div className="border-b border-[#2c2621]/20" />
+              <div className="border-b border-dark-brown/20" />
             </div>
           </div>
 
