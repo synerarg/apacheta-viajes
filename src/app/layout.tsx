@@ -1,8 +1,11 @@
 import type { Metadata } from "next"
 import { Playfair_Display, Lato } from "next/font/google"
-import "./globals.css"
+
+import { AuthSessionSync } from "@/components/auth/auth-session-sync"
 import { Navbar } from "@/components/layout/navbar"
 import { Footer } from "@/components/layout/footer"
+
+import "./globals.css"
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",
@@ -34,6 +37,7 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${lato.className} antialiased`}
       >
+        <AuthSessionSync />
         <Navbar />
         {children}
         <Footer />
