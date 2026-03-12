@@ -1,43 +1,130 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import Link from "next/link"
+import { useRouter } from "next/navigation"
 import { ChevronLeft } from "lucide-react"
+import { toast } from "sonner"
+
+import { useCart } from "@/hooks/use-cart"
+import {
+  clearCart,
+  saveLastCheckoutSnapshot,
+} from "@/lib/cart/cart-storage"
+import { createClient } from "@/lib/supabase/client"
+import type { CheckoutPaymentMethod, CheckoutSubmitResult } from "@/types/checkout/checkout.types"
 
 function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
 }
 
-const orderItems = [
-  {
-    id: 1,
-    category: "Paquete",
-    name: "Vuelta a los Valles Calchaquíes",
-    price: 450000,
-    quantity: 1,
-  },
-  {
-    id: 2,
-    category: "Paquete",
-    name: "Vuelta a los Valles Calchaquíes",
-    price: 450000,
-    quantity: 1,
-  },
-  {
-    id: 3,
-    category: "Paquete",
-    name: "Vuelta a los Valles Calchaquíes",
-    price: 450000,
-    quantity: 1,
-  },
-]
-
-type PaymentMethod = "mercadopago" | "transferencia" | "efectivo"
+const supabase = createClient()
 
 export function CheckoutView() {
-  const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>("mercadopago")
+  const router = useRouter()
+  const { items, isEmpty, subtotal } = useCart()
+  const [paymentMethod, setPaymentMethod] =
+    useState<CheckoutPaymentMethod>("mercadopago")
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const [contact, setContact] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+    phone: "",
+  })
+  const [passenger, setPassenger] = useState({
+    fullName: "",
+    documentNumber: "",
+    birthDate: "",
+    nationality: "",
+    specialRequirements: "",
+  })
 
-  const subtotal = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  useEffect(() => {
+    let active = true
+
+    void (async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser()
+
+      if (!active || !user) {
+        return
+      }
+
+      setContact((currentContact) => ({
+        ...currentContact,
+        email: currentContact.email || user.email || "",
+        firstName:
+          currentContact.firstName || user.user_metadata?.nombre || "",
+        lastName:
+          currentContact.lastName || user.user_metadata?.apellido || "",
+      }))
+    })()
+
+    return () => {
+      active = false
+    }
+  }, [])
+
+  const handleCheckoutSubmit = async () => {
+    if (isEmpty) {
+      toast.error("Tu carrito está vacío.")
+      return
+    }
+
+    setIsSubmitting(true)
+
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          items,
+          paymentMethod,
+          contact,
+          passenger,
+        }),
+      })
+
+      const result = (await response.json()) as CheckoutSubmitResult & {
+        error?: string
+      }
+
+      if (response.status === 401) {
+        toast.error("Necesitás iniciar sesión para continuar.")
+        router.push("/login")
+        return
+      }
+
+      if (!response.ok) {
+        toast.error(result.error ?? "No se pudo iniciar la reserva.")
+        return
+      }
+
+      saveLastCheckoutSnapshot({
+        submittedAt: new Date().toISOString(),
+        paymentMethod: result.paymentMethod,
+        items,
+        reservations: result.reservations,
+      })
+
+      clearCart()
+
+      if (result.redirectUrl?.startsWith("http")) {
+        window.location.assign(result.redirectUrl)
+        return
+      }
+
+      router.push(result.redirectUrl ?? result.successUrl)
+    } catch {
+      toast.error("No se pudo iniciar la reserva.")
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
 
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-16">
@@ -80,6 +167,13 @@ export function CheckoutView() {
                   <input
                     type="text"
                     placeholder="Ej: Juan"
+                    value={contact.firstName}
+                    onChange={(event) =>
+                      setContact((currentContact) => ({
+                        ...currentContact,
+                        firstName: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -90,6 +184,13 @@ export function CheckoutView() {
                   <input
                     type="text"
                     placeholder="Ej: García"
+                    value={contact.lastName}
+                    onChange={(event) =>
+                      setContact((currentContact) => ({
+                        ...currentContact,
+                        lastName: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -100,6 +201,13 @@ export function CheckoutView() {
                   <input
                     type="email"
                     placeholder="correo@ejemplo.com"
+                    value={contact.email}
+                    onChange={(event) =>
+                      setContact((currentContact) => ({
+                        ...currentContact,
+                        email: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -110,6 +218,13 @@ export function CheckoutView() {
                   <input
                     type="tel"
                     placeholder="+54 9 387 555-0000"
+                    value={contact.phone}
+                    onChange={(event) =>
+                      setContact((currentContact) => ({
+                        ...currentContact,
+                        phone: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -129,6 +244,13 @@ export function CheckoutView() {
                   <input
                     type="text"
                     placeholder="Como figura en el DNI"
+                    value={passenger.fullName}
+                    onChange={(event) =>
+                      setPassenger((currentPassenger) => ({
+                        ...currentPassenger,
+                        fullName: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -139,6 +261,13 @@ export function CheckoutView() {
                   <input
                     type="text"
                     placeholder="Ej: 38.000.000"
+                    value={passenger.documentNumber}
+                    onChange={(event) =>
+                      setPassenger((currentPassenger) => ({
+                        ...currentPassenger,
+                        documentNumber: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -148,6 +277,13 @@ export function CheckoutView() {
                   </label>
                   <input
                     type="date"
+                    value={passenger.birthDate}
+                    onChange={(event) =>
+                      setPassenger((currentPassenger) => ({
+                        ...currentPassenger,
+                        birthDate: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -158,6 +294,13 @@ export function CheckoutView() {
                   <input
                     type="text"
                     placeholder="Ej: Argentina"
+                    value={passenger.nationality}
+                    onChange={(event) =>
+                      setPassenger((currentPassenger) => ({
+                        ...currentPassenger,
+                        nationality: event.target.value,
+                      }))
+                    }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -170,6 +313,13 @@ export function CheckoutView() {
                   <textarea
                     rows={3}
                     placeholder="Alergias alimentarias, requerimientos de accesibilidad, etc."
+                    value={passenger.specialRequirements}
+                    onChange={(event) =>
+                      setPassenger((currentPassenger) => ({
+                        ...currentPassenger,
+                        specialRequirements: event.target.value,
+                      }))
+                    }
                     className="border border-dark-brown/30 bg-transparent px-3 py-2.5 text-sm font-sans text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-colors resize-none"
                   />
                 </div>
@@ -199,7 +349,11 @@ export function CheckoutView() {
                       label: "Efectivo en sucursal",
                       description: "Caseros 450, Salta Capital",
                     },
-                  ] as { id: PaymentMethod; label: string; description: string }[]
+                  ] as {
+                    id: CheckoutPaymentMethod
+                    label: string
+                    description: string
+                  }[]
                 ).map((method) => (
                   <button
                     key={method.id}
@@ -243,7 +397,7 @@ export function CheckoutView() {
               </h2>
 
               <div className="flex flex-col gap-4 mb-6">
-                {orderItems.map((item) => (
+                {items.map((item) => (
                   <div
                     key={item.id}
                     className="flex justify-between items-start gap-4 pb-4 border-b border-dark-brown/10 last:border-0 last:pb-0"
@@ -260,7 +414,7 @@ export function CheckoutView() {
                       </p>
                     </div>
                     <span className="text-sm font-sans font-semibold text-dark-brown whitespace-nowrap">
-                      {formatPrice(item.price * item.quantity)}
+                      {formatPrice(item.unitPrice * item.quantity)}
                     </span>
                   </div>
                 ))}
@@ -296,12 +450,18 @@ export function CheckoutView() {
                 </div>
               </div>
 
-              <Link
-                href="/checkout/success"
-                className="block w-full bg-primary hover:bg-primary/80 text-off-white font-sans text-base font-bold py-4 text-center transition-colors"
+              <button
+                type="button"
+                onClick={handleCheckoutSubmit}
+                disabled={isSubmitting || isEmpty}
+                className={`block w-full text-off-white font-sans text-base font-bold py-4 text-center transition-colors ${
+                  isSubmitting || isEmpty
+                    ? "bg-primary/50"
+                    : "bg-primary hover:bg-primary/80"
+                }`}
               >
                 Confirmar Reserva
-              </Link>
+              </button>
 
               <p className="mt-4 text-center text-subtle font-sans text-xs leading-relaxed">
                 *Sujeto a disponibilidad y cambios sin previo aviso.

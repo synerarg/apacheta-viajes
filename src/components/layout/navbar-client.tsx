@@ -16,6 +16,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import { useCart } from "@/hooks/use-cart"
 import { createClient } from "@/lib/supabase/client"
 import type { AuthenticatedNavbarUser } from "@/types/auth/auth.types"
 
@@ -47,6 +48,7 @@ function resolveDisplayName(user: AuthenticatedNavbarUser | null) {
 export function NavbarClient({ user }: NavbarClientProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isSigningOut, startSigningOut] = useTransition()
+  const { totalItems } = useCart()
   const router = useRouter()
   const displayName = resolveDisplayName(user)
 
@@ -117,13 +119,15 @@ export function NavbarClient({ user }: NavbarClientProps) {
               </Link>
             )}
 
-            <button
-              type="button"
+            <Link
+              href="/carrito"
               className="flex size-8 items-center justify-center transition-colors duration-150 hover:bg-white/20"
-              aria-label="Carrito"
+              aria-label={
+                totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
+              }
             >
               <ShoppingCartIcon className="h-5 w-5" />
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -199,14 +203,16 @@ export function NavbarClient({ user }: NavbarClientProps) {
                     </Link>
                   )}
 
-                  <button
-                    type="button"
+                  <Link
+                    href="/carrito"
                     className="flex items-center gap-2 transition-colors hover:text-white"
-                    aria-label="Carrito"
+                    aria-label={
+                      totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
+                    }
                   >
                     <ShoppingCartIcon className="h-5 w-5" />
                     <span className="text-sm">Carrito</span>
-                  </button>
+                  </Link>
                 </div>
               </div>
             </nav>

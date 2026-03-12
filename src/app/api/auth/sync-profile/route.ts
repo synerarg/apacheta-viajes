@@ -1,13 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { createClient } from "@/lib/supabase/server"
-import { createServerAuthService } from "@/services/auth/auth.service"
+import { createServerAuthController } from "@/controllers/auth/auth.controller"
 
 export async function POST() {
   try {
-    const supabase = await createClient()
-    const authService = createServerAuthService(supabase)
-    const profile = await authService.syncAuthenticatedUser()
+    const authController = await createServerAuthController()
+    const profile = await authController.syncAuthenticatedUser()
 
     return NextResponse.json(
       {
