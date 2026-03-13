@@ -23,8 +23,8 @@ const supabase = createClient()
 
 const navLinks = [
   { href: "/", label: "Inicio" },
-  { href: "/#paquetes", label: "Paquetes NOA" },
-  { href: "/#experiencias", label: "Experiencias" },
+  { href: "/paquetes", label: "Paquetes NOA" },
+  { href: "/experiencias", label: "Experiencias" },
   { href: "/#hoteleria", label: "Hotelería" },
   { href: "/para-agencias", label: "Para Agencias" },
   { href: "/emisivo", label: "Emisivo" },
@@ -117,13 +117,13 @@ export function NavbarClient({ user }: NavbarClientProps) {
               </Link>
             )}
 
-            <button
-              type="button"
+            <Link 
+              href="/carrito"
               className="flex size-8 items-center justify-center transition-colors duration-150 hover:bg-white/20"
               aria-label="Carrito"
             >
               <ShoppingCartIcon className="h-5 w-5" />
-            </button>
+            </Link >
           </div>
         </div>
 
