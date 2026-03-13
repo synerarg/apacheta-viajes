@@ -1,10 +1,15 @@
+"use client"
+
+import { useSyncExternalStore } from "react"
 import Link from "next/link"
+
+import { loadLastCheckoutSnapshot } from "@/lib/cart/cart-storage"
 
 function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
 }
 
-const orderItems = [
+const fallbackOrderItems = [
   {
     id: 1,
     category: "Paquete",
@@ -28,9 +33,26 @@ const orderItems = [
   },
 ]
 
-const total = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
-
 export function ConfirmacionView() {
+  const checkoutSnapshot = useSyncExternalStore(
+    () => () => undefined,
+    loadLastCheckoutSnapshot,
+    () => null,
+  )
+
+  const orderItems =
+    checkoutSnapshot?.items.map((item) => ({
+      id: item.id,
+      category: item.category,
+      name: item.name,
+      price: item.unitPrice,
+      quantity: item.quantity,
+    })) ?? fallbackOrderItems
+  const total = orderItems.reduce((sum, i) => sum + i.price * i.quantity, 0)
+  const orderReference = checkoutSnapshot?.reservations[0]?.reservationId
+    ? `#AP-${checkoutSnapshot.reservations[0].reservationId.slice(0, 8).toUpperCase()}`
+    : "#AP-20260001"
+
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-16">
       <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-20">
@@ -79,7 +101,7 @@ export function ConfirmacionView() {
                 Detalle del pedido
               </h2>
               <span className="text-xs font-sans text-subtle tracking-[0.12em] uppercase">
-                N° #AP-20260001
+                N° {orderReference}
               </span>
             </div>
 

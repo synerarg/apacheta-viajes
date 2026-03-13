@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { createClient } from "@/lib/supabase/server"
-import { createServerAuthService } from "@/services/auth/auth.service"
+import { createServerAuthController } from "@/controllers/auth/auth.controller"
 
 function getSafeRedirectPath(next: string | null) {
   if (!next || !next.startsWith("/")) {
@@ -23,10 +22,9 @@ export async function GET(request: Request) {
   }
 
   try {
-    const supabase = await createClient()
-    const authService = createServerAuthService(supabase)
+    const authController = await createServerAuthController()
 
-    await authService.completeOAuthSignIn(code)
+    await authController.completeOAuthSignIn(code)
 
     return NextResponse.redirect(new URL(next, requestUrl.origin))
   } catch {

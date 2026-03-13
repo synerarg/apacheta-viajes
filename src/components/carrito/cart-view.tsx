@@ -1,75 +1,28 @@
 "use client"
 
-import { useState } from "react"
 import { Trash2, Minus, Plus } from "lucide-react"
 import Image from "next/image"
 import Link from "next/link"
 
-interface CartItem {
-  id: number
-  category: string
-  name: string
-  description: string
-  price: number
-  quantity: number
-  image: string
-}
-
-const initialCartItems: CartItem[] = [
-  {
-    id: 1,
-    category: "Paquete",
-    name: "Vuelta a los Valles Calchaquíes",
-    description: "Breve descrip.",
-    price: 450000,
-    quantity: 1,
-    image: "",
-  },
-  {
-    id: 2,
-    category: "Paquete",
-    name: "Vuelta a los Valles Calchaquíes",
-    description: "Breve descrip.",
-    price: 450000,
-    quantity: 1,
-    image: "",
-  },
-  {
-    id: 3,
-    category: "Paquete",
-    name: "Vuelta a los Valles Calchaquíes",
-    description: "Breve descrip.",
-    price: 450000,
-    quantity: 1,
-    image: "",
-  },
-]
+import { useCart } from "@/hooks/use-cart"
 
 function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
 }
 
 export function CartView() {
-  const [cartItems, setCartItems] = useState<CartItem[]>(initialCartItems)
+  const { items, isEmpty, removeItem, subtotal, totalItems, updateItemQuantity } =
+    useCart()
 
-  const updateQuantity = (id: number, delta: number) => {
-    setCartItems((items) =>
-      items.map((item) =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    )
+  const updateQuantity = (id: string, delta: number) => {
+    const cartItem = items.find((item) => item.id === id)
+
+    if (!cartItem) {
+      return
+    }
+
+    updateItemQuantity(cartItem.id, cartItem.quantity + delta)
   }
-
-  const removeItem = (id: number) => {
-    setCartItems((items) => items.filter((item) => item.id !== id))
-  }
-
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0
-  )
 
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-16">
@@ -91,13 +44,13 @@ export function CartView() {
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
           {/* Left Column - Cart Items */}
           <div className="flex-1">
-            {cartItems.length > 0 ? (
+            {!isEmpty ? (
               <div className="flex flex-col">
-                {cartItems.map((item, index) => (
+                {items.map((item, index) => (
                   <div
                     key={item.id}
                     className={`flex gap-6 py-6 ${
-                      index !== cartItems.length - 1
+                      index !== items.length - 1
                         ? "border-b border-dark-brown/15"
                         : ""
                     }`}
@@ -141,7 +94,7 @@ export function CartView() {
                       {/* Bottom Content */}
                       <div className="flex items-end justify-between mt-4">
                         <p className="font-serif text-xl md:text-2xl font-bold text-primary">
-                          {formatPrice(item.price * item.quantity)}
+                          {formatPrice(item.unitPrice * item.quantity)}
                         </p>
 
                         {/* Quantity Stepper */}
@@ -194,8 +147,8 @@ export function CartView() {
               <div className="space-y-3 mb-4">
                 <div className="flex justify-between items-center">
                   <span className="font-sans text-sm text-dark-brown">
-                    Subtotal ({cartItems.length}{" "}
-                    {cartItems.length === 1 ? "item" : "items"})
+                    Subtotal ({totalItems}{" "}
+                    {totalItems === 1 ? "item" : "items"})
                   </span>
                   <span className="font-sans text-sm text-dark-brown">
                     {formatPrice(subtotal)}
@@ -223,8 +176,13 @@ export function CartView() {
               </div>
 
               <Link
-                href="/checkout"
-                className="block w-full bg-primary hover:bg-primary/80 text-off-white font-sans text-base font-bold py-4 text-center transition-colors"
+                href={isEmpty ? "/carrito" : "/checkout"}
+                aria-disabled={isEmpty}
+                className={`block w-full text-off-white font-sans text-base font-bold py-4 text-center transition-colors ${
+                  isEmpty
+                    ? "pointer-events-none bg-primary/50"
+                    : "bg-primary hover:bg-primary/80"
+                }`}
               >
                 Finalizar Reserva
               </Link>
