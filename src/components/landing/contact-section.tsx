@@ -111,7 +111,7 @@ export function ContactSection() {
               a medida.
             </p>
 
-            <form className="flex flex-col gap-5">
+            <form autoComplete="off" className="flex flex-col gap-5">
               {/* Row 1 */}
               <div className="grid md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5">
@@ -120,6 +120,7 @@ export function ContactSection() {
                   </label>
                   <input
                     type="text"
+                    autoComplete="name"
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -129,6 +130,7 @@ export function ContactSection() {
                   </label>
                   <input
                     type="text"
+                    autoComplete="organization"
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -163,6 +165,7 @@ export function ContactSection() {
                   </label>
                   <input
                     type="text"
+                    autoComplete="off"
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -176,6 +179,7 @@ export function ContactSection() {
                   </label>
                   <input
                     type="text"
+                    autoComplete="off"
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -185,6 +189,8 @@ export function ContactSection() {
                   </label>
                   <input
                     type="text"
+                    inputMode="numeric"
+                    autoComplete="off"
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -195,6 +201,7 @@ export function ContactSection() {
                 <label className="text-sm text-muted-foreground">Mensaje</label>
                 <textarea
                   rows={3}
+                  autoComplete="off"
                   className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
                 />
               </div>

@@ -9,22 +9,35 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 
+const inputClass =
+  "bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+
 export function ContactForm() {
   return (
-    <div className="flex flex-col gap-5">
+    <form
+      autoComplete="off"
+      onSubmit={(e) => e.preventDefault()}
+      className="flex flex-col gap-5"
+    >
       <div className="grid md:grid-cols-2 gap-5">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-muted-foreground">Nombre Completo</label>
+          <label className="text-sm text-muted-foreground">
+            Nombre Completo
+          </label>
           <input
             type="text"
-            className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            autoComplete="name"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-muted-foreground">Correo Electrónico</label>
+          <label className="text-sm text-muted-foreground">
+            Correo Electrónico
+          </label>
           <input
             type="email"
-            className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            autoComplete="email"
+            className={inputClass}
           />
         </div>
       </div>
@@ -46,27 +59,40 @@ export function ContactForm() {
           </Select>
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-muted-foreground">Presupuesto Estimado</label>
+          <label className="text-sm text-muted-foreground">
+            Presupuesto Estimado
+          </label>
           <input
             type="text"
-            className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            autoComplete="off"
+            placeholder="Ej: USD 2.000 por persona"
+            className={inputClass}
           />
         </div>
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-muted-foreground">Fechas Estimadas</label>
+          <label className="text-sm text-muted-foreground">
+            Fechas Estimadas
+          </label>
           <input
             type="text"
-            className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            autoComplete="off"
+            placeholder="Ej: vacaciones de julio"
+            className={inputClass}
           />
         </div>
         <div className="flex flex-col gap-1.5">
-          <label className="text-sm text-muted-foreground">Número de Pasajeros Estimado</label>
+          <label className="text-sm text-muted-foreground">
+            Número de Pasajeros
+          </label>
           <input
             type="text"
-            className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
+            inputMode="numeric"
+            autoComplete="off"
+            placeholder="Ej: 4"
+            className={inputClass}
           />
         </div>
       </div>
@@ -75,16 +101,18 @@ export function ContactForm() {
         <label className="text-sm text-muted-foreground">Mensaje</label>
         <textarea
           rows={3}
-          className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
+          autoComplete="off"
+          placeholder="Contanos sobre tu viaje ideal..."
+          className={`${inputClass} resize-none`}
         />
       </div>
 
       <Button
-        type="button"
+        type="submit"
         className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2"
       >
         Enviar Solicitud
       </Button>
-    </div>
+    </form>
   )
 }
