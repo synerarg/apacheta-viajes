@@ -3,7 +3,7 @@ import { ContactForm } from "./contact-form"
 export function ContactSection() {
   return (
     <section className="bg-background py-16 md:py-24">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="text-center mb-12">
           <p className="text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">
             Contacto
@@ -13,7 +13,7 @@ export function ContactSection() {
           </h2>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12">
           {/* Left Column - Contact Info */}
           <div>
             <h3 className="text-xl font-medium text-foreground mb-6">

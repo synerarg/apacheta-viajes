@@ -26,7 +26,7 @@ const navLinks = [
   { href: "/", label: "Inicio" },
   { href: "/paquetes", label: "Paquetes NOA" },
   { href: "/experiencias", label: "Experiencias" },
-  { href: "/#hoteleria", label: "Hotelería" },
+  { href: "/hoteleria", label: "Hotelería" },
   { href: "/para-agencias", label: "Para Agencias" },
   { href: "/emisivo", label: "Emisivo" },
 ]

@@ -3,7 +3,7 @@ import Image from "next/image"
 export function WhyChooseSection() {
   return (
     <section className="bg-muted/50 py-16 md:py-24">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <h2 className="font-serif text-3xl md:text-4xl italic text-foreground mb-12">
           Por qué elegir Apacheta
         </h2>

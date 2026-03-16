@@ -8,7 +8,7 @@ export function MetricsSection() {
 
   return (
     <section className="bg-primary">
-      <div className="mx-auto max-w-[1440px] px-4 py-8">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px] py-8">
         <div className="grid grid-cols-2 gap-6 md:flex md:items-center md:justify-between md:gap-4">
           {metrics.map((metric, index) => (
             <div

@@ -21,7 +21,7 @@ export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
 
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-20">
-      <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-20">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Page header — no full-width hero */}
         <div className="mb-8 md:mb-10">
           <span className="text-xs uppercase tracking-[0.22em] text-subtle font-sans block mb-4">

@@ -3,7 +3,7 @@ import { Check } from "lucide-react"
 export function ServicesSection() {
   return (
     <section className="bg-background py-16 md:py-24">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="mb-12">
           <h2 className="font-serif text-3xl md:text-4xl italic text-foreground mb-3">
             Servicios DMC

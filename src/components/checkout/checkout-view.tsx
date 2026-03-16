@@ -128,7 +128,7 @@ export function CheckoutView() {
 
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-16">
-      <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-20">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Back link */}
         <Link
           href="/carrito"

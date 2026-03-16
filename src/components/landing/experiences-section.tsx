@@ -43,7 +43,7 @@ const experiences = [
 export function ExperiencesSection() {
   return (
     <section className="py-16 md:py-24 bg-background">
-      <div className="mx-auto max-w-[1440px] px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="text-center mb-10 md:mb-14">
           <p className="text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">

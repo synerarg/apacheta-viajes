@@ -3,7 +3,7 @@ import Image from "next/image"
 export function HeroSection() {
   return (
     <section className="min-h-[80vh] pt-24 pb-16 bg-off-white">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="grid lg:grid-cols-[55fr_45fr] gap-8 lg:gap-12 items-center min-h-[calc(80vh-6rem)]">
           {/* Left Column - Text */}
           <div className="flex flex-col justify-center w-full">

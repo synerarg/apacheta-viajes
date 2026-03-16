@@ -24,7 +24,7 @@ const footerColumns = [
 export function Footer() {
   return (
     <footer className="w-full bg-dark-brown">
-      <div className="max-w-[1440px] mx-auto px-8 pt-20 pb-8">
+      <div className="w-[calc(100%-1rem)] max-w-[1440px] mx-auto pt-20 pb-8">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 pb-12 border-b border-off-white/20">
           <div className="md:col-span-1">
             <p className="font-playfair text-xl text-off-white font-normal tracking-widest mb-5">

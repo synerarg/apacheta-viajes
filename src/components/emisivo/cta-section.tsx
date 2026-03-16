@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 export function CtaSection() {
   return (
     <section className="py-20 lg:py-28 bg-off-white">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="max-w-3xl mx-auto text-center">
           <h2 className="font-serif italic text-3xl md:text-4xl lg:text-5xl text-dark-brown mb-6 text-balance">
             ¿Tenés otro destino en mente?

@@ -28,7 +28,7 @@ const packages = [
 export function PackagesSection() {
   return (
     <section className="bg-background py-16 md:py-24">
-      <div className="mx-auto max-w-[1440px] px-4 sm:px-6 lg:px-8">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">

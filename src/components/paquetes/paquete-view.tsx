@@ -71,7 +71,7 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
       </div>
 
       {/* Body */}
-      <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-20 py-14 md:py-20">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px] py-14 md:py-20">
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
           {/* Left Column */}
           <div className="flex-1 min-w-0">

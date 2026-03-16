@@ -55,7 +55,7 @@ export function ConfirmacionView() {
 
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-16">
-      <div className="mx-auto max-w-[1440px] px-6 md:px-12 lg:px-20">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="max-w-[720px]">
           {/* Status */}
           <div className="flex items-center gap-3 mb-8">

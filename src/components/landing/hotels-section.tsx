@@ -45,7 +45,7 @@ function StarRating({ count }: { count: number }) {
 export function HotelsSection() {
   return (
     <section className="py-16 md:py-24">
-      <div className="mx-auto max-w-[1440px] px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="mb-3 text-xs font-medium uppercase tracking-[0.2em] text-muted-foreground">

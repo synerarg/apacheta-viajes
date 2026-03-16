@@ -12,7 +12,7 @@ import {
 export function ContactSection() {
   return (
     <section className="py-16 md:py-24">
-      <div className="mx-auto max-w-[1440px] px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="text-center mb-12">
           <p className="text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">

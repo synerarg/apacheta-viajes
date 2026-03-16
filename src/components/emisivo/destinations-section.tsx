@@ -31,7 +31,7 @@ export function DestinationsSection() {
 
   return (
     <section className="py-20 lg:py-28 bg-off-white">
-      <div className="container mx-auto px-4">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="grid lg:grid-cols-[55fr_45fr] gap-8 lg:gap-12">
           {/* Left Column - Destination List */}
           <div className="lg:sticky lg:top-28 lg:self-start">
