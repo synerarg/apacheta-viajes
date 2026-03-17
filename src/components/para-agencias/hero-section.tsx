@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 
 export function HeroSection() {
@@ -27,17 +29,21 @@ export function HeroSection() {
         </p>
         <div className="flex flex-col sm:flex-row gap-4">
           <Button
+            asChild
             size="lg"
             className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-base cursor-pointer"
           >
-            Ver Tarifario
+            <Link href="/#contacto">Ver Tarifario</Link>
           </Button>
           <Button
+            asChild
             size="lg"
             variant="outline"
             className="border-white text-white hover:bg-white/10 bg-transparent px-8 py-6 text-base cursor-pointer hover:text-white"
           >
-            Hablar con Gerencia
+            <Link href="https://wa.me/5493875550192" target="_blank">
+              Hablar con Gerencia
+            </Link>
           </Button>
         </div>
       </div>

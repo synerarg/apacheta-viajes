@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 
 export function CtaSection() {
@@ -15,17 +17,21 @@ export function CtaSection() {
           </p>
           <div className="flex flex-col sm:flex-row gap-8 justify-center">
             <Button
+              asChild
               size="lg"
               className="bg-primary hover:bg-primary/90 text-white rounded-none px-8 py-6 text-base font-bold"
             >
-              Solicitar Cotización a Medida
+              <Link href="/#contacto">Solicitar Cotización a Medida</Link>
             </Button>
             <Button
+              asChild
               size="lg"
               variant="outline"
               className="border-primary text-primary hover:bg-primary/5 hover:text-primary rounded-none px-8 py-6 text-base font-bold"
             >
-              Contactar por WhatsApp
+              <Link href="https://wa.me/5493875550192" target="_blank">
+                Contactar por WhatsApp
+              </Link>
             </Button>
           </div>
         </div>

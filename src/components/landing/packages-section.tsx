@@ -1,33 +1,16 @@
 import Image from "next/image"
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
+import type { StorefrontPackageItem } from "@/types/storefront/storefront.types"
 
-const packages = [
-  {
-    id: 1,
-    name: "Nombre Paquete 1",
-    description: "Breve descripción del paquete",
-    price: "XXX.XXX",
-    image: "/landing/placeholder.png",
-  },
-  {
-    id: 2,
-    name: "Nombre Paquete 2",
-    description: "Breve descripción del paquete",
-    price: "XXX.XXX",
-    image: "/landing/placeholder.png",
-  },
-  {
-    id: 3,
-    name: "Nombre Paquete 3",
-    description: "Breve descripción del paquete",
-    price: "XXX.XXX",
-    image: "/landing/placeholder.png",
-  },
-]
+interface PackagesSectionProps {
+  packages: StorefrontPackageItem[]
+}
 
-export function PackagesSection() {
+export function PackagesSection({ packages }: PackagesSectionProps) {
   return (
-    <section className="bg-background py-16 md:py-24">
+    <section id="paquetes" className="bg-background py-16 md:py-24">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -62,14 +45,15 @@ export function PackagesSection() {
                   {pkg.description}
                 </p>
                 <p className="mt-1 text-sm font-medium text-primary">
-                  Desde ARS ${pkg.price}
+                  Desde {pkg.currency} ${pkg.price.toLocaleString("es-AR")}
                 </p>
                 <Button
+                  asChild
                   variant="outline"
                   size="sm"
                   className="mt-3 w-fit border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                 >
-                  Ver Detalle
+                  <Link href={`/paquetes/${pkg.slug}`}>Ver Detalle</Link>
                 </Button>
               </div>
             </div>
@@ -79,11 +63,12 @@ export function PackagesSection() {
         {/* CTA Button */}
         <div className="mt-12 flex justify-center">
           <Button
+            asChild
             variant="default"
             size="lg"
             className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
           >
-            Ver Todos Los Paquetes
+            <Link href="/paquetes">Ver Todos Los Paquetes</Link>
           </Button>
         </div>
       </div>

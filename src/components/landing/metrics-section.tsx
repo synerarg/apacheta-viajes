@@ -1,10 +1,10 @@
-export function MetricsSection() {
-  const metrics = [
-    { value: "+25", label: "AÑOS DE EXPERIENCIA" },
-    { value: "+5.000", label: "VIAJEROS POR AÑO" },
-    { value: "100%", label: "FLOTA PROPIA" },
-    { value: "+200", label: "ITINERARIOS DISEÑADOS" },
-  ]
+import type { StorefrontMetricItem } from "@/types/storefront/storefront.types"
+
+interface MetricsSectionProps {
+  metrics: StorefrontMetricItem[]
+}
+
+export function MetricsSection({ metrics }: MetricsSectionProps) {
 
   return (
     <section className="bg-primary">

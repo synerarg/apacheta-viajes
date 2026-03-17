@@ -3,18 +3,25 @@
 import { useState } from "react"
 import { FilterBar } from "@/components/catalog/filter-bar"
 import { ExperienciaCard } from "@/components/catalog/experiencia-card"
-import {
-  experienciasMock,
-  categoriasExperiencias,
-} from "@/lib/mock-data/experiencias"
+import type { StorefrontExperienceItem } from "@/types/storefront/storefront.types"
 
-export function CatalogoExperiencias() {
-  const [activeCategoria, setActiveCategoria] = useState("Todos")
+interface CatalogoExperienciasProps {
+  experiencias: StorefrontExperienceItem[]
+  categorias: string[]
+  initialCategoria?: string
+}
+
+export function CatalogoExperiencias({
+  experiencias,
+  categorias,
+  initialCategoria = "Todos",
+}: CatalogoExperienciasProps) {
+  const [activeCategoria, setActiveCategoria] = useState(initialCategoria)
 
   const filtered =
     activeCategoria === "Todos"
-      ? experienciasMock
-      : experienciasMock.filter((e) => e.categoria === activeCategoria)
+      ? experiencias
+      : experiencias.filter((experience) => experience.category === activeCategoria)
 
   // Build asymmetric masonry layout
   // Left col: tall + 2 shorter | Center col: 2 medium | Right col: tall + medium + shorter
@@ -47,7 +54,7 @@ export function CatalogoExperiencias() {
         {/* Filters */}
         <div className="mb-10">
           <FilterBar
-            categorias={categoriasExperiencias}
+            categorias={categorias}
             activeCategoria={activeCategoria}
             onCategoriaChange={handleCategoriaChange}
           />

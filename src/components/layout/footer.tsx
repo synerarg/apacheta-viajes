@@ -7,16 +7,16 @@ const footerColumns = [
     links: [
       { label: "Paquetes NOA", href: "/paquetes" },
       { label: "Experiencias", href: "/experiencias" },
-      { label: "Hotelería", href: "/hoteleria" },
+      { label: "Hotelería", href: "/#hoteleria" },
       { label: "Emisivo", href: "/emisivo" },
     ],
   },
   {
     title: "EMPRESA",
     links: [
-      { label: "Sobre Nosotros", href: "/nosotros" },
+      { label: "Sobre Nosotros", href: "/#nosotros" },
       { label: "Para Agencias", href: "/para-agencias" },
-      { label: "Contacto", href: "/contacto" },
+      { label: "Contacto", href: "/#contacto" },
     ],
   },
 ]

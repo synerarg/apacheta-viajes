@@ -1,5 +1,8 @@
 "use client"
 
+import { useState } from "react"
+import { toast } from "sonner"
+
 import { Button } from "@/components/ui/button"
 import {
   Select,
@@ -8,10 +11,64 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { submitContactRequest } from "@/lib/contact/contact-request"
 
 export function ContactSection() {
+  const [formData, setFormData] = useState({
+    nombreCompleto: "",
+    agenciaEmpresa: "",
+    tipoViaje: "",
+    presupuestoEstimado: "",
+    fechasEstimadas: "",
+    numeroPasajeros: "",
+    mensaje: "",
+  })
+  const [isSubmitting, setIsSubmitting] = useState(false)
+
+  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+
+    try {
+      setIsSubmitting(true)
+
+      await submitContactRequest({
+        nombreCompleto: formData.nombreCompleto,
+        tipoViaje: formData.tipoViaje || undefined,
+        presupuestoEstimado: formData.presupuestoEstimado || undefined,
+        fechasEstimadas: formData.fechasEstimadas || undefined,
+        numeroPasajeros: formData.numeroPasajeros
+          ? Number(formData.numeroPasajeros)
+          : undefined,
+        mensaje: formData.mensaje || undefined,
+        metadata: {
+          source: "landing",
+          agencyName: formData.agenciaEmpresa || undefined,
+        },
+      })
+
+      setFormData({
+        nombreCompleto: "",
+        agenciaEmpresa: "",
+        tipoViaje: "",
+        presupuestoEstimado: "",
+        fechasEstimadas: "",
+        numeroPasajeros: "",
+        mensaje: "",
+      })
+      toast.success("Recibimos tu solicitud.")
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "No se pudo enviar la solicitud.",
+      )
+    } finally {
+      setIsSubmitting(false)
+    }
+  }
+
   return (
-    <section className="py-16 md:py-24">
+    <section id="contacto" className="py-16 md:py-24">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="text-center mb-12">
@@ -111,7 +168,11 @@ export function ContactSection() {
               a medida.
             </p>
 
-            <form autoComplete="off" className="flex flex-col gap-5">
+            <form
+              autoComplete="off"
+              className="flex flex-col gap-5"
+              onSubmit={handleSubmit}
+            >
               {/* Row 1 */}
               <div className="grid md:grid-cols-2 gap-5">
                 <div className="flex flex-col gap-1.5">
@@ -121,6 +182,13 @@ export function ContactSection() {
                   <input
                     type="text"
                     autoComplete="name"
+                    value={formData.nombreCompleto}
+                    onChange={(event) =>
+                      setFormData((currentData) => ({
+                        ...currentData,
+                        nombreCompleto: event.target.value,
+                      }))
+                    }
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -131,6 +199,13 @@ export function ContactSection() {
                   <input
                     type="text"
                     autoComplete="organization"
+                    value={formData.agenciaEmpresa}
+                    onChange={(event) =>
+                      setFormData((currentData) => ({
+                        ...currentData,
+                        agenciaEmpresa: event.target.value,
+                      }))
+                    }
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -142,7 +217,15 @@ export function ContactSection() {
                   <label className="text-sm text-muted-foreground">
                     Tipo de Viaje
                   </label>
-                  <Select>
+                  <Select
+                    value={formData.tipoViaje}
+                    onValueChange={(value) =>
+                      setFormData((currentData) => ({
+                        ...currentData,
+                        tipoViaje: value,
+                      }))
+                    }
+                  >
                     <SelectTrigger className="bg-transparent border-0 border-b border-border rounded-none px-0 py-2 h-auto focus:ring-0 focus:ring-offset-0">
                       <SelectValue placeholder="Seleccionar..." />
                     </SelectTrigger>
@@ -166,6 +249,13 @@ export function ContactSection() {
                   <input
                     type="text"
                     autoComplete="off"
+                    value={formData.presupuestoEstimado}
+                    onChange={(event) =>
+                      setFormData((currentData) => ({
+                        ...currentData,
+                        presupuestoEstimado: event.target.value,
+                      }))
+                    }
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -180,6 +270,13 @@ export function ContactSection() {
                   <input
                     type="text"
                     autoComplete="off"
+                    value={formData.fechasEstimadas}
+                    onChange={(event) =>
+                      setFormData((currentData) => ({
+                        ...currentData,
+                        fechasEstimadas: event.target.value,
+                      }))
+                    }
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -191,6 +288,13 @@ export function ContactSection() {
                     type="text"
                     inputMode="numeric"
                     autoComplete="off"
+                    value={formData.numeroPasajeros}
+                    onChange={(event) =>
+                      setFormData((currentData) => ({
+                        ...currentData,
+                        numeroPasajeros: event.target.value,
+                      }))
+                    }
                     className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
                   />
                 </div>
@@ -202,6 +306,13 @@ export function ContactSection() {
                 <textarea
                   rows={3}
                   autoComplete="off"
+                  value={formData.mensaje}
+                  onChange={(event) =>
+                    setFormData((currentData) => ({
+                      ...currentData,
+                      mensaje: event.target.value,
+                    }))
+                  }
                   className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
                 />
               </div>
@@ -209,6 +320,7 @@ export function ContactSection() {
               {/* Submit */}
               <Button
                 type="submit"
+                disabled={isSubmitting}
                 className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2"
               >
                 Enviar Solicitud

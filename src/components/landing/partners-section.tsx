@@ -1,28 +1,16 @@
 import Image from "next/image"
 import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
+import type { StorefrontEmisivoDestinationItem } from "@/types/storefront/storefront.types"
 
-const destinations = [
-  {
-    name: "Nombre Destino",
-    description: "Breve descripción del viaje",
-    image: "/landing/placeholder-3.png",
-  },
-  {
-    name: "Nombre Destino",
-    description: "Breve descripción del viaje",
-    image: "/landing/placeholder-3.png",
-  },
-  {
-    name: "Nombre Destino",
-    description: "Breve descripción del viaje",
-    image: "/landing/placeholder-3.png",
-  },
-]
+interface PartnersSectionProps {
+  destinations: StorefrontEmisivoDestinationItem[]
+}
 
-export function PartnersSection() {
+export function PartnersSection({ destinations }: PartnersSectionProps) {
   return (
-    <section className="bg-dark-brown py-16 md:py-24">
+    <section id="emisivo" className="bg-dark-brown py-16 md:py-24">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Para Agencias y Operadores */}
         <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-start mb-20">
@@ -42,7 +30,7 @@ export function PartnersSection() {
               asChild
               className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
             >
-              <Link href="#contacto">Contactate</Link>
+              <Link href="/para-agencias#contacto">Contactate</Link>
             </Button>
           </div>
           <div className="relative aspect-4/3 rounded-lg overflow-hidden">
@@ -71,8 +59,8 @@ export function PartnersSection() {
         </div>
 
         <div className="grid gap-6 md:grid-cols-3 mb-12">
-          {destinations.map((destination, index) => (
-            <Link key={index} href="#" className="group block">
+          {destinations.map((destination) => (
+            <Link key={destination.id} href={destination.href} className="group block">
               <div className="relative aspect-4/3 rounded-lg overflow-hidden mb-4">
                 <Image
                   src={destination.image}
@@ -92,15 +80,14 @@ export function PartnersSection() {
         </div>
 
         <div className="text-center">
-          <Link href="#emisivo">
-            <Button
-              variant="default"
-              size="lg"
-              className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
-            >
-              Consultar Viajes al Exterior
-            </Button>
-          </Link>
+          <Button
+            asChild
+            variant="default"
+            size="lg"
+            className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
+          >
+            <Link href="/emisivo">Consultar Viajes al Exterior</Link>
+          </Button>
         </div>
       </div>
     </section>

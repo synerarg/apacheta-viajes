@@ -1,15 +1,41 @@
 import Image from "next/image"
 import { BedDouble, Car, Utensils, User, Ticket, MapPin } from "lucide-react"
-import { SidebarCotizacion } from "@/components/product/sidebar-cotizacion"
 import { ImageGallery } from "@/components/product/image-gallery"
+import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
 import { UbicacionMap } from "@/components/product/ubicacion-map"
-import type { PaqueteMock } from "@/lib/mock-data/paquetes"
 
-interface PaqueteViewProps {
-  paquete: PaqueteMock
+export interface PaqueteViewData {
+  id: string
+  nombre: string
+  descripcion_corta: string
+  duracion_dias: number
+  precio_desde: number
+  moneda: string
+  imagen_url: string
+  incluye_alojamiento: boolean
+  incluye_traslado: boolean
+  incluye_comidas: boolean
+  incluye_guia: boolean
+  incluye_entradas: boolean
+  categoria: string
+  fecha_salida?: string
+  itinerario: Array<{
+    dia: number
+    titulo: string
+    descripcion: string
+  }>
+  galeria: string[]
+  ubicacion: string
+  latitud: number
+  longitud: number
+  paqueteFechaId: string | null
 }
 
-const incluyeItems = (paquete: PaqueteMock) => [
+interface PaqueteViewProps {
+  paquete: PaqueteViewData
+}
+
+const incluyeItems = (paquete: PaqueteViewData) => [
   {
     icon: <BedDouble className="w-5 h-5 text-primary" />,
     label: "Alojamiento",
@@ -132,7 +158,7 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
                 Galería
               </h2>
               <ImageGallery
-                images={[paquete.imagen_url].filter(Boolean)}
+                images={paquete.galeria}
                 alt={paquete.nombre}
               />
             </section>
@@ -145,13 +171,13 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
               <div className="flex items-center gap-2 mb-5">
                 <MapPin className="w-4 h-4 text-primary" />
                 <span className="font-sans text-sm text-subtle">
-                  Salta & Jujuy, Argentina
+                  {paquete.ubicacion}
                 </span>
               </div>
               <UbicacionMap
                 nombre={paquete.nombre}
-                latitud={-24.7859}
-                longitud={-65.4117}
+                latitud={paquete.latitud}
+                longitud={paquete.longitud}
               />
             </section>
           </div>
@@ -159,12 +185,29 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
           {/* Right Sidebar */}
           <div className="lg:w-[380px] flex-shrink-0">
             <div className="sticky top-28">
-              <SidebarCotizacion
+              <SidebarCotizacionCart
                 precio={paquete.precio_desde}
                 moneda={paquete.moneda}
                 fecha={paquete.fecha_salida}
                 duracion={duracion}
                 tipo="paquete"
+                cartItem={
+                  paquete.paqueteFechaId
+                    ? {
+                        id: `paquete:${paquete.paqueteFechaId}`,
+                        kind: "paquete",
+                        category: paquete.categoria,
+                        name: paquete.nombre,
+                        description: paquete.descripcion_corta,
+                        unitPrice: paquete.precio_desde,
+                        quantity: 1,
+                        image: paquete.imagen_url,
+                        moneda: paquete.moneda,
+                        paqueteFechaId: paquete.paqueteFechaId,
+                        experienciaId: null,
+                      }
+                    : null
+                }
               />
             </div>
           </div>

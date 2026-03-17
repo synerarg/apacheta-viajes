@@ -1,3 +1,5 @@
+import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
 
 export function HeroSection() {
@@ -40,17 +42,19 @@ export function HeroSection() {
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Button
+            asChild
             size="lg"
             className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-base"
           >
-            Explorar Paquetes
+            <Link href="/#paquetes">Explorar Paquetes</Link>
           </Button>
           <Button
+            asChild
             size="lg"
             variant="outline"
             className="border-white text-white hover:bg-white/10 bg-transparent px-8 py-6 text-base"
           >
-            Armar mi viaje
+            <Link href="/#contacto">Armar mi viaje</Link>
           </Button>
         </div>
       </div>

@@ -1,12 +1,29 @@
 import Image from "next/image"
 import { MapPin } from "lucide-react"
-import { SidebarCotizacion } from "@/components/product/sidebar-cotizacion"
 import { ImageGallery } from "@/components/product/image-gallery"
+import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
 import { UbicacionMap } from "@/components/product/ubicacion-map"
-import type { ExperienciaMock } from "@/lib/mock-data/experiencias"
+
+export interface ExperienciaViewData {
+  id: string
+  nombre: string
+  descripcion: string
+  descripcion_corta: string
+  duracion_horas: number
+  precio: number
+  moneda: string
+  imagen_url: string
+  ubicacion: string
+  latitud: number
+  longitud: number
+  categoria: string
+  fecha_salida?: string
+  longitud_km?: number
+  galeria?: string[]
+}
 
 interface ExperienciaViewProps {
-  experiencia: ExperienciaMock
+  experiencia: ExperienciaViewData
 }
 
 export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
@@ -98,13 +115,26 @@ export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
           {/* Right Sidebar */}
           <div className="lg:w-[380px] flex-shrink-0">
             <div className="sticky top-28">
-              <SidebarCotizacion
+              <SidebarCotizacionCart
                 precio={experiencia.precio}
                 moneda={experiencia.moneda}
                 fecha={experiencia.fecha_salida}
                 duracion={duracion}
                 longitud={longitud}
                 tipo="experiencia"
+                cartItem={{
+                  id: `experiencia:${experiencia.id}`,
+                  kind: "experiencia",
+                  category: experiencia.categoria,
+                  name: experiencia.nombre,
+                  description: experiencia.descripcion_corta,
+                  unitPrice: experiencia.precio,
+                  quantity: 1,
+                  image: experiencia.imagen_url,
+                  moneda: experiencia.moneda,
+                  paqueteFechaId: null,
+                  experienciaId: experiencia.id,
+                }}
               />
             </div>
           </div>

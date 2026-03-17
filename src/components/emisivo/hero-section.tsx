@@ -1,6 +1,10 @@
 import Image from "next/image"
 
-export function HeroSection() {
+interface HeroSectionProps {
+  image: string
+}
+
+export function HeroSection({ image }: HeroSectionProps) {
   return (
     <section className="min-h-[80vh] pt-24 pb-16 bg-off-white">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
@@ -22,7 +26,7 @@ export function HeroSection() {
           {/* Right Column - Image: rectangular, no border radius */}
           <div className="relative h-[400px] lg:h-[500px] overflow-hidden">
             <Image
-              src=""
+              src={image}
               alt="Avión en pista de aeropuerto"
               fill
               className="object-cover"

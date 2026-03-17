@@ -3,18 +3,26 @@
 import { useState } from "react"
 import { FilterBar } from "@/components/catalog/filter-bar"
 import { PackageCard } from "@/components/catalog/package-card"
-import { paquetesMock, categoriasPaquetes } from "@/lib/mock-data/paquetes"
+import type { StorefrontPackageItem } from "@/types/storefront/storefront.types"
 
 const ITEMS_PER_PAGE = 3
 
-export function CatalogoPaquetes() {
+interface CatalogoPaquetesProps {
+  paquetes: StorefrontPackageItem[]
+  categorias: string[]
+}
+
+export function CatalogoPaquetes({
+  paquetes,
+  categorias,
+}: CatalogoPaquetesProps) {
   const [activeCategoria, setActiveCategoria] = useState("Todos")
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
   const filtered =
     activeCategoria === "Todos"
-      ? paquetesMock
-      : paquetesMock.filter((p) => p.categoria === activeCategoria)
+      ? paquetes
+      : paquetes.filter((paquete) => paquete.category === activeCategoria)
 
   const visible = filtered.slice(0, visibleCount)
   const hasMore = visibleCount < filtered.length
@@ -45,7 +53,7 @@ export function CatalogoPaquetes() {
         {/* Filters */}
         <div className="mb-10">
           <FilterBar
-            categorias={categoriasPaquetes}
+            categorias={categorias}
             activeCategoria={activeCategoria}
             onCategoriaChange={handleCategoriaChange}
           />

@@ -1,10 +1,11 @@
 import Image from "next/image"
 import Link from "next/link"
 import { Calendar, Clock } from "lucide-react"
-import type { PaqueteMock } from "@/lib/mock-data/paquetes"
+
+import type { StorefrontPackageItem } from "@/types/storefront/storefront.types"
 
 interface PackageCardProps {
-  paquete: PaqueteMock
+  paquete: StorefrontPackageItem
 }
 
 export function PackageCard({ paquete }: PackageCardProps) {
@@ -12,10 +13,10 @@ export function PackageCard({ paquete }: PackageCardProps) {
     <div className="flex flex-col md:flex-row gap-0 border-b border-dark-brown/15 pb-10 mb-10">
       {/* Image */}
       <div className="relative w-full md:w-[572px] h-[220px] md:h-[313px] flex-shrink-0 overflow-hidden bg-muted">
-        {paquete.imagen_url && (
+        {paquete.image && (
           <Image
-            src={paquete.imagen_url}
-            alt={paquete.nombre}
+            src={paquete.image}
+            alt={paquete.name}
             fill
             className="object-cover"
           />
@@ -27,34 +28,34 @@ export function PackageCard({ paquete }: PackageCardProps) {
         <div>
           {/* Category tag */}
           <span className="text-xs uppercase tracking-[0.18em] text-subtle font-sans block mb-2">
-            {paquete.categoria}
+            {paquete.category}
           </span>
 
           {/* Title */}
           <h3 className="font-serif text-2xl md:text-3xl font-medium text-dark-brown mb-4 leading-tight">
-            {paquete.nombre}
+            {paquete.name}
           </h3>
 
           {/* Meta */}
           <div className="flex flex-wrap gap-5 mb-4">
-            {paquete.fecha_salida && (
+            {paquete.departureLabel && (
               <div className="flex items-center gap-2 text-sm text-subtle font-sans">
                 <Calendar className="w-4 h-4 text-primary flex-shrink-0" />
-                <span>{paquete.fecha_salida}</span>
+                <span>{paquete.departureLabel}</span>
               </div>
             )}
             <div className="flex items-center gap-2 text-sm text-subtle font-sans">
               <Clock className="w-4 h-4 text-primary flex-shrink-0" />
               <span>
-                {paquete.duracion_dias}{" "}
-                {paquete.duracion_dias === 1 ? "día" : "días"}
+                {paquete.durationDays}{" "}
+                {paquete.durationDays === 1 ? "día" : "días"}
               </span>
             </div>
           </div>
 
           {/* Description */}
           <p className="text-sm md:text-base text-subtle font-sans leading-relaxed line-clamp-3 mb-6">
-            {paquete.descripcion_corta}
+            {paquete.description}
           </p>
         </div>
 
@@ -72,7 +73,7 @@ export function PackageCard({ paquete }: PackageCardProps) {
               Desde
             </p>
             <p className="font-sans text-2xl md:text-3xl font-bold text-primary">
-              ARS ${paquete.precio_desde.toLocaleString("es-AR")}
+              {paquete.currency} ${paquete.price.toLocaleString("es-AR")}
             </p>
           </div>
         </div>

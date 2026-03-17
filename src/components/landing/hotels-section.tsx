@@ -1,31 +1,13 @@
 import Image from "next/image"
 import Link from "next/link"
+
 import { Button } from "@/components/ui/button"
+import type { StorefrontHotelItem } from "@/types/storefront/storefront.types"
 import { Star } from "lucide-react"
 
-const hotels = [
-  {
-    id: 1,
-    name: "Nombre Hotel 1",
-    location: "Ubicación del Hotel",
-    image: "/landing/placeholder-2.png",
-    stars: 4,
-  },
-  {
-    id: 2,
-    name: "Nombre Hotel 2",
-    location: "Ubicación del Hotel",
-    image: "/landing/placeholder-2.png",
-    stars: 5,
-  },
-  {
-    id: 3,
-    name: "Nombre Hotel 3",
-    location: "Ubicación del Hotel",
-    image: "/landing/placeholder-2.png",
-    stars: 3,
-  },
-]
+interface HotelsSectionProps {
+  hotels: StorefrontHotelItem[]
+}
 
 function StarRating({ count }: { count: number }) {
   return (
@@ -42,9 +24,9 @@ function StarRating({ count }: { count: number }) {
   )
 }
 
-export function HotelsSection() {
+export function HotelsSection({ hotels }: HotelsSectionProps) {
   return (
-    <section className="py-16 md:py-24">
+    <section id="hoteleria" className="py-16 md:py-24">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="mb-12 text-center">
@@ -59,7 +41,7 @@ export function HotelsSection() {
         {/* Hotels Grid */}
         <div className="mx-auto grid gap-8 md:grid-cols-3">
           {hotels.map((hotel) => (
-            <Link key={hotel.id} href="#" className="group block">
+            <Link key={hotel.id} href={hotel.href} className="group block">
               <div className="mb-4 aspect-4/5 overflow-hidden rounded-lg">
                 <Image
                   src={hotel.image}
@@ -82,7 +64,7 @@ export function HotelsSection() {
 
         {/* CTA Button */}
         <div className="mt-12 text-center">
-          <Link href="#hotelería">
+          <Link href="/#contacto">
             <Button
               variant="default"
               size="lg"

@@ -19,7 +19,6 @@ export function SidebarCotizacion({
   fecha,
   duracion,
   longitud,
-  tipo,
   onAgregarAlCarro,
 }: SidebarCotizacionProps) {
   const [added, setAdded] = useState(false)

@@ -3,31 +3,20 @@
 import { useState } from "react"
 import Image from "next/image"
 
-const destinations = [
-  {
-    id: "peru",
-    name: "Perú & Camino Inca",
-    image: "",
-  },
-  {
-    id: "caribe",
-    name: "Caribe & Centroamérica",
-    image: "",
-  },
-  {
-    id: "europa",
-    name: "Europa Clásica",
-    image: "",
-  },
-  {
-    id: "usa",
-    name: "Estados Unidos",
-    image: "",
-  },
-]
+import type { StorefrontEmisivoDestinationItem } from "@/types/storefront/storefront.types"
 
-export function DestinationsSection() {
-  const [activeDestination, setActiveDestination] = useState(destinations[0])
+interface DestinationsSectionProps {
+  destinations: StorefrontEmisivoDestinationItem[]
+}
+
+export function DestinationsSection({ destinations }: DestinationsSectionProps) {
+  const [activeDestination, setActiveDestination] = useState(
+    destinations[0] ?? null,
+  )
+
+  if (!activeDestination) {
+    return null
+  }
 
   return (
     <section className="py-20 lg:py-28 bg-off-white">
