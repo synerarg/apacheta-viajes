@@ -51,6 +51,16 @@ import type {
   HotelesImagenesUpdate,
 } from "@/types/hoteles-imagenes/hoteles-imagenes.types"
 import type {
+  OrdenesInsert,
+  OrdenesRow,
+  OrdenesUpdate,
+} from "@/types/ordenes/ordenes.types"
+import type {
+  OrdenesItemsInsert,
+  OrdenesItemsRow,
+  OrdenesItemsUpdate,
+} from "@/types/ordenes-items/ordenes-items.types"
+import type {
   PaquetesCategoriasInsert,
   PaquetesCategoriasRow,
   PaquetesCategoriasUpdate,
@@ -75,6 +85,16 @@ import type {
   PaquetesRow,
   PaquetesUpdate,
 } from "@/types/paquetes/paquetes.types"
+import type {
+  PagosInsert,
+  PagosRow,
+  PagosUpdate,
+} from "@/types/pagos/pagos.types"
+import type {
+  PagosEventosInsert,
+  PagosEventosRow,
+  PagosEventosUpdate,
+} from "@/types/pagos-eventos/pagos-eventos.types"
 import type {
   ReservasInsert,
   ReservasRow,
@@ -217,6 +237,41 @@ export interface Database {
           },
         ]
       }
+      ordenes: {
+        Row: OrdenesRow
+        Insert: OrdenesInsert
+        Update: OrdenesUpdate
+        Relationships: [
+          {
+            foreignKeyName: "ordenes_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ordenes_items: {
+        Row: OrdenesItemsRow
+        Insert: OrdenesItemsInsert
+        Update: OrdenesItemsUpdate
+        Relationships: [
+          {
+            foreignKeyName: "ordenes_items_orden_id_fkey"
+            columns: ["orden_id"]
+            isOneToOne: false
+            referencedRelation: "ordenes"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "ordenes_items_reserva_id_fkey"
+            columns: ["reserva_id"]
+            isOneToOne: false
+            referencedRelation: "reservas"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       paquetes: {
         Row: PaquetesRow
         Insert: PaquetesInsert
@@ -290,6 +345,34 @@ export interface Database {
             columns: ["paquete_id"]
             isOneToOne: false
             referencedRelation: "paquetes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pagos: {
+        Row: PagosRow
+        Insert: PagosInsert
+        Update: PagosUpdate
+        Relationships: [
+          {
+            foreignKeyName: "pagos_orden_id_fkey"
+            columns: ["orden_id"]
+            isOneToOne: false
+            referencedRelation: "ordenes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pagos_eventos: {
+        Row: PagosEventosRow
+        Insert: PagosEventosInsert
+        Update: PagosEventosUpdate
+        Relationships: [
+          {
+            foreignKeyName: "pagos_eventos_pago_id_fkey"
+            columns: ["pago_id"]
+            isOneToOne: false
+            referencedRelation: "pagos"
             referencedColumns: ["id"]
           },
         ]

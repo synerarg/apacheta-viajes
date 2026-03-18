@@ -30,5 +30,35 @@ export interface LastCheckoutSnapshot {
   submittedAt: string
   paymentMethod: "mercadopago" | "transferencia" | "efectivo"
   items: CartItem[]
+  order: {
+    orderId: string
+    reference: string
+    status: string
+    paymentStatus: string
+    total: number
+    currency: string
+  }
+  payment: {
+    paymentId: string
+    method: string
+    status: string
+    amount: number
+    currency: string
+    externalReference: string
+    redirectUrl: string | null
+    expiresAt: string | null
+    receiptReference: string | null
+    receiptUrl: string | null
+  } | null
   reservations: CheckoutReservationSnapshot[]
+  bankTransfer: {
+    paymentId: string
+    expiresAt: string
+    reference: string
+    status: string
+    amount: number
+    currency: string
+    receiptReference: string | null
+    receiptUrl: string | null
+  } | null
 }

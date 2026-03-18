@@ -1,5 +1,6 @@
-import { createClient } from "@/lib/supabase/server"
+import { adminClient } from "@/lib/supabase/admin-client"
 import { createCheckoutService, type CheckoutService } from "@/services/checkout/checkout.service"
+import type { DatabaseClient } from "@/types/database/database.types"
 import type { CheckoutSubmitInput, CheckoutUserContext } from "@/types/checkout/checkout.types"
 
 export class CheckoutController {
@@ -11,10 +12,18 @@ export class CheckoutController {
   ) {
     return this.checkoutService.submitCheckout(input, user)
   }
+
+  async getOrderSummary(orderId: string, user: CheckoutUserContext | null) {
+    return this.checkoutService.getOrderSummary(orderId, user)
+  }
+
+  async listUserOrders(user: CheckoutUserContext | null) {
+    return this.checkoutService.listUserOrders(user)
+  }
 }
 
 export async function createServerCheckoutController() {
-  const supabase = await createClient()
-
-  return new CheckoutController(createCheckoutService(supabase))
+  return new CheckoutController(
+    createCheckoutService(adminClient as DatabaseClient),
+  )
 }

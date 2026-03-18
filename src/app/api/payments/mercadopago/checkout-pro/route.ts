@@ -4,7 +4,7 @@ import { z } from "zod"
 import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
 
 const createMercadoPagoCheckoutProSchema = z.object({
-  reservationId: z.string().uuid(),
+  orderId: z.string().uuid(),
   title: z.string().min(1).optional(),
   description: z.string().min(1).optional(),
   payer: z

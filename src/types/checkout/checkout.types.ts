@@ -1,5 +1,9 @@
 import type { CartItem, CheckoutReservationSnapshot } from "@/types/cart/cart.types"
-import type { BankTransferPaymentResult } from "@/types/payments/payments.types"
+import type {
+  BankTransferPaymentResult,
+  CheckoutOrderSummary,
+  CheckoutPaymentSummary,
+} from "@/types/payments/payments.types"
 
 export type CheckoutPaymentMethod = "mercadopago" | "transferencia" | "efectivo"
 
@@ -32,8 +36,19 @@ export interface CheckoutUserContext {
 
 export interface CheckoutSubmitResult {
   paymentMethod: CheckoutPaymentMethod
+  order: {
+    orderId: string
+    reference: string
+    status: CheckoutOrderSummary["status"]
+    paymentStatus: CheckoutOrderSummary["paymentStatus"]
+    total: number
+    currency: string
+  }
+  payment: CheckoutPaymentSummary | null
   reservations: CheckoutReservationSnapshot[]
   redirectUrl: string | null
   successUrl: string
   bankTransfer: BankTransferPaymentResult | null
 }
+
+export type CheckoutOrderDetailResult = CheckoutOrderSummary

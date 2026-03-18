@@ -67,6 +67,7 @@ export function getBankTransferConfig() {
       "BANK_TRANSFER_ACCOUNT_HOLDER",
       BankTransferConfigurationException,
     ),
+    taxId: getEnvironmentVariable("BANK_TRANSFER_ACCOUNT_TAX_ID") ?? null,
     alias: getRequiredEnvironmentVariable(
       "BANK_TRANSFER_ALIAS",
       BankTransferConfigurationException,
@@ -78,6 +79,27 @@ export function getBankTransferConfig() {
     receiptEmail: getEnvironmentVariable("BANK_TRANSFER_RECEIPT_EMAIL") ?? null,
     paymentWindowHours: Number(
       getEnvironmentVariable("BANK_TRANSFER_PAYMENT_WINDOW_HOURS") ?? "24",
+    ),
+    receiptBucket: getRequiredEnvironmentVariable(
+      "BANK_TRANSFER_RECEIPT_BUCKET",
+      BankTransferConfigurationException,
+    ),
+    receiptMaxBytes: Number(
+      getEnvironmentVariable("BANK_TRANSFER_RECEIPT_MAX_BYTES") ?? "10485760",
+    ),
+    allowedReceiptMimeTypes: (
+      getEnvironmentVariable("BANK_TRANSFER_ALLOWED_MIME_TYPES") ??
+      "application/pdf,image/jpeg,image/png,image/webp"
+    )
+      .split(",")
+      .map((value) => value.trim())
+      .filter(Boolean),
+    receiptMaxReuploads: Number(
+      getEnvironmentVariable("BANK_TRANSFER_RECEIPT_MAX_REUPLOADS") ?? "3",
+    ),
+    receiptSignedUrlTtlSeconds: Number(
+      getEnvironmentVariable("BANK_TRANSFER_RECEIPT_SIGNED_URL_TTL_SECONDS") ??
+        "300",
     ),
   }
 }

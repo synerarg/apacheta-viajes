@@ -108,7 +108,21 @@ export function CheckoutView() {
         submittedAt: new Date().toISOString(),
         paymentMethod: result.paymentMethod,
         items,
+        order: result.order,
+        payment: result.payment,
         reservations: result.reservations,
+        bankTransfer: result.bankTransfer
+          ? {
+              paymentId: result.bankTransfer.paymentId,
+              expiresAt: result.bankTransfer.expiresAt,
+              reference: result.bankTransfer.reference,
+              status: result.bankTransfer.status,
+              amount: result.bankTransfer.amount,
+              currency: result.bankTransfer.currency,
+              receiptReference: result.bankTransfer.receiptReference,
+              receiptUrl: result.bankTransfer.receiptUrl,
+            }
+          : null,
       })
 
       clearCart()

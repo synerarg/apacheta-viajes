@@ -1,11 +1,11 @@
 import { adminClient } from "@/lib/supabase/admin-client"
-import { createClient } from "@/lib/supabase/server"
 import { createPaymentsService, type PaymentsService } from "@/services/payments/payments.service"
 import type {
   ConfirmBankTransferInput,
   CreateBankTransferPaymentInput,
   CreateMercadoPagoCheckoutProInput,
   CreatePaymentInput,
+  UploadBankTransferReceiptInput,
 } from "@/types/payments/payments.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
@@ -35,18 +35,34 @@ export class PaymentsController {
   }
 
   async confirmBankTransfer(input: ConfirmBankTransferInput) {
-    return this.paymentsService.confirmBankTransfer(input.reservationId, {
+    return this.paymentsService.confirmBankTransfer({
+      paymentId: input.paymentId,
       payer: input.payer,
       note: input.note,
       receiptReference: input.receiptReference,
     })
   }
+
+  async uploadBankTransferReceipt(input: UploadBankTransferReceiptInput) {
+    return this.paymentsService.uploadBankTransferReceipt(input)
+  }
+
+  async getCheckoutOrderSummary(orderId: string) {
+    return this.paymentsService.getCheckoutOrderSummary(orderId)
+  }
+
+  async getBankTransferReceiptDownloadUrl(paymentId: string, userId: string) {
+    return this.paymentsService.getBankTransferReceiptDownloadUrl({
+      paymentId,
+      userId,
+    })
+  }
 }
 
 export async function createServerPaymentsController() {
-  const supabase = await createClient()
-
-  return new PaymentsController(createPaymentsService(supabase))
+  return new PaymentsController(
+    createPaymentsService(adminClient as DatabaseClient),
+  )
 }
 
 export function createAdminPaymentsController() {

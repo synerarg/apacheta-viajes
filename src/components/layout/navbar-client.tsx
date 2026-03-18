@@ -51,6 +51,9 @@ export function NavbarClient({ user }: NavbarClientProps) {
   const { totalItems } = useCart()
   const router = useRouter()
   const displayName = resolveDisplayName(user)
+  const resolvedNavLinks = user
+    ? [...navLinks, { href: "/mis-reservas", label: "Mis reservas" }]
+    : navLinks
 
   function handleSignOut() {
     startSigningOut(async () => {
@@ -74,7 +77,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
         </Link>
 
         <div className="hidden items-center gap-6 lg:flex xl:gap-8">
-          {navLinks.map((link) => (
+          {resolvedNavLinks.map((link) => (
             <Link
               key={link.label}
               href={link.href}
@@ -154,7 +157,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
             </SheetHeader>
 
             <nav className="mt-8 flex flex-col gap-2">
-              {navLinks.map((link) => (
+              {resolvedNavLinks.map((link) => (
                 <Link
                   key={link.label}
                   href={link.href}
