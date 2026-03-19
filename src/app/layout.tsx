@@ -3,8 +3,7 @@ import { Playfair_Display, Lato } from "next/font/google"
 import { Toaster } from "sonner"
 
 import { AuthSessionSync } from "@/components/auth/auth-session-sync"
-import { Navbar } from "@/components/layout/navbar"
-import { Footer } from "@/components/layout/footer"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 import "./globals.css"
 
@@ -38,11 +37,11 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${lato.className} antialiased`}
       >
-        <AuthSessionSync />
-        <Toaster richColors position="top-right" />
-        <Navbar />
-        {children}
-        <Footer />
+        <TooltipProvider>
+          <AuthSessionSync />
+          <Toaster richColors position="top-right" />
+          {children}
+        </TooltipProvider>
       </body>
     </html>
   )

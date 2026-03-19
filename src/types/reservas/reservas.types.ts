@@ -1,11 +1,5 @@
-export type ReservaTipo = "paquete" | "experiencia"
-
-export type ReservaEstado =
-  | "pendiente"
-  | "confirmada"
-  | "pagada"
-  | "completada"
-  | "cancelada"
+export type { ReservaTipo, ReservaEstado } from "@/types/shared/enums"
+import type { ReservaTipo, ReservaEstado, Moneda } from "@/types/shared/enums"
 
 export interface ReservasRow {
   id: string
@@ -17,7 +11,7 @@ export interface ReservasRow {
   cantidad_pasajeros: number
   precio_unitario: number
   precio_total: number
-  moneda: string | null
+  moneda: Moneda | null
   notas: string | null
   created_at: string | null
   updated_at: string | null
@@ -33,7 +27,7 @@ export interface ReservasInsert {
   cantidad_pasajeros?: number
   precio_unitario: number
   precio_total: number
-  moneda?: string | null
+  moneda?: Moneda | null
   notas?: string | null
   created_at?: string | null
   updated_at?: string | null
@@ -49,7 +43,7 @@ export interface ReservasUpdate {
   cantidad_pasajeros?: number
   precio_unitario?: number
   precio_total?: number
-  moneda?: string | null
+  moneda?: Moneda | null
   notas?: string | null
   created_at?: string | null
   updated_at?: string | null

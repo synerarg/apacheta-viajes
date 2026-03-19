@@ -55,6 +55,20 @@ export async function updateSession(request: NextRequest) {
       }
       return NextResponse.redirect(new URL("/login", request.url))
     }
+
+    // Verificar que el usuario tiene rol admin
+    const { data: profile } = await supabase
+      .from("usuarios")
+      .select("tipo")
+      .eq("id", user.id)
+      .maybeSingle()
+
+    if (profile?.tipo !== "admin") {
+      if (isApiRoute) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 })
+      }
+      return NextResponse.redirect(new URL("/", request.url))
+    }
   }
 
   return response

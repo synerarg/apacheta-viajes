@@ -3,6 +3,14 @@ import {
   CheckoutServiceException,
   CheckoutValidationException,
 } from "@/exceptions/checkout/checkout.exceptions"
+import {
+  BankTransferConfigurationException,
+  MercadoPagoConfigurationException,
+} from "@/exceptions/payments/payments.exceptions"
+import {
+  getBankTransferConfig,
+  getMercadoPagoConfig,
+} from "@/lib/payments/payments.config"
 import { createExperienciasRepository } from "@/repositories/experiencias/experiencias.repository"
 import { createOrdenesItemsRepository } from "@/repositories/ordenes-items/ordenes-items.repository"
 import { createOrdenesRepository } from "@/repositories/ordenes/ordenes.repository"
@@ -72,6 +80,38 @@ function mapCheckoutPaymentMethod(method: CheckoutSubmitInput["paymentMethod"]):
   return "cash_local"
 }
 
+function assertCheckoutPaymentConfigured(
+  paymentMethod: CheckoutSubmitInput["paymentMethod"],
+) {
+  try {
+    if (paymentMethod === "mercadopago") {
+      getMercadoPagoConfig()
+      return
+    }
+
+    if (paymentMethod === "transferencia") {
+      getBankTransferConfig()
+    }
+  } catch (error) {
+    if (
+      error instanceof MercadoPagoConfigurationException ||
+      error instanceof BankTransferConfigurationException
+    ) {
+      throw new CheckoutValidationException(
+        error instanceof MercadoPagoConfigurationException
+          ? "Mercado Pago no está configurado correctamente."
+          : "La transferencia bancaria no está configurada correctamente.",
+        {
+          cause:
+            error.cause instanceof Error ? error.cause.message : error.message,
+        },
+      )
+    }
+
+    throw error
+  }
+}
+
 export class CheckoutService {
   private readonly reservasService
   private readonly paquetesFechasService
@@ -117,6 +157,8 @@ export class CheckoutService {
       if (input.items.length === 0) {
         throw new CheckoutValidationException("Cart is empty")
       }
+
+      assertCheckoutPaymentConfigured(input.paymentMethod)
 
       const orderReference = buildOrderReference()
       const paymentMethod = mapCheckoutPaymentMethod(input.paymentMethod)

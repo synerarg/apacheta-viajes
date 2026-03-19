@@ -3,6 +3,7 @@ import { BedDouble, Car, Utensils, User, Ticket, MapPin } from "lucide-react"
 import { ImageGallery } from "@/components/product/image-gallery"
 import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
 import { UbicacionMap } from "@/components/product/ubicacion-map"
+import type { Moneda } from "@/types/shared/enums"
 
 export interface PaqueteViewData {
   id: string
@@ -10,7 +11,7 @@ export interface PaqueteViewData {
   descripcion_corta: string
   duracion_dias: number
   precio_desde: number
-  moneda: string
+  moneda: Moneda
   imagen_url: string
   incluye_alojamiento: boolean
   incluye_traslado: boolean

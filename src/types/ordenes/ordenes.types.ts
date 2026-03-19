@@ -1,3 +1,6 @@
+export type { OrdenEstado, PagoEstado, MetodoPago } from "@/types/shared/enums"
+import type { OrdenEstado, PagoEstado, MetodoPago, Moneda } from "@/types/shared/enums"
+
 type DatabaseJson =
   | string
   | number
@@ -6,38 +9,19 @@ type DatabaseJson =
   | { [key: string]: DatabaseJson | undefined }
   | DatabaseJson[]
 
-export type OrdenEstado =
-  | "pendiente"
-  | "pago_pendiente"
-  | "pago_reportado"
-  | "pagada"
-  | "confirmada"
-  | "cancelada"
-  | "completada"
-
-export type OrdenEstadoPago =
-  | "pending"
-  | "requires_action"
-  | "reported"
-  | "approved"
-  | "rejected"
-  | "cancelled"
-  | "expired"
-
-export type OrdenMetodoPago =
-  | "mercadopago_checkout_pro"
-  | "bank_transfer"
-  | "cash_local"
+// Re-export legacy aliases for backwards compatibility
+export type OrdenEstadoPago = PagoEstado
+export type OrdenMetodoPago = MetodoPago
 
 export interface OrdenesRow {
   id: string
   usuario_id: string
   codigo_referencia: string
   estado: OrdenEstado
-  estado_pago: OrdenEstadoPago
-  metodo_pago: OrdenMetodoPago
+  estado_pago: PagoEstado
+  metodo_pago: MetodoPago
   total: number
-  moneda: string
+  moneda: Moneda
   contacto: DatabaseJson | null
   pasajero_principal: DatabaseJson | null
   notas: string | null
@@ -50,10 +34,10 @@ export interface OrdenesInsert {
   usuario_id: string
   codigo_referencia: string
   estado?: OrdenEstado
-  estado_pago?: OrdenEstadoPago
-  metodo_pago: OrdenMetodoPago
+  estado_pago?: PagoEstado
+  metodo_pago: MetodoPago
   total: number
-  moneda?: string
+  moneda?: Moneda
   contacto?: DatabaseJson | null
   pasajero_principal?: DatabaseJson | null
   notas?: string | null
@@ -66,10 +50,10 @@ export interface OrdenesUpdate {
   usuario_id?: string
   codigo_referencia?: string
   estado?: OrdenEstado
-  estado_pago?: OrdenEstadoPago
-  metodo_pago?: OrdenMetodoPago
+  estado_pago?: PagoEstado
+  metodo_pago?: MetodoPago
   total?: number
-  moneda?: string
+  moneda?: Moneda
   contacto?: DatabaseJson | null
   pasajero_principal?: DatabaseJson | null
   notas?: string | null

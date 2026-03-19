@@ -1,3 +1,5 @@
+import type { ReservaTipo, Moneda } from "@/types/shared/enums"
+
 type DatabaseJson =
   | string
   | number
@@ -6,20 +8,21 @@ type DatabaseJson =
   | { [key: string]: DatabaseJson | undefined }
   | DatabaseJson[]
 
-export type OrdenItemTipo = "paquete" | "experiencia"
+// Re-export legacy alias
+export type OrdenItemTipo = ReservaTipo
 
 export interface OrdenesItemsRow {
   id: string
   orden_id: string
   reserva_id: string
-  tipo: OrdenItemTipo
+  tipo: ReservaTipo
   nombre: string
   descripcion_corta: string | null
   imagen_url: string | null
   cantidad: number
   precio_unitario: number
   precio_total: number
-  moneda: string
+  moneda: Moneda
   metadata: DatabaseJson | null
   created_at: string | null
   updated_at: string | null
@@ -29,14 +32,14 @@ export interface OrdenesItemsInsert {
   id?: string
   orden_id: string
   reserva_id: string
-  tipo: OrdenItemTipo
+  tipo: ReservaTipo
   nombre: string
   descripcion_corta?: string | null
   imagen_url?: string | null
   cantidad?: number
   precio_unitario: number
   precio_total: number
-  moneda?: string
+  moneda?: Moneda
   metadata?: DatabaseJson | null
   created_at?: string | null
   updated_at?: string | null
@@ -46,14 +49,14 @@ export interface OrdenesItemsUpdate {
   id?: string
   orden_id?: string
   reserva_id?: string
-  tipo?: OrdenItemTipo
+  tipo?: ReservaTipo
   nombre?: string
   descripcion_corta?: string | null
   imagen_url?: string | null
   cantidad?: number
   precio_unitario?: number
   precio_total?: number
-  moneda?: string
+  moneda?: Moneda
   metadata?: DatabaseJson | null
   created_at?: string | null
   updated_at?: string | null

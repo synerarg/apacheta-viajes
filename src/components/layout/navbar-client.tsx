@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ShoppingCartIcon, UserIcon } from "@phosphor-icons/react"
+import { ChartBarIcon, ShoppingCartIcon, UserIcon } from "@phosphor-icons/react"
 import { MenuIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -16,6 +16,11 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useCart } from "@/hooks/use-cart"
 import { createClient } from "@/lib/supabase/client"
 import type { AuthenticatedNavbarUser } from "@/types/auth/auth.types"
@@ -97,40 +102,75 @@ export function NavbarClient({ user }: NavbarClientProps) {
             <Link href="/#paquetes">Explorar Paquetes</Link>
           </Button>
 
-          <div className="flex items-center gap-6 text-white/90">
-            {user ? (
-              <>
-                <button
-                  type="button"
-                  className="flex items-center gap-2 transition-colors hover:text-white"
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
+          <div className="flex items-center gap-2 text-white/90">
+            {/* Carrito */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Link
+                  href="/carrito"
+                  className="relative flex size-9 items-center justify-center transition-colors duration-150 hover:bg-white/20"
+                  aria-label={totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
                 >
-                  <UserIcon className="h-5 w-5" />
-                  <span className="text-sm">
-                    {isSigningOut ? "Saliendo..." : "Salir"}
-                  </span>
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                className="flex items-center gap-2 transition-colors hover:text-white"
-              >
-                <UserIcon className="h-5 w-5" />
-                <span className="text-sm">Ingresar</span>
-              </Link>
-            )}
+                  <ShoppingCartIcon className="h-5 w-5" />
+                  {totalItems > 0 && (
+                    <span className="absolute -right-0.5 -top-0.5 flex size-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary">
+                      {totalItems}
+                    </span>
+                  )}
+                </Link>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
+              </TooltipContent>
+            </Tooltip>
 
-            <Link 
-              href="/carrito"
-              className="flex size-8 items-center justify-center transition-colors duration-150 hover:bg-white/20"
-              aria-label={
-                totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
-              }
-            >
-              <ShoppingCartIcon className="h-5 w-5" />
-            </Link>
+            {/* Usuario */}
+            <Tooltip>
+              <TooltipTrigger asChild>
+                {user ? (
+                  <button
+                    type="button"
+                    className="flex size-9 items-center justify-center transition-colors duration-150 hover:bg-white/20"
+                    onClick={handleSignOut}
+                    disabled={isSigningOut}
+                    aria-label={isSigningOut ? "Saliendo..." : "Cerrar sesión"}
+                  >
+                    <UserIcon className="h-5 w-5" />
+                  </button>
+                ) : (
+                  <Link
+                    href="/login"
+                    className="flex size-9 items-center justify-center transition-colors duration-150 hover:bg-white/20"
+                    aria-label="Ingresar"
+                  >
+                    <UserIcon className="h-5 w-5" />
+                  </Link>
+                )}
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                {user
+                  ? isSigningOut
+                    ? "Saliendo..."
+                    : `Cerrar sesión (${displayName})`
+                  : "Ingresar"}
+              </TooltipContent>
+            </Tooltip>
+
+            {/* Dashboard — solo admin */}
+            {user?.tipo === "admin" && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/dashboard"
+                    className="flex size-9 items-center justify-center transition-colors duration-150 hover:bg-white/20"
+                    aria-label="Dashboard"
+                  >
+                    <ChartBarIcon className="h-5 w-5" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Dashboard admin</TooltipContent>
+              </Tooltip>
+            )}
           </div>
         </div>
 
@@ -180,6 +220,17 @@ export function NavbarClient({ user }: NavbarClientProps) {
                 </Button>
 
                 <div className="mt-2 flex items-center justify-center gap-6 text-white/90">
+                  {user?.tipo === "admin" && (
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center gap-2 transition-colors hover:text-white"
+                      onClick={() => setIsOpen(false)}
+                    >
+                      <ChartBarIcon className="h-5 w-5" />
+                      <span className="text-sm">Dashboard</span>
+                    </Link>
+                  )}
+
                   {user ? (
                     <button
                       type="button"

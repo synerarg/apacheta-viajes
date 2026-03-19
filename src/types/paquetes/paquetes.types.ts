@@ -1,3 +1,5 @@
+import type { Moneda } from "@/types/shared/enums"
+
 export interface PaquetesRow {
   id: string
   nombre: string
@@ -6,7 +8,7 @@ export interface PaquetesRow {
   descripcion_corta: string | null
   duracion_dias: number
   precio_desde: number
-  moneda: string | null
+  moneda: Moneda | null
   imagen_url: string | null
   destino_id: string | null
   incluye_alojamiento: boolean | null
@@ -29,7 +31,7 @@ export interface PaquetesInsert {
   descripcion_corta?: string | null
   duracion_dias?: number
   precio_desde: number
-  moneda?: string | null
+  moneda?: Moneda | null
   imagen_url?: string | null
   destino_id?: string | null
   incluye_alojamiento?: boolean | null
@@ -52,7 +54,7 @@ export interface PaquetesUpdate {
   descripcion_corta?: string | null
   duracion_dias?: number
   precio_desde?: number
-  moneda?: string | null
+  moneda?: Moneda | null
   imagen_url?: string | null
   destino_id?: string | null
   incluye_alojamiento?: boolean | null

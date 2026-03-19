@@ -1,10 +1,6 @@
-import { createElement } from "react"
-import { renderToStaticMarkup } from "react-dom/server"
-
 import {
   NotificationsServiceException,
 } from "@/exceptions/notifications/notifications.exceptions"
-import { TransactionalNotificationEmail } from "@/emails/transactional-notification.email"
 import {
   getTransactionalEmailConfig,
   isTransactionalEmailEnabled,
@@ -18,6 +14,15 @@ type ContactSnapshot = {
   firstName?: string | null
   lastName?: string | null
   email?: string | null
+}
+
+function escapeHtml(value: string) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;")
 }
 
 function formatPrice(amount: number, currency: string) {
@@ -105,6 +110,75 @@ function buildPlainTextEmail(input: {
   ]
     .filter(Boolean)
     .join("\n")
+}
+
+function buildHtmlEmail(input: {
+  previewText: string
+  eyebrow: string
+  title: string
+  greeting: string
+  intro: string
+  orderReference: string
+  total: string
+  paymentMethod: string
+  paymentStatus: string
+  steps: string[]
+  actionLabel?: string
+  actionUrl?: string
+  supportEmail: string
+}) {
+  const stepsMarkup = input.steps
+    .map(
+      (step) =>
+        `<li style="margin:0 0 8px 0;color:#404040;font-size:14px;line-height:1.6;">${escapeHtml(step)}</li>`,
+    )
+    .join("")
+  const actionMarkup =
+    input.actionLabel && input.actionUrl
+      ? `<div style="margin-top:24px;">
+          <a href="${escapeHtml(input.actionUrl)}" style="display:inline-block;background:#0f766e;color:#ffffff;text-decoration:none;padding:12px 18px;font-size:14px;font-weight:600;border-radius:0;">
+            ${escapeHtml(input.actionLabel)}
+          </a>
+        </div>`
+      : ""
+
+  return `<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charSet="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>${escapeHtml(input.title)}</title>
+  </head>
+  <body style="margin:0;padding:32px 16px;background:#f5f5f4;font-family:Georgia,'Times New Roman',serif;color:#171717;">
+    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(input.previewText)}</div>
+    <div style="max-width:640px;margin:0 auto;background:#ffffff;border:1px solid #e7e5e4;">
+      <div style="padding:32px;border-bottom:1px solid #e7e5e4;">
+        <p style="margin:0 0 10px 0;font-size:12px;letter-spacing:0.14em;text-transform:uppercase;color:#0f766e;">${escapeHtml(input.eyebrow)}</p>
+        <h1 style="margin:0;font-size:28px;line-height:1.2;color:#171717;">${escapeHtml(input.title)}</h1>
+      </div>
+      <div style="padding:32px;">
+        <p style="margin:0 0 16px 0;font-size:16px;line-height:1.7;color:#262626;">${escapeHtml(input.greeting)}</p>
+        <p style="margin:0 0 24px 0;font-size:15px;line-height:1.7;color:#404040;">${escapeHtml(input.intro)}</p>
+        <div style="margin-bottom:24px;padding:20px;background:#fafaf9;border:1px solid #e7e5e4;">
+          <p style="margin:0 0 8px 0;font-size:14px;color:#404040;"><strong>Reserva:</strong> ${escapeHtml(input.orderReference)}</p>
+          <p style="margin:0 0 8px 0;font-size:14px;color:#404040;"><strong>Total:</strong> ${escapeHtml(input.total)}</p>
+          <p style="margin:0 0 8px 0;font-size:14px;color:#404040;"><strong>Método de pago:</strong> ${escapeHtml(input.paymentMethod)}</p>
+          <p style="margin:0;font-size:14px;color:#404040;"><strong>Estado del pago:</strong> ${escapeHtml(input.paymentStatus)}</p>
+        </div>
+        <div>
+          <p style="margin:0 0 12px 0;font-size:14px;font-weight:600;color:#171717;">Próximos pasos</p>
+          <ol style="margin:0;padding-left:20px;">${stepsMarkup}</ol>
+        </div>
+        ${actionMarkup}
+      </div>
+      <div style="padding:24px 32px;border-top:1px solid #e7e5e4;background:#fafaf9;">
+        <p style="margin:0;font-size:12px;line-height:1.6;color:#57534e;">
+          Si necesitás ayuda, respondé este email o escribinos a ${escapeHtml(input.supportEmail)}.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>`
 }
 
 export class TransactionalEmailService {
@@ -313,23 +387,21 @@ export class TransactionalEmailService {
       input.context.latestPayment?.estado ?? input.context.order.estado_pago,
     )
     const greetingName = resolveGreetingName(contact)
-    const html = `<!DOCTYPE html>${renderToStaticMarkup(
-      createElement(TransactionalNotificationEmail, {
-        previewText: `${input.subject} - ${orderReference}`,
-        eyebrow: input.eyebrow,
-        title: input.title,
-        greeting: `Hola ${greetingName},`,
-        intro: input.intro,
-        orderReference,
-        total,
-        paymentMethod,
-        paymentStatus,
-        steps: input.steps,
-        actionLabel: input.actionLabel,
-        actionUrl: input.actionUrl,
-        supportEmail: config.supportEmail,
-      }),
-    )}`
+    const html = buildHtmlEmail({
+      previewText: `${input.subject} - ${orderReference}`,
+      eyebrow: input.eyebrow,
+      title: input.title,
+      greeting: `Hola ${greetingName},`,
+      intro: input.intro,
+      orderReference,
+      total,
+      paymentMethod,
+      paymentStatus,
+      steps: input.steps,
+      actionLabel: input.actionLabel,
+      actionUrl: input.actionUrl,
+      supportEmail: config.supportEmail ?? config.from ?? "soporte@apacheta-viajes.com",
+    })
     const text = buildPlainTextEmail({
       title: input.title,
       intro: input.intro,

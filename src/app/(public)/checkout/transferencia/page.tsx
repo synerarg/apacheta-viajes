@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useMemo, useRef, useState } from "react"
+import { Suspense, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Copy, Check, Plus, FileText } from "lucide-react"
@@ -26,7 +26,7 @@ function getRemainingSeconds(expiresAt?: string | null) {
   return Math.max(0, diff)
 }
 
-export default function TransferenciaPage() {
+function TransferenciaPageContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -356,5 +356,13 @@ export default function TransferenciaPage() {
         </p>
       </div>
     </main>
+  )
+}
+
+export default function TransferenciaPage() {
+  return (
+    <Suspense fallback={null}>
+      <TransferenciaPageContent />
+    </Suspense>
   )
 }

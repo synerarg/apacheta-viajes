@@ -2,7 +2,11 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import { createServerCheckoutController } from "@/controllers/checkout/checkout.controller"
-import { CheckoutAuthenticationException, CheckoutValidationException } from "@/exceptions/checkout/checkout.exceptions"
+import {
+  CheckoutAuthenticationException,
+  CheckoutServiceException,
+  CheckoutValidationException,
+} from "@/exceptions/checkout/checkout.exceptions"
 import { createClient } from "@/lib/supabase/server"
 
 const cartItemSchema = z.object({
@@ -14,7 +18,7 @@ const cartItemSchema = z.object({
   unitPrice: z.number().nonnegative(),
   quantity: z.number().int().positive(),
   image: z.string(),
-  moneda: z.string().min(1),
+  moneda: z.enum(["ARS", "USD", "EUR", "BRL", "MXN", "CLP", "COP", "PEN", "UYU"]),
   paqueteFechaId: z.string().uuid().nullable(),
   experienciaId: z.string().uuid().nullable(),
 })
@@ -36,6 +40,22 @@ const checkoutSubmitSchema = z.object({
     specialRequirements: z.string(),
   }),
 })
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof z.ZodError) {
+    return "Invalid checkout payload"
+  }
+
+  if (error instanceof Error) {
+    if (error.cause instanceof Error) {
+      return getErrorMessage(error.cause)
+    }
+
+    return error.message
+  }
+
+  return "Checkout failed"
+}
 
 export async function POST(request: Request) {
   try {
@@ -66,18 +86,26 @@ export async function POST(request: Request) {
     if (error instanceof CheckoutValidationException || error instanceof z.ZodError) {
       return NextResponse.json(
         {
-          error:
-            error instanceof z.ZodError
-              ? "Invalid checkout payload"
-              : error.message,
+          error: getErrorMessage(error),
         },
         { status: 400 },
       )
     }
 
+    if (error instanceof CheckoutServiceException) {
+      console.error("Checkout failed", error)
+
+      return NextResponse.json(
+        {
+          error: getErrorMessage(error),
+        },
+        { status: 500 },
+      )
+    }
+
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Checkout failed",
+        error: getErrorMessage(error),
       },
       { status: 500 },
     )

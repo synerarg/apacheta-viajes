@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(pnpm add lucide-react)",
-      "mcp__claude_ai_Figma__get_design_context"
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(ls \"D:/valentin-gonzalez/dev/apacheta-viajes/src/app/\\(auth\\)/\")",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)"
     ]
   }
 }

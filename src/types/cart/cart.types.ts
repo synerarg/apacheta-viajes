@@ -1,3 +1,5 @@
+import type { Moneda } from "@/types/shared/enums"
+
 export type CartItemKind = "paquete" | "experiencia"
 
 export interface CartItem {
@@ -9,7 +11,7 @@ export interface CartItem {
   unitPrice: number
   quantity: number
   image: string
-  moneda: string
+  moneda: Moneda
   paqueteFechaId: string | null
   experienciaId: string | null
 }

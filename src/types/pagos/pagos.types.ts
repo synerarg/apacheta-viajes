@@ -1,3 +1,6 @@
+export type { PagoEstado, MetodoPago, PagoProveedor } from "@/types/shared/enums"
+import type { PagoEstado, MetodoPago, PagoProveedor, Moneda } from "@/types/shared/enums"
+
 type DatabaseJson =
   | string
   | number
@@ -6,30 +9,17 @@ type DatabaseJson =
   | { [key: string]: DatabaseJson | undefined }
   | DatabaseJson[]
 
-export type PagoMetodo =
-  | "mercadopago_checkout_pro"
-  | "bank_transfer"
-  | "cash_local"
-
-export type PagoProveedor = "mercadopago" | "bank_transfer" | "cash_local"
-
-export type PagoEstado =
-  | "pending"
-  | "requires_action"
-  | "reported"
-  | "approved"
-  | "rejected"
-  | "cancelled"
-  | "expired"
+// Re-export legacy aliases for backwards compatibility
+export type PagoMetodo = MetodoPago
 
 export interface PagosRow {
   id: string
   orden_id: string
-  metodo: PagoMetodo
+  metodo: MetodoPago
   proveedor: PagoProveedor
   estado: PagoEstado
   monto: number
-  moneda: string
+  moneda: Moneda
   external_reference: string
   provider_reference: string | null
   redirect_url: string | null
@@ -46,11 +36,11 @@ export interface PagosRow {
 export interface PagosInsert {
   id?: string
   orden_id: string
-  metodo: PagoMetodo
+  metodo: MetodoPago
   proveedor: PagoProveedor
   estado?: PagoEstado
   monto: number
-  moneda?: string
+  moneda?: Moneda
   external_reference: string
   provider_reference?: string | null
   redirect_url?: string | null
@@ -67,11 +57,11 @@ export interface PagosInsert {
 export interface PagosUpdate {
   id?: string
   orden_id?: string
-  metodo?: PagoMetodo
+  metodo?: MetodoPago
   proveedor?: PagoProveedor
   estado?: PagoEstado
   monto?: number
-  moneda?: string
+  moneda?: Moneda
   external_reference?: string
   provider_reference?: string | null
   redirect_url?: string | null
