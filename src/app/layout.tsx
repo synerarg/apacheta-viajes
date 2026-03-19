@@ -39,9 +39,11 @@ export default function RootLayout({
       <body
         className={`${playfairDisplay.variable} ${lato.className} antialiased`}
       >
-        <AuthSessionSync />
-        <Toaster richColors position="bottom-right" />
-        {children}
+        <TooltipProvider>
+          <AuthSessionSync />
+          <Toaster richColors position="bottom-right" />
+          {children}
+        </TooltipProvider>
       </body>
     </html>
   )
