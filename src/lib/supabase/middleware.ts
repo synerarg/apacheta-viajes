@@ -17,7 +17,9 @@ export async function updateSession(request: NextRequest) {
         return request.cookies.getAll()
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        )
         response = NextResponse.next({
           request,
         })
@@ -56,7 +58,6 @@ export async function updateSession(request: NextRequest) {
       return NextResponse.redirect(new URL("/login", request.url))
     }
 
-    // Verificar que el usuario tiene rol admin
     const { data: profile } = await supabase
       .from("usuarios")
       .select("tipo")
