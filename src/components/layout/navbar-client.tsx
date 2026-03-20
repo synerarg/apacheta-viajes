@@ -4,7 +4,7 @@ import { useState, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ShoppingCartIcon, UserIcon, XIcon } from "@phosphor-icons/react"
+import { ShoppingCartIcon, SquaresFourIcon, UserIcon, XIcon } from "@phosphor-icons/react"
 import { LogOutIcon, MenuIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -151,6 +151,23 @@ export function NavbarClient({ user }: NavbarClientProps) {
                 </Tooltip>
               )}
 
+              {user?.tipo === "admin" && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/dashboard"
+                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                      aria-label="Dashboard"
+                    >
+                      <SquaresFourIcon className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Dashboard</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
@@ -289,14 +306,28 @@ export function NavbarClient({ user }: NavbarClientProps) {
               </Link>
             )}
 
-            <Link
-              href="/carrito"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
-            >
-              <ShoppingCartIcon className="h-4 w-4" />
-              <span>Carrito{totalItems > 0 ? ` (${totalItems})` : ""}</span>
-            </Link>
+            <div className="flex items-center gap-4">
+              {user?.tipo === "admin" && (
+                <Link
+                  href="/dashboard"
+                  onClick={() => setIsOpen(false)}
+                  className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
+                  aria-label="Dashboard"
+                >
+                  <SquaresFourIcon className="h-4 w-4" />
+                  <span>Dashboard</span>
+                </Link>
+              )}
+
+              <Link
+                href="/carrito"
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
+              >
+                <ShoppingCartIcon className="h-4 w-4" />
+                <span>Carrito{totalItems > 0 ? ` (${totalItems})` : ""}</span>
+              </Link>
+            </div>
           </div>
         </div>
       </div>
