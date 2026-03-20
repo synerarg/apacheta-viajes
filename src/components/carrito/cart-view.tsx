@@ -53,7 +53,7 @@ export function CartView() {
                     }`}
                   >
                     {/* Image placeholder */}
-                    <div className="relative w-32 h-32 md:w-40 md:h-40 flex-shrink-0 overflow-hidden bg-muted">
+                    <div className="relative w-32 h-32 md:w-40 md:h-40 shrink-0 overflow-hidden bg-muted">
                       {item.image && (
                         <Image
                           src={item.image}
@@ -135,7 +135,7 @@ export function CartView() {
           </div>
 
           {/* Right Column - Order Summary */}
-          <div className="lg:w-[340px] xl:w-[380px] flex-shrink-0">
+          <div className="lg:w-[340px] xl:w-[380px] shrink-0">
             <div className="sticky top-28 bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
               <h2 className="font-serif text-2xl font-semibold text-dark-brown mb-6">
                 Resumen

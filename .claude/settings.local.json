@@ -9,7 +9,9 @@
       "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes -maxdepth 3 -name tailwind.config.* -o -name globals.css -o -name variables.css)",
       "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes -maxdepth 3 \\\\\\(-name *tailwind* -o -name *theme* \\\\\\) -type f)",
       "Bash(ls -la /d/valentin-gonzalez/dev/apacheta-viajes/*.config.*)",
-      "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes/src -type f -name *notification* -o -name *email*)"
+      "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes/src -type f -name *notification* -o -name *email*)",
+      "Bash(Remove-Item -Recurse -Force \"C:\\\\Users\\\\tomas\\\\OneDrive\\\\Documentos\\\\synera\\\\apacheta\\\\.next\" -ErrorAction SilentlyContinue)",
+      "Bash(Write-Host \"Cache .next eliminado\")"
     ]
   }
 }
