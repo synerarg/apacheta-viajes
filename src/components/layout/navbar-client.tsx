@@ -97,8 +97,50 @@ export function NavbarClient({ user }: NavbarClientProps) {
               <Link href="/paquetes">Explorar Paquetes</Link>
             </Button>
 
-            <div className="flex items-center gap-6 text-white/90">
-              {user ? (
+            <div className="flex items-center gap-2 text-white/90">
+              {/* 1 — Dashboard (solo admin) */}
+              {user?.tipo === "admin" && (
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/dashboard"
+                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                      aria-label="Dashboard"
+                    >
+                      <SquaresFourIcon className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Dashboard</p>
+                  </TooltipContent>
+                </Tooltip>
+              )}
+
+              {/* 2 — Carrito */}
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/carrito"
+                    className="relative flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                    aria-label={
+                      totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
+                    }
+                  >
+                    <ShoppingCartIcon className="h-5 w-5" />
+                    {totalItems > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary">
+                        {totalItems}
+                      </span>
+                    )}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}</p>
+                </TooltipContent>
+              </Tooltip>
+
+              {/* 3 — Mis reservas / Cerrar sesión (solo si hay usuario) */}
+              {user && (
                 <>
                   <Tooltip>
                     <TooltipTrigger asChild>
@@ -122,9 +164,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                         className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
                         onClick={handleSignOut}
                         disabled={isSigningOut}
-                        aria-label={
-                          isSigningOut ? "Cerrando sesión" : "Cerrar sesión"
-                        }
+                        aria-label={isSigningOut ? "Cerrando sesión" : "Cerrar sesión"}
                       >
                         <LogOutIcon className="h-5 w-5" />
                       </button>
@@ -134,61 +174,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
                     </TooltipContent>
                   </Tooltip>
                 </>
-              ) : (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/login"
-                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                      aria-label="Ingresar"
-                    >
-                      <UserIcon className="h-5 w-5" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Ingresar</p>
-                  </TooltipContent>
-                </Tooltip>
               )}
-
-              {user?.tipo === "admin" && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/dashboard"
-                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                      aria-label="Dashboard"
-                    >
-                      <SquaresFourIcon className="h-5 w-5" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Dashboard</p>
-                  </TooltipContent>
-                </Tooltip>
-              )}
-
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Link
-                    href="/carrito"
-                    className="relative flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                    aria-label={
-                      totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
-                    }
-                  >
-                    <ShoppingCartIcon className="h-5 w-5" />
-                    {totalItems > 0 && (
-                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary">
-                        {totalItems}
-                      </span>
-                    )}
-                  </Link>
-                </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  <p>{totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}</p>
-                </TooltipContent>
-              </Tooltip>
             </div>
           </div>
 
