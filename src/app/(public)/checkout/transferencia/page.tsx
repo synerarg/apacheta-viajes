@@ -159,9 +159,10 @@ function TransferenciaPageContent() {
   ]
 
   const formatTime = (seconds: number) => {
-    const mins = Math.floor(seconds / 60)
+    const hours = Math.floor(seconds / 3600)
+    const mins = Math.floor((seconds % 3600) / 60)
     const secs = seconds % 60
-    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
+    return `${hours.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
   }
 
   const copyToClipboard = (text: string, field: string) => {
@@ -247,7 +248,7 @@ function TransferenciaPageContent() {
         <div className="flex justify-end mt-6">
           <div className="bg-primary text-off-white text-sm font-sans px-4 py-2">
             Tiempo Restante:{" "}
-            {isLoadingOrder ? "--:--" : formatTime(timeLeft)}
+            {isLoadingOrder ? "--:--:--" : formatTime(timeLeft)}
           </div>
         </div>
 
