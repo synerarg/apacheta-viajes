@@ -4,7 +4,12 @@ import { useState, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ShoppingCartIcon, SquaresFourIcon, UserIcon, XIcon } from "@phosphor-icons/react"
+import {
+  ShoppingCartIcon,
+  SquaresFourIcon,
+  UserIcon,
+  XIcon,
+} from "@phosphor-icons/react"
 import { LogOutIcon, MenuIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -61,7 +66,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
     <>
       <header className="fixed left-1/2 top-4 z-50 w-[calc(100%-1rem)] max-w-[1440px] -translate-x-1/2">
         <nav className="flex items-center justify-between bg-primary px-4 py-2.5 lg:px-6 lg:py-3">
-
           {/* Logo */}
           <Link href="/" className="flex shrink-0">
             <Image
@@ -135,7 +139,9 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>{totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}</p>
+                  <p>
+                    {totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
+                  </p>
                 </TooltipContent>
               </Tooltip>
 
@@ -156,23 +162,6 @@ export function NavbarClient({ user }: NavbarClientProps) {
                       <p>{displayName}</p>
                     </TooltipContent>
                   </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
-                        onClick={handleSignOut}
-                        disabled={isSigningOut}
-                        aria-label={isSigningOut ? "Cerrando sesión" : "Cerrar sesión"}
-                      >
-                        <LogOutIcon className="h-5 w-5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">
-                      <p>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</p>
-                    </TooltipContent>
-                  </Tooltip>
                 </>
               )}
             </div>
@@ -183,7 +172,9 @@ export function NavbarClient({ user }: NavbarClientProps) {
             <Link
               href="/carrito"
               className="relative flex h-10 w-10 items-center justify-center text-white transition-colors hover:bg-white/10"
-              aria-label={totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
+              aria-label={
+                totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
+              }
             >
               <ShoppingCartIcon className="h-5 w-5" />
               {totalItems > 0 && (
@@ -209,7 +200,9 @@ export function NavbarClient({ user }: NavbarClientProps) {
       {/* Backdrop */}
       <div
         className={`fixed inset-0 z-60 bg-black/50 transition-opacity duration-300 lg:hidden ${
-          isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
+          isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsOpen(false)}
         aria-hidden="true"
