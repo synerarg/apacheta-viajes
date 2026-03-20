@@ -213,12 +213,12 @@ export function LoginForm() {
 
   return (
     <div className="flex min-h-screen">
-      <div className="flex flex-1 flex-col justify-center px-8 py-12 bg-muted/30 lg:px-16 xl:px-24">
+      <div className="flex flex-1 flex-col justify-center px-5 py-10 sm:px-8 sm:py-12 bg-muted/30 lg:px-16 xl:px-24">
         <div className="mx-auto w-full max-w-lg">
           {step === "email" ? (
-            <form onSubmit={handleSendCode} className="space-y-8">
+            <form onSubmit={handleSendCode} className="space-y-7 sm:space-y-8">
               <div className="space-y-2">
-                <h1 className="font-serif italic text-4xl md:text-5xl text-foreground leading-tight">
+                <h1 className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-foreground leading-tight">
                   Bienvenido a Apacheta
                 </h1>
                 <p className="text-muted-foreground text-sm text-center">
@@ -289,9 +289,9 @@ export function LoginForm() {
               </div>
             </form>
           ) : (
-            <form onSubmit={handleVerifyCode} className="space-y-8">
+            <form onSubmit={handleVerifyCode} className="space-y-7 sm:space-y-8">
               <div className="space-y-2 text-center flex flex-col items-center justify-center">
-                <h1 className="font-serif italic text-4xl md:text-5xl text-foreground leading-tight">
+                <h1 className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-foreground leading-tight">
                   Ingresa el código
                   <br />
                   de verificación
@@ -306,35 +306,35 @@ export function LoginForm() {
                   maxLength={6}
                   value={otp}
                   onChange={setOtp}
-                  containerClassName="justify-start gap-0"
+                  containerClassName="justify-center gap-0"
                 >
-                  <InputOTPGroup className="gap-2">
+                  <InputOTPGroup className="gap-1 sm:gap-2">
                     <InputOTPSlot
                       index={0}
-                      className="h-14 w-12 bg-primary/20 text-lg font-medium rounded-none border border-primary"
+                      className="h-12 w-9 sm:h-14 sm:w-12 bg-primary/20 text-base sm:text-lg font-medium rounded-none border border-primary"
                     />
                     <InputOTPSlot
                       index={1}
-                      className="h-14 w-12 bg-primary/20 text-lg font-medium rounded-none border border-primary"
+                      className="h-12 w-9 sm:h-14 sm:w-12 bg-primary/20 text-base sm:text-lg font-medium rounded-none border border-primary"
                     />
                     <InputOTPSlot
                       index={2}
-                      className="h-14 w-12 bg-primary/20 text-lg font-medium rounded-none border border-primary"
+                      className="h-12 w-9 sm:h-14 sm:w-12 bg-primary/20 text-base sm:text-lg font-medium rounded-none border border-primary"
                     />
                   </InputOTPGroup>
-                  <InputOTPSeparator className="text-muted-foreground mx-2" />
-                  <InputOTPGroup className="gap-2">
+                  <InputOTPSeparator className="text-muted-foreground mx-1 sm:mx-2" />
+                  <InputOTPGroup className="gap-1 sm:gap-2">
                     <InputOTPSlot
                       index={3}
-                      className="h-14 w-12 bg-primary/20 text-lg font-medium rounded-none border border-primary"
+                      className="h-12 w-9 sm:h-14 sm:w-12 bg-primary/20 text-base sm:text-lg font-medium rounded-none border border-primary"
                     />
                     <InputOTPSlot
                       index={4}
-                      className="h-14 w-12 bg-primary/20 text-lg font-medium rounded-none border border-primary"
+                      className="h-12 w-9 sm:h-14 sm:w-12 bg-primary/20 text-base sm:text-lg font-medium rounded-none border border-primary"
                     />
                     <InputOTPSlot
                       index={5}
-                      className="h-14 w-12 bg-primary/20 text-lg font-medium rounded-none border border-primary"
+                      className="h-12 w-9 sm:h-14 sm:w-12 bg-primary/20 text-base sm:text-lg font-medium rounded-none border border-primary"
                     />
                   </InputOTPGroup>
                 </InputOTP>

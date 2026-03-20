@@ -25,35 +25,35 @@ export function CartView() {
   }
 
   return (
-    <main className="min-h-screen bg-off-white pt-36 pb-16">
+    <main className="min-h-screen bg-off-white pt-32 pb-16">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
-        <div className="mb-10">
+        <div className="mb-8 md:mb-10">
           <p className="text-sm text-subtle font-sans tracking-[0.15em] uppercase mb-2">
             Resumen
           </p>
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal text-dark-brown italic mb-2">
             Tu Selección
           </h1>
-          <p className="text-base text-subtle font-sans">
+          <p className="text-sm sm:text-base text-subtle font-sans">
             Experiencias curadas para tu travesía.
           </p>
         </div>
 
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          <div className="flex-1">
+          <div className="flex-1 min-w-0">
             {!isEmpty ? (
               <div className="flex flex-col">
                 {items.map((item, index) => (
                   <div
                     key={item.id}
-                    className={`flex gap-6 py-6 ${
+                    className={`flex gap-3 sm:gap-5 md:gap-6 py-5 sm:py-6 ${
                       index !== items.length - 1
                         ? "border-b border-dark-brown/15"
                         : ""
                     }`}
                   >
-                    {/* Image placeholder */}
-                    <div className="relative w-32 h-32 md:w-40 md:h-40 shrink-0 overflow-hidden bg-muted">
+                    {/* Image */}
+                    <div className="relative w-20 h-20 sm:w-28 sm:h-28 md:w-36 md:h-36 lg:w-40 lg:h-40 shrink-0 overflow-hidden bg-muted">
                       {item.image && (
                         <Image
                           src={item.image}
@@ -65,7 +65,7 @@ export function CartView() {
                     </div>
 
                     {/* Content */}
-                    <div className="flex-1 flex flex-col justify-between relative">
+                    <div className="flex-1 min-w-0 flex flex-col justify-between relative">
                       {/* Delete Button */}
                       <button
                         onClick={() => removeItem(item.id)}
@@ -76,39 +76,39 @@ export function CartView() {
                       </button>
 
                       {/* Top Content */}
-                      <div className="pr-8">
-                        <p className="font-serif text-xl md:text-2xl font-normal text-primary mb-0.5">
+                      <div className="pr-6">
+                        <p className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl font-normal text-primary mb-0.5 truncate">
                           {item.category}
                         </p>
-                        <h3 className="font-serif text-xl md:text-2xl font-semibold text-dark-brown mb-1">
+                        <h3 className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl font-semibold text-dark-brown mb-1 leading-snug">
                           {item.name}
                         </h3>
-                        <p className="text-sm text-subtle font-sans">
+                        <p className="text-xs sm:text-sm text-subtle font-sans line-clamp-2">
                           {item.description}
                         </p>
                       </div>
 
                       {/* Bottom Content */}
-                      <div className="flex items-end justify-between mt-4">
-                        <p className="font-serif text-xl md:text-2xl font-bold text-primary">
+                      <div className="flex items-center justify-between mt-3 gap-2">
+                        <p className="font-serif text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-primary shrink-0">
                           {formatPrice(item.unitPrice * item.quantity)}
                         </p>
 
                         {/* Quantity Stepper */}
-                        <div className="flex items-center border border-dark-brown h-10 md:h-8">
+                        <div className="flex items-center border border-dark-brown h-9 shrink-0">
                           <button
                             onClick={() => updateQuantity(item.id, -1)}
-                            className="w-10 md:w-8 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors cursor-pointer"
+                            className="w-9 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors cursor-pointer"
                             aria-label="Disminuir cantidad"
                           >
                             <Minus className="w-3 h-3 text-dark-brown" />
                           </button>
-                          <span className="w-10 md:w-8 h-full flex items-center justify-center text-sm font-sans text-dark-brown border-x border-dark-brown">
+                          <span className="w-9 h-full flex items-center justify-center text-sm font-sans text-dark-brown border-x border-dark-brown">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, 1)}
-                            className="w-10 md:w-8 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors cursor-pointer"
+                            className="w-9 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors cursor-pointer"
                             aria-label="Aumentar cantidad"
                           >
                             <Plus className="w-3 h-3 text-dark-brown" />
@@ -136,26 +136,26 @@ export function CartView() {
 
           {/* Right Column - Order Summary */}
           <div className="lg:w-[340px] xl:w-[380px] shrink-0">
-            <div className="sticky top-28 bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
-              <h2 className="font-serif text-2xl font-semibold text-dark-brown mb-6">
+            <div className="sticky top-28 bg-white border border-dark-brown/20 p-4 sm:p-6 md:p-8">
+              <h2 className="font-serif text-xl sm:text-2xl font-semibold text-dark-brown mb-5 sm:mb-6">
                 Resumen
               </h2>
 
               <div className="space-y-3 mb-4">
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-4">
                   <span className="font-sans text-sm text-dark-brown">
                     Subtotal ({totalItems}{" "}
                     {totalItems === 1 ? "item" : "items"})
                   </span>
-                  <span className="font-sans text-sm text-dark-brown">
+                  <span className="font-sans text-sm text-dark-brown whitespace-nowrap">
                     {formatPrice(subtotal)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center">
+                <div className="flex justify-between items-center gap-4">
                   <span className="font-sans text-sm text-subtle">
                     Impuestos y tasas
                   </span>
-                  <span className="font-sans text-sm text-subtle">
+                  <span className="font-sans text-sm text-subtle whitespace-nowrap">
                     A calcular
                   </span>
                 </div>
@@ -163,11 +163,11 @@ export function CartView() {
 
               <div className="border-t border-dark-brown/20 my-4" />
 
-              <div className="flex justify-between items-center mb-6">
+              <div className="flex justify-between items-center gap-4 mb-6">
                 <span className="font-sans text-base font-bold text-dark-brown">
                   Total
                 </span>
-                <span className="font-serif text-xl font-bold text-primary">
+                <span className="font-serif text-lg sm:text-xl font-bold text-primary whitespace-nowrap">
                   {formatPrice(subtotal)}
                 </span>
               </div>
@@ -175,7 +175,7 @@ export function CartView() {
               <Link
                 href={isEmpty ? "/carrito" : "/checkout"}
                 aria-disabled={isEmpty}
-                className={`block w-full text-off-white font-sans text-base font-bold py-4 text-center transition-colors ${
+                className={`block w-full text-off-white font-sans text-sm sm:text-base font-bold py-4 text-center transition-colors ${
                   isEmpty
                     ? "pointer-events-none bg-primary/50"
                     : "bg-primary hover:bg-primary/80"

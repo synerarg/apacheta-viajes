@@ -41,9 +41,7 @@ export default function RootLayout({
       >
         <AuthSessionSync />
         <Toaster richColors position="bottom-right" />
-        <Navbar />
         {children}
-        <Footer />
       </body>
     </html>
   )
