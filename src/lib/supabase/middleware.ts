@@ -30,7 +30,6 @@ export async function updateSession(request: NextRequest) {
     },
   })
 
-  // getUser() valida el JWT en el servidor; getSession() solo lee el token y puede estar vencido
   const {
     data: { user },
   } = await supabase.auth.getUser()
