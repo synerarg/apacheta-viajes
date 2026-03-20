@@ -245,9 +245,9 @@ export function ConfirmacionView() {
       : "#AP-20260001"
 
   return (
-    <main className="min-h-screen bg-off-white pt-28 pb-16">
-      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
-        <div className="max-w-[720px]">
+    <main className="min-h-screen bg-off-white pt-28 pb-16 flex items-center justify-center">
+      <div className="mx-auto w-[calc(100%-1rem)] max-w-[720px]">
+        <div>
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-dark-brown flex items-center justify-center shrink-0">
               <svg
