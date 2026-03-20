@@ -107,29 +107,61 @@ export class MercadoPagoCheckoutProService {
       },
     })
 
-    const preference = await createCheckoutProPreference(
-      buildMercadoPagoPreferenceBody({
-        externalReference,
-        items: items.map((item) => ({
-          id: item.id,
-          title: item.nombre,
-          description: item.descripcion_corta ?? undefined,
-          quantity: item.cantidad,
-          unit_price: Number(item.precio_unitario),
-          currency_id: item.moneda,
-        })),
-        payerEmail: input.payer?.email ?? user?.email ?? null,
-        successPath:
-          input.successPath ??
-          `/checkout/success?orderId=${order.id}&paymentMethod=mercadopago`,
-        failurePath:
-          input.failurePath ??
-          `/checkout/success?orderId=${order.id}&paymentMethod=mercadopago`,
-        pendingPath:
-          input.pendingPath ??
-          `/checkout/success?orderId=${order.id}&paymentMethod=mercadopago`,
-      }),
-    )
+    let preference
+
+    try {
+      preference = await createCheckoutProPreference(
+        buildMercadoPagoPreferenceBody({
+          externalReference,
+          items: items.map((item) => ({
+            id: item.id,
+            title: item.nombre,
+            description: item.descripcion_corta ?? undefined,
+            quantity: item.cantidad,
+            unit_price: Number(item.precio_unitario),
+            currency_id: item.moneda,
+          })),
+          payerEmail: input.payer?.email ?? user?.email ?? null,
+          successPath:
+            input.successPath ??
+            `/checkout/success?orderId=${order.id}&paymentMethod=mercadopago`,
+          failurePath:
+            input.failurePath ??
+            `/checkout/error?orderId=${order.id}&paymentMethod=mercadopago`,
+          pendingPath:
+            input.pendingPath ??
+            `/checkout/success?orderId=${order.id}&paymentMethod=mercadopago`,
+        }),
+      )
+    } catch (error) {
+      const failedAt = new Date().toISOString()
+
+      await this.paymentsRepository.updatePaymentById(payment.id, {
+        estado: "cancelled",
+        updated_at: failedAt,
+      })
+      await this.paymentsRepository.updateOrderById(order.id, {
+        estado: "cancelada",
+        estado_pago: "cancelled",
+        updated_at: failedAt,
+      })
+      await this.paymentsRepository.updateOrderReservationsStatus(
+        order.id,
+        "cancelada",
+        `Fallo la creacion del pago de Mercado Pago. payment_id=${payment.id}`,
+      )
+      await this.paymentsRepository.createPaymentEvent({
+        pago_id: payment.id,
+        tipo: "mercadopago.preference_failed",
+        estado: "cancelled",
+        mensaje: "No se pudo crear la preferencia de Mercado Pago",
+        payload: {
+          error: error instanceof Error ? error.message : String(error),
+        },
+      })
+
+      throw error
+    }
 
     await this.paymentsRepository.updatePaymentById(payment.id, {
       provider_reference: preference.id,

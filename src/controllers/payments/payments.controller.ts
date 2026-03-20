@@ -1,10 +1,12 @@
 import { adminClient } from "@/lib/supabase/admin-client"
 import { createPaymentsService, type PaymentsService } from "@/services/payments/payments.service"
 import type {
+  AuthorizeBankTransferReceiptUploadInput,
   ConfirmBankTransferInput,
   CreateBankTransferPaymentInput,
   CreateMercadoPagoCheckoutProInput,
   CreatePaymentInput,
+  RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
 } from "@/types/payments/payments.types"
 import type { DatabaseClient } from "@/types/database/database.types"
@@ -45,6 +47,18 @@ export class PaymentsController {
 
   async uploadBankTransferReceipt(input: UploadBankTransferReceiptInput) {
     return this.paymentsService.uploadBankTransferReceipt(input)
+  }
+
+  async authorizeBankTransferReceiptUpload(
+    input: AuthorizeBankTransferReceiptUploadInput,
+  ) {
+    return this.paymentsService.authorizeBankTransferReceiptUpload(input)
+  }
+
+  async registerBankTransferReceiptUpload(
+    input: RegisterBankTransferReceiptInput,
+  ) {
+    return this.paymentsService.registerBankTransferReceiptUpload(input)
   }
 
   async getCheckoutOrderSummary(orderId: string) {

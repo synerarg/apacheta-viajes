@@ -25,6 +25,18 @@ function mergeReservationNotes(currentNotes: string | null, nextNote: string) {
   return [currentNotes?.trim(), nextNote.trim()].filter(Boolean).join("\n\n")
 }
 
+function sanitizeReceiptFileName(fileName: string) {
+  return fileName.replace(/[^a-zA-Z0-9._-]/g, "-")
+}
+
+function buildReceiptStoragePath(
+  orderId: string,
+  paymentId: string,
+  fileName: string,
+) {
+  return `${orderId}/${paymentId}/${Date.now()}-${sanitizeReceiptFileName(fileName)}`
+}
+
 function resolveLatestPayment(payments: PagosRow[]) {
   return [...payments].sort((left, right) => {
     const leftDate = left.created_at ? Date.parse(left.created_at) : 0
@@ -317,8 +329,11 @@ export class PaymentsRepository {
     try {
       const payment = await this.getPaymentById(input.paymentId)
       const config = getBankTransferConfig()
-      const sanitizedFileName = input.fileName.replace(/[^a-zA-Z0-9._-]/g, "-")
-      const storagePath = `${payment.orden_id}/${payment.id}/${Date.now()}-${sanitizedFileName}`
+      const storagePath = buildReceiptStoragePath(
+        payment.orden_id,
+        payment.id,
+        input.fileName,
+      )
       const buffer = Buffer.from(input.fileBuffer)
       const upload = await this.supabase.storage
         .from(config.receiptBucket)
@@ -336,6 +351,62 @@ export class PaymentsRepository {
       }
     } catch (error) {
       throw new PaymentsRepositoryException("uploadBankTransferReceipt", error)
+    }
+  }
+
+  async createBankTransferReceiptSignedUploadUrl(input: {
+    paymentId: string
+    fileName: string
+  }) {
+    try {
+      const payment = await this.getPaymentById(input.paymentId)
+      const config = getBankTransferConfig()
+      const storagePath = buildReceiptStoragePath(
+        payment.orden_id,
+        payment.id,
+        input.fileName,
+      )
+      const signedUpload = await this.supabase.storage
+        .from(config.receiptBucket)
+        .createSignedUploadUrl(storagePath)
+
+      if (signedUpload.error) {
+        throw signedUpload.error
+      }
+
+      if (!signedUpload.data?.token) {
+        throw new Error("Supabase did not return a signed upload token")
+      }
+
+      return {
+        bucket: config.receiptBucket,
+        path: storagePath,
+        token: signedUpload.data.token,
+      }
+    } catch (error) {
+      throw new PaymentsRepositoryException(
+        "createBankTransferReceiptSignedUploadUrl",
+        error,
+      )
+    }
+  }
+
+  async assertReceiptObjectExists(storagePath: string) {
+    try {
+      const config = getBankTransferConfig()
+      const objectInfo = await this.supabase.storage
+        .from(config.receiptBucket)
+        .info(storagePath)
+
+      if (objectInfo.error) {
+        throw objectInfo.error
+      }
+
+      if (!objectInfo.data) {
+        throw new Error("Supabase did not return the uploaded receipt object")
+      }
+    } catch (error) {
+      throw new PaymentsRepositoryException("assertReceiptObjectExists", error)
     }
   }
 

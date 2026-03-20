@@ -29,9 +29,46 @@ function resolvePaymentStatusLabel(status?: string | null) {
       return "Pago rechazado"
     case "cancelled":
       return "Pago cancelado"
+    case "expired":
+      return "Pago vencido"
     default:
       return "En revisión"
   }
+}
+
+function resolveSummaryMessage(
+  paymentMethod?: string,
+  paymentStatus?: string | null,
+) {
+  if (paymentMethod === "bank_transfer") {
+    if (paymentStatus === "approved") {
+      return "La transferencia fue validada correctamente y tu reserva ya quedó pagada."
+    }
+
+    if (paymentStatus === "reported") {
+      return "Recibimos tu comprobante y nuestro equipo ya está validando la acreditación."
+    }
+
+    if (paymentStatus === "expired") {
+      return "La ventana para informar la transferencia venció y la reserva quedó expirada."
+    }
+
+    return "Tu reserva fue creada y quedó pendiente de que completes la transferencia bancaria."
+  }
+
+  if (paymentMethod === "mercadopago_checkout_pro") {
+    if (paymentStatus === "approved") {
+      return "Mercado Pago aprobó el pago y tu reserva quedó registrada correctamente."
+    }
+
+    if (paymentStatus === "rejected" || paymentStatus === "cancelled") {
+      return "El pago no se pudo acreditar. Revisá el estado de la orden para intentar nuevamente."
+    }
+
+    return "Tu reserva fue creada y estamos esperando la confirmación final de Mercado Pago."
+  }
+
+  return "Recibimos tu solicitud correctamente y nuestro equipo continuará con la confirmación operativa."
 }
 
 function resolveNextSteps(paymentMethod?: string, paymentStatus?: string | null) {
@@ -242,9 +279,7 @@ export function ConfirmacionView() {
             ¡Gracias por tu reserva!
           </h1>
           <p className="text-base md:text-lg text-dark-brown font-sans leading-relaxed mb-2">
-            Recibimos tu solicitud correctamente. Nuestro equipo la revisará y
-            te contactará a la brevedad para confirmar disponibilidad y
-            coordinar el pago.
+            {resolveSummaryMessage(paymentMethod ?? undefined, paymentStatus)}
           </p>
           <p className="text-sm text-subtle font-sans mb-10">
             {isLoadingOrder

@@ -6,7 +6,18 @@ export const metadata: Metadata = {
   title: "Error en el pago | Apacheta Viajes",
 }
 
-export default function ErrorPage() {
+function buildRetryHref(orderId: string | undefined) {
+  return orderId ? `/mis-reservas?order=${orderId}` : "/mis-reservas"
+}
+
+export default async function ErrorPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ orderId?: string; paymentMethod?: string }>
+}) {
+  const { orderId, paymentMethod } = await searchParams
+  const isMercadoPago = paymentMethod === "mercadopago"
+
   return (
     <main className="min-h-screen bg-off-white pt-28 flex items-center justify-center">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[560px] py-16 flex flex-col items-center text-center">
@@ -22,21 +33,23 @@ export default function ErrorPage() {
 
         {/* Subtitle */}
         <p className="text-[15px] text-subtle font-sans mb-10 max-w-[440px] leading-relaxed">
-          No pudimos procesar la transacción a través de Payway.
+          {isMercadoPago
+            ? "No pudimos procesar la transacción a través de Mercado Pago."
+            : "No pudimos procesar la transacción con el medio de pago seleccionado."}
           <br />
-          Por favor, verificá los datos de tu tarjeta e intentá con otro medio de pago.
+          Verificá el estado de tu orden e intentá nuevamente con otro medio de pago si hace falta.
         </p>
 
         {/* CTA Buttons */}
         <div className="w-full flex flex-col gap-3">
           <Link
-            href="/checkout"
+            href={buildRetryHref(orderId)}
             className="block w-full bg-primary hover:bg-primary/80 text-off-white text-center text-[15px] font-semibold font-sans py-3 transition-colors"
           >
-            Reintentar Pago
+            Ver mi reserva
           </Link>
           <Link
-            href="/checkout"
+            href={buildRetryHref(orderId)}
             className="block w-full bg-transparent text-dark-brown text-center text-[15px] font-medium font-sans py-3 border border-dark-brown hover:bg-dark-brown/5 transition-colors"
           >
             Cambiar Método de Pago

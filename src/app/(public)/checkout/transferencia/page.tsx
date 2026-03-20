@@ -10,7 +10,10 @@ import {
   loadLastCheckoutSnapshot,
   saveLastCheckoutSnapshot,
 } from "@/lib/cart/cart-storage"
+import { createClient } from "@/lib/supabase/client"
 import type { CheckoutOrderDetailResult } from "@/types/checkout/checkout.types"
+
+const supabase = createClient()
 
 function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
@@ -200,15 +203,64 @@ function TransferenciaPageContent() {
 
     try {
       setIsSubmitting(true)
+      const uploadAuthorizationResponse = await fetch(
+        `/api/payments/bank-transfer/${bankTransfer.paymentId}/receipt-upload-url`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            fileName: selectedFile.name,
+            fileType: selectedFile.type,
+            fileSize: selectedFile.size,
+          }),
+        },
+      )
+      const uploadAuthorizationResult =
+        (await uploadAuthorizationResponse.json()) as {
+          bucket?: string
+          path?: string
+          token?: string
+          error?: string
+        }
 
-      const formData = new FormData()
-      formData.set("receipt", selectedFile)
+      if (!uploadAuthorizationResponse.ok) {
+        toast.error(
+          uploadAuthorizationResult.error ??
+            "No se pudo autorizar la carga del comprobante.",
+        )
+        return
+      }
+
+      const { error: uploadError } = await supabase.storage
+        .from(uploadAuthorizationResult.bucket ?? "")
+        .uploadToSignedUrl(
+          uploadAuthorizationResult.path ?? "",
+          uploadAuthorizationResult.token ?? "",
+          selectedFile,
+          {
+            upsert: false,
+          },
+        )
+
+      if (uploadError) {
+        toast.error(uploadError.message)
+        return
+      }
 
       const response = await fetch(
         `/api/payments/bank-transfer/${bankTransfer.paymentId}/receipt`,
         {
           method: "POST",
-          body: formData,
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            receiptStoragePath: uploadAuthorizationResult.path,
+            fileName: selectedFile.name,
+            fileType: selectedFile.type,
+          }),
         },
       )
       const result = (await response.json()) as { error?: string }

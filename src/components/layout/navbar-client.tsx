@@ -5,9 +5,14 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ShoppingCartIcon, UserIcon, XIcon } from "@phosphor-icons/react"
-import { MenuIcon } from "lucide-react"
+import { LogOutIcon, MenuIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 import { useCart } from "@/hooks/use-cart"
 import { createClient } from "@/lib/supabase/client"
 import type { AuthenticatedNavbarUser } from "@/types/auth/auth.types"
@@ -71,7 +76,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
 
           {/* Desktop — nav links */}
           <div className="hidden items-center gap-6 lg:flex xl:gap-8">
-            {navLinks.map((link) => (
+            {resolvedNavLinks.map((link) => (
               <Link
                 key={link.label}
                 href={link.href}
@@ -94,39 +99,79 @@ export function NavbarClient({ user }: NavbarClientProps) {
 
             <div className="flex items-center gap-6 text-white/90">
               {user ? (
-                <button
-                  type="button"
-                  className="flex items-center gap-2 transition-colors hover:text-white cursor-pointer"
-                  onClick={handleSignOut}
-                  disabled={isSigningOut}
-                >
-                  <UserIcon className="h-5 w-5" />
-                  <span className="text-sm">
-                    {isSigningOut ? "Saliendo..." : "Salir"}
-                  </span>
-                </button>
+                <>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Link
+                        href="/mis-reservas"
+                        className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                        aria-label="Mis reservas"
+                      >
+                        <UserIcon className="h-5 w-5" />
+                      </Link>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>{displayName}</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white cursor-pointer disabled:cursor-not-allowed disabled:opacity-60"
+                        onClick={handleSignOut}
+                        disabled={isSigningOut}
+                        aria-label={
+                          isSigningOut ? "Cerrando sesión" : "Cerrar sesión"
+                        }
+                      >
+                        <LogOutIcon className="h-5 w-5" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      <p>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </>
               ) : (
-                <Link
-                  href="/login"
-                  className="flex items-center gap-2 transition-colors hover:text-white"
-                >
-                  <UserIcon className="h-5 w-5" />
-                  <span className="text-sm">Ingresar</span>
-                </Link>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/login"
+                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                      aria-label="Ingresar"
+                    >
+                      <UserIcon className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">
+                    <p>Ingresar</p>
+                  </TooltipContent>
+                </Tooltip>
               )}
 
-              <Link
-                href="/carrito"
-                className="relative flex size-8 items-center justify-center transition-colors hover:bg-white/20"
-                aria-label={totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
-              >
-                <ShoppingCartIcon className="h-5 w-5" />
-                {totalItems > 0 && (
-                  <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary">
-                    {totalItems}
-                  </span>
-                )}
-              </Link>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    href="/carrito"
+                    className="relative flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                    aria-label={
+                      totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
+                    }
+                  >
+                    <ShoppingCartIcon className="h-5 w-5" />
+                    {totalItems > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-white text-[10px] font-bold text-primary">
+                        {totalItems}
+                      </span>
+                    )}
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">
+                  <p>{totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}</p>
+                </TooltipContent>
+              </Tooltip>
             </div>
           </div>
 
@@ -195,7 +240,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
         {/* Links */}
         <nav className="flex-1 overflow-y-auto px-6 py-4">
           <ul className="flex flex-col">
-            {navLinks.map((link) => (
+            {resolvedNavLinks.map((link) => (
               <li key={link.label}>
                 <Link
                   href={link.href}

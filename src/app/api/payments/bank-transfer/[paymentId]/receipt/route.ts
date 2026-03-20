@@ -1,7 +1,13 @@
 import { NextResponse } from "next/server"
 
 import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
+import {
+  PaymentReceiptAccessDeniedException,
+  PaymentReceiptValidationException,
+} from "@/exceptions/payments/payments.exceptions"
 import { createClient } from "@/lib/supabase/server"
+
+const JSON_CONTENT_TYPE = "application/json"
 
 export async function POST(
   request: Request,
@@ -21,34 +27,84 @@ export async function POST(
       )
     }
 
-    const formData = await request.formData()
-    const receipt = formData.get("receipt")
+    const paymentsController = await createServerPaymentsController()
+    const contentType = request.headers.get("content-type") ?? ""
+    const result = contentType.includes(JSON_CONTENT_TYPE)
+      ? await (async () => {
+          const body = (await request.json()) as {
+            receiptStoragePath?: string
+            fileName?: string
+            fileType?: string
+            receiptReference?: string
+            note?: string
+          }
 
-    if (!(receipt instanceof File)) {
-      return NextResponse.json(
-        { error: "El comprobante es obligatorio." },
-        { status: 400 },
-      )
+          if (
+            !body.receiptStoragePath?.trim() ||
+            !body.fileName?.trim() ||
+            !body.fileType?.trim()
+          ) {
+            return NextResponse.json(
+              { error: "Faltan datos para registrar el comprobante." },
+              { status: 400 },
+            )
+          }
+
+          const uploadResult =
+            await paymentsController.registerBankTransferReceiptUpload({
+              paymentId,
+              userId: user.id,
+              receiptStoragePath: body.receiptStoragePath.trim(),
+              fileName: body.fileName.trim(),
+              fileType: body.fileType.trim(),
+              receiptReference: body.receiptReference?.trim() || undefined,
+              note: body.note?.trim() || undefined,
+            })
+
+          return NextResponse.json(uploadResult, { status: 200 })
+        })()
+      : await (async () => {
+          const formData = await request.formData()
+          const receipt = formData.get("receipt")
+
+          if (!(receipt instanceof File)) {
+            return NextResponse.json(
+              { error: "El comprobante es obligatorio." },
+              { status: 400 },
+            )
+          }
+
+          const receiptReference = formData.get("receiptReference")
+          const note = formData.get("note")
+          const uploadResult = await paymentsController.uploadBankTransferReceipt({
+            paymentId,
+            userId: user.id,
+            fileName: receipt.name,
+            fileType: receipt.type || "application/octet-stream",
+            fileBuffer: await receipt.arrayBuffer(),
+            receiptReference:
+              typeof receiptReference === "string" && receiptReference.trim().length > 0
+                ? receiptReference.trim()
+                : undefined,
+            note:
+              typeof note === "string" && note.trim().length > 0
+                ? note.trim()
+                : undefined,
+          })
+
+          return NextResponse.json(uploadResult, { status: 200 })
+        })()
+
+    return result
+  } catch (error) {
+    if (error instanceof PaymentReceiptAccessDeniedException) {
+      return NextResponse.json({ error: error.message }, { status: 403 })
     }
 
-    const receiptReference = formData.get("receiptReference")
-    const note = formData.get("note")
-    const paymentsController = await createServerPaymentsController()
-    const result = await paymentsController.uploadBankTransferReceipt({
-      paymentId,
-      userId: user.id,
-      fileName: receipt.name,
-      fileType: receipt.type || "application/octet-stream",
-      fileBuffer: await receipt.arrayBuffer(),
-      receiptReference:
-        typeof receiptReference === "string" && receiptReference.trim().length > 0
-          ? receiptReference.trim()
-          : undefined,
-      note: typeof note === "string" && note.trim().length > 0 ? note.trim() : undefined,
-    })
+    if (error instanceof PaymentReceiptValidationException) {
+      return NextResponse.json({ error: error.message }, { status: 400 })
+    }
 
-    return NextResponse.json(result, { status: 200 })
-  } catch (error) {
     return NextResponse.json(
       {
         error:

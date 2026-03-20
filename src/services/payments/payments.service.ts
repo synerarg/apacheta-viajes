@@ -7,8 +7,10 @@ import {
 import { getBankTransferConfig } from "@/lib/payments/payments.config"
 import { createPaymentsRepository } from "@/repositories/payments/payments.repository"
 import type {
+  AuthorizeBankTransferReceiptUploadInput,
   BankTransferConfirmationResult,
   BankTransferPaymentResult,
+  BankTransferReceiptUploadAuthorizationResult,
   BankTransferReceiptUploadResult,
   CashLocalPaymentResult,
   CheckoutOrderSummary,
@@ -19,6 +21,7 @@ import type {
   MercadoPagoCheckoutProResult,
   PaymentReceiptAccessInput,
   PaymentReceiptDownloadResult,
+  RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
 } from "@/types/payments/payments.types"
 import type { DatabaseClient } from "@/types/database/database.types"
@@ -231,6 +234,18 @@ export class PaymentsService {
     input: UploadBankTransferReceiptInput,
   ): Promise<BankTransferReceiptUploadResult> {
     return this.bankTransferPaymentService.uploadReceipt(input)
+  }
+
+  async authorizeBankTransferReceiptUpload(
+    input: AuthorizeBankTransferReceiptUploadInput,
+  ): Promise<BankTransferReceiptUploadAuthorizationResult> {
+    return this.bankTransferPaymentService.authorizeReceiptUpload(input)
+  }
+
+  async registerBankTransferReceiptUpload(
+    input: RegisterBankTransferReceiptInput,
+  ): Promise<BankTransferReceiptUploadResult> {
+    return this.bankTransferPaymentService.registerUploadedReceipt(input)
   }
 
   async getCheckoutOrderSummary(orderId: string): Promise<CheckoutOrderSummary> {

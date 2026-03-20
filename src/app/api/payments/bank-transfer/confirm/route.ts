@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
+import { createAdminPaymentsController } from "@/controllers/payments/payments.controller"
+import { requireAdminSession } from "@/lib/dashboard/admin-auth"
 
 const confirmBankTransferSchema = z.object({
   paymentId: z.string().uuid(),
@@ -18,13 +19,21 @@ const confirmBankTransferSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    await requireAdminSession()
     const body = await request.json()
     const payload = confirmBankTransferSchema.parse(body)
-    const paymentsController = await createServerPaymentsController()
+    const paymentsController = createAdminPaymentsController()
     const result = await paymentsController.confirmBankTransfer(payload)
 
     return NextResponse.json(result, { status: 200 })
   } catch (error) {
+    const status =
+      error instanceof Error && error.message === "No autenticado"
+        ? 401
+        : error instanceof Error && error.message === "No autorizado"
+          ? 403
+          : 400
+
     return NextResponse.json(
       {
         error:
@@ -32,7 +41,7 @@ export async function POST(request: Request) {
             ? error.message
             : "Bank transfer confirmation failed",
       },
-      { status: 400 },
+      { status },
     )
   }
 }

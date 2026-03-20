@@ -94,6 +94,24 @@ export interface UploadBankTransferReceiptInput {
   userId: string
 }
 
+export interface AuthorizeBankTransferReceiptUploadInput {
+  paymentId: string
+  userId: string
+  fileName: string
+  fileType: string
+  fileSize: number
+}
+
+export interface RegisterBankTransferReceiptInput {
+  paymentId: string
+  userId: string
+  receiptStoragePath: string
+  fileName: string
+  fileType: string
+  receiptReference?: string
+  note?: string
+}
+
 export interface BankTransferDetails {
   bankName: string
   accountHolder: string
@@ -144,6 +162,15 @@ export interface BankTransferReceiptUploadResult {
   hasReceipt: boolean
   receiptUrl: string | null
   uploadedAt: string
+}
+
+export interface BankTransferReceiptUploadAuthorizationResult {
+  orderId: string
+  paymentId: string
+  bucket: string
+  path: string
+  token: string
+  maxBytes: number
 }
 
 export interface CreatePaymentInput {

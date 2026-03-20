@@ -1,16 +1,19 @@
 import {
+  PaymentReceiptAccessDeniedException,
   PaymentReceiptValidationException,
-  PaymentsServiceException,
 } from "@/exceptions/payments/payments.exceptions"
 import { getBankTransferConfig } from "@/lib/payments/payments.config"
 import type { PaymentsRepository } from "@/repositories/payments/payments.repository"
 import type { TransactionalEmailService } from "@/services/notifications/transactional-email.service"
 import type {
+  AuthorizeBankTransferReceiptUploadInput,
   BankTransferConfirmationResult,
   BankTransferPaymentResult,
+  BankTransferReceiptUploadAuthorizationResult,
   BankTransferReceiptUploadResult,
   ConfirmBankTransferInput,
   CreateBankTransferPaymentInput,
+  RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
 } from "@/types/payments/payments.types"
 
@@ -48,6 +51,10 @@ function isPaymentExpired(expiresAt?: string | null) {
   return Date.parse(expiresAt) <= Date.now()
 }
 
+function buildPaymentOwnershipPrefix(orderId: string, paymentId: string) {
+  return `${orderId}/${paymentId}/`
+}
+
 export class BankTransferPaymentService {
   constructor(
     private readonly paymentsRepository: PaymentsRepository,
@@ -76,6 +83,144 @@ export class BankTransferPaymentService {
     } catch (error) {
       console.error("Failed to send payment approved email", error)
     }
+  }
+
+  private async getReceiptUploadContext(paymentId: string, userId: string) {
+    const payment = await this.paymentsRepository.getPaymentById(paymentId)
+    const orderContext = await this.paymentsRepository.getOrderContext(payment.orden_id)
+
+    if (orderContext.order.usuario_id !== userId) {
+      throw new PaymentReceiptAccessDeniedException(
+        "bankTransferReceipt",
+        new Error("Payment does not belong to the authenticated user"),
+      )
+    }
+
+    return {
+      payment,
+      orderContext,
+      config: getBankTransferConfig(),
+    }
+  }
+
+  private async expirePaymentIfNeeded(input: {
+    paymentId: string
+    orderId: string
+    expiresAt?: string | null
+    status: string
+  }) {
+    if (!isPaymentExpired(input.expiresAt) || input.status === "approved") {
+      return false
+    }
+
+    const expiredAt = new Date().toISOString()
+
+    await this.paymentsRepository.updatePaymentById(input.paymentId, {
+      estado: "expired",
+      updated_at: expiredAt,
+    })
+    await this.paymentsRepository.updateOrderById(input.orderId, {
+      estado: "cancelada",
+      estado_pago: "expired",
+      updated_at: expiredAt,
+    })
+    await this.paymentsRepository.updateOrderReservationsStatus(
+      input.orderId,
+      "cancelada",
+      `Transferencia expirada antes de completar el comprobante. payment_id=${input.paymentId}`,
+    )
+    await this.paymentsRepository.createPaymentEvent({
+      pago_id: input.paymentId,
+      tipo: "bank_transfer.expired",
+      estado: "expired",
+      mensaje: "Transferencia expirada antes de recibir comprobante",
+      payload: {
+        expiredAt,
+      },
+    })
+
+    return true
+  }
+
+  private validateReceiptFile(input: {
+    config: ReturnType<typeof getBankTransferConfig>
+    fileName: string
+    fileType: string
+    fileSize?: number
+  }) {
+    const allowedExtensions =
+      MIME_TYPE_TO_EXTENSIONS[input.fileType]?.map((value) => value.toLowerCase()) ?? []
+    const extension = resolveFileExtension(input.fileName)
+
+    if (!input.config.allowedReceiptMimeTypes.includes(input.fileType)) {
+      throw new PaymentReceiptValidationException(
+        "El formato del comprobante no es válido.",
+      )
+    }
+
+    if (allowedExtensions.length > 0 && !allowedExtensions.includes(extension)) {
+      throw new PaymentReceiptValidationException(
+        "La extensión del archivo no coincide con el tipo de comprobante.",
+      )
+    }
+
+    if (typeof input.fileSize === "number") {
+      if (!Number.isFinite(input.fileSize) || input.fileSize <= 0) {
+        throw new PaymentReceiptValidationException(
+          "El comprobante no puede estar vacío.",
+        )
+      }
+
+      if (input.fileSize > input.config.receiptMaxBytes) {
+        throw new PaymentReceiptValidationException(
+          "El comprobante excede el tamaño máximo permitido.",
+        )
+      }
+    }
+  }
+
+  private async validateReceiptUploadState(input: {
+    paymentId: string
+    orderId: string
+    paymentStatus: string
+    expiresAt?: string | null
+    maxReuploads: number
+  }) {
+    const isExpired = await this.expirePaymentIfNeeded({
+      paymentId: input.paymentId,
+      orderId: input.orderId,
+      expiresAt: input.expiresAt,
+      status: input.paymentStatus,
+    })
+
+    if (isExpired) {
+      throw new PaymentReceiptValidationException(
+        "La ventana para informar esta transferencia ya venció.",
+      )
+    }
+
+    if (
+      input.paymentStatus === "approved" ||
+      input.paymentStatus === "cancelled" ||
+      input.paymentStatus === "rejected" ||
+      input.paymentStatus === "expired"
+    ) {
+      throw new PaymentReceiptValidationException(
+        "Este pago ya no admite nuevos comprobantes.",
+      )
+    }
+
+    const previousUploads = (
+      await this.paymentsRepository.listPaymentEvents(input.paymentId)
+    ).filter((event) => event.tipo === "bank_transfer.receipt_uploaded").length
+
+    if (previousUploads >= input.maxReuploads) {
+      throw new PaymentReceiptValidationException(
+        "Superaste la cantidad máxima de reintentos para este comprobante.",
+      )
+    }
+
+    return previousUploads
   }
 
   async createInstructions(
@@ -149,64 +294,14 @@ export class BankTransferPaymentService {
   async uploadReceipt(
     input: UploadBankTransferReceiptInput,
   ): Promise<BankTransferReceiptUploadResult> {
-    const payment = await this.paymentsRepository.getPaymentById(input.paymentId)
-    const orderContext = await this.paymentsRepository.getOrderContext(payment.orden_id)
-
-    if (orderContext.order.usuario_id !== input.userId) {
-      throw new PaymentsServiceException(
-        "uploadReceipt",
-        new Error("Payment does not belong to the authenticated user"),
-      )
-    }
-
-    const config = getBankTransferConfig()
+    const { payment, orderContext, config } = await this.getReceiptUploadContext(
+      input.paymentId,
+      input.userId,
+    )
 
     if (payment.metodo !== "bank_transfer") {
       throw new PaymentReceiptValidationException(
         "El comprobante sólo puede cargarse para pagos por transferencia.",
-      )
-    }
-
-    if (isPaymentExpired(payment.expires_at)) {
-      const expiredAt = new Date().toISOString()
-
-      await this.paymentsRepository.updatePaymentById(payment.id, {
-        estado: "expired",
-        updated_at: expiredAt,
-      })
-      await this.paymentsRepository.updateOrderById(orderContext.order.id, {
-        estado: "cancelada",
-        estado_pago: "expired",
-        updated_at: expiredAt,
-      })
-      await this.paymentsRepository.updateOrderReservationsStatus(
-        orderContext.order.id,
-        "cancelada",
-        `Transferencia expirada antes de cargar comprobante. payment_id=${payment.id}`,
-      )
-      await this.paymentsRepository.createPaymentEvent({
-        pago_id: payment.id,
-        tipo: "bank_transfer.expired",
-        estado: "expired",
-        mensaje: "Transferencia expirada antes de recibir comprobante",
-        payload: {
-          expiredAt,
-        },
-      })
-
-      throw new PaymentReceiptValidationException(
-        "La ventana para informar esta transferencia ya venció.",
-      )
-    }
-
-    if (
-      payment.estado === "approved" ||
-      payment.estado === "cancelled" ||
-      payment.estado === "rejected" ||
-      payment.estado === "expired"
-    ) {
-      throw new PaymentReceiptValidationException(
-        "Este pago ya no admite nuevos comprobantes.",
       )
     }
 
@@ -222,31 +317,19 @@ export class BankTransferPaymentService {
       )
     }
 
-    const allowedExtensions =
-      MIME_TYPE_TO_EXTENSIONS[input.fileType]?.map((value) => value.toLowerCase()) ?? []
-    const extension = resolveFileExtension(input.fileName)
-
-    if (!config.allowedReceiptMimeTypes.includes(input.fileType)) {
-      throw new PaymentReceiptValidationException(
-        "El formato del comprobante no es válido.",
-      )
-    }
-
-    if (allowedExtensions.length > 0 && !allowedExtensions.includes(extension)) {
-      throw new PaymentReceiptValidationException(
-        "La extensión del archivo no coincide con el tipo de comprobante.",
-      )
-    }
-
-    const previousUploads = (
-      await this.paymentsRepository.listPaymentEvents(payment.id)
-    ).filter((event) => event.tipo === "bank_transfer.receipt_uploaded").length
-
-    if (previousUploads >= config.receiptMaxReuploads) {
-      throw new PaymentReceiptValidationException(
-        "Superaste la cantidad máxima de reintentos para este comprobante.",
-      )
-    }
+    this.validateReceiptFile({
+      config,
+      fileName: input.fileName,
+      fileType: input.fileType,
+      fileSize: input.fileBuffer.byteLength,
+    })
+    const previousUploads = await this.validateReceiptUploadState({
+      paymentId: payment.id,
+      orderId: orderContext.order.id,
+      paymentStatus: payment.estado,
+      expiresAt: payment.expires_at,
+      maxReuploads: config.receiptMaxReuploads,
+    })
 
     const upload = await this.paymentsRepository.uploadBankTransferReceipt({
       paymentId: payment.id,
@@ -260,6 +343,154 @@ export class BankTransferPaymentService {
     await this.paymentsRepository.updatePaymentById(payment.id, {
       estado: nextStatus,
       receipt_storage_path: upload.receiptStoragePath,
+      receipt_url: null,
+      receipt_reference: input.receiptReference ?? payment.receipt_reference,
+      updated_at: uploadedAt,
+    })
+
+    await this.paymentsRepository.updateOrderById(orderContext.order.id, {
+      estado: "pago_reportado",
+      estado_pago: nextStatus,
+      updated_at: uploadedAt,
+    })
+
+    await this.paymentsRepository.updateOrderReservationsStatus(
+      orderContext.order.id,
+      "confirmada",
+      `Comprobante de transferencia cargado. payment_id=${payment.id}`,
+    )
+
+    await this.paymentsRepository.createPaymentEvent({
+      pago_id: payment.id,
+      tipo: "bank_transfer.receipt_uploaded",
+      estado: nextStatus,
+      mensaje: "Comprobante de transferencia cargado por el cliente",
+      payload: {
+        note: input.note ?? null,
+        receiptReference: input.receiptReference ?? null,
+        reuploadNumber: previousUploads + 1,
+      },
+    })
+
+    await this.notifyReceiptReported(payment.id)
+
+    return {
+      orderId: orderContext.order.id,
+      paymentId: payment.id,
+      status: nextStatus,
+      receiptReference: input.receiptReference ?? payment.receipt_reference,
+      hasReceipt: true,
+      receiptUrl: null,
+      uploadedAt,
+    }
+  }
+
+  async authorizeReceiptUpload(
+    input: AuthorizeBankTransferReceiptUploadInput,
+  ): Promise<BankTransferReceiptUploadAuthorizationResult> {
+    const { payment, orderContext, config } = await this.getReceiptUploadContext(
+      input.paymentId,
+      input.userId,
+    )
+
+    if (payment.metodo !== "bank_transfer") {
+      throw new PaymentReceiptValidationException(
+        "El comprobante sólo puede cargarse para pagos por transferencia.",
+      )
+    }
+
+    this.validateReceiptFile({
+      config,
+      fileName: input.fileName,
+      fileType: input.fileType,
+      fileSize: input.fileSize,
+    })
+    await this.validateReceiptUploadState({
+      paymentId: payment.id,
+      orderId: orderContext.order.id,
+      paymentStatus: payment.estado,
+      expiresAt: payment.expires_at,
+      maxReuploads: config.receiptMaxReuploads,
+    })
+
+    const upload = await this.paymentsRepository.createBankTransferReceiptSignedUploadUrl(
+      {
+        paymentId: payment.id,
+        fileName: input.fileName,
+      },
+    )
+
+    return {
+      orderId: orderContext.order.id,
+      paymentId: payment.id,
+      bucket: upload.bucket,
+      path: upload.path,
+      token: upload.token,
+      maxBytes: config.receiptMaxBytes,
+    }
+  }
+
+  async registerUploadedReceipt(
+    input: RegisterBankTransferReceiptInput,
+  ): Promise<BankTransferReceiptUploadResult> {
+    const { payment, orderContext, config } = await this.getReceiptUploadContext(
+      input.paymentId,
+      input.userId,
+    )
+
+    if (payment.metodo !== "bank_transfer") {
+      throw new PaymentReceiptValidationException(
+        "El comprobante sólo puede cargarse para pagos por transferencia.",
+      )
+    }
+
+    this.validateReceiptFile({
+      config,
+      fileName: input.fileName,
+      fileType: input.fileType,
+    })
+
+    if (
+      !input.receiptStoragePath.startsWith(
+        buildPaymentOwnershipPrefix(orderContext.order.id, payment.id),
+      )
+    ) {
+      throw new PaymentReceiptValidationException(
+        "La referencia del comprobante no corresponde a este pago.",
+      )
+    }
+
+    if (
+      payment.estado === "reported" &&
+      payment.receipt_storage_path === input.receiptStoragePath
+    ) {
+      return {
+        orderId: orderContext.order.id,
+        paymentId: payment.id,
+        status: payment.estado,
+        receiptReference: payment.receipt_reference,
+        hasReceipt: true,
+        receiptUrl: null,
+        uploadedAt: payment.updated_at ?? payment.created_at ?? new Date().toISOString(),
+      }
+    }
+
+    const previousUploads = await this.validateReceiptUploadState({
+      paymentId: payment.id,
+      orderId: orderContext.order.id,
+      paymentStatus: payment.estado,
+      expiresAt: payment.expires_at,
+      maxReuploads: config.receiptMaxReuploads,
+    })
+
+    await this.paymentsRepository.assertReceiptObjectExists(input.receiptStoragePath)
+
+    const uploadedAt = new Date().toISOString()
+    const nextStatus = "reported" as const
+
+    await this.paymentsRepository.updatePaymentById(payment.id, {
+      estado: nextStatus,
+      receipt_storage_path: input.receiptStoragePath,
       receipt_url: null,
       receipt_reference: input.receiptReference ?? payment.receipt_reference,
       updated_at: uploadedAt,
