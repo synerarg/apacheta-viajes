@@ -25,7 +25,7 @@ const lato = Lato({
 export const metadata: Metadata = {
   title: "Apacheta Viajes — Operador Turístico del Norte Argentino",
   description:
-    "DMC especializado en el NOA. Flota propia, diseño a medida y 25 años de experiencia en Salta y Jujuy.",
+    "DMC especializado en el NOA. Flo76ta propia, diseño a medida y 25 años de experiencia en Salta y Jujuy.",
 }
 
 export default function RootLayout({
@@ -39,7 +39,7 @@ export default function RootLayout({
         className={`${playfairDisplay.variable} ${lato.className} antialiased`}
       >
         <AuthSessionSync />
-        <Toaster richColors position="top-right" />
+        <Toaster richColors position="bottom-right" />
         <Navbar />
         {children}
         <Footer />

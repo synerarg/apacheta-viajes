@@ -30,7 +30,7 @@ export function SidebarCotizacion({
   }
 
   return (
-    <div className="border border-dark-brown/30 bg-white p-8">
+    <div className="border border-dark-brown/30 bg-white p-5 sm:p-6 md:p-8">
       {/* Price header */}
       <div className="mb-6">
         <p className="font-serif text-2xl text-dark-brown mb-1">

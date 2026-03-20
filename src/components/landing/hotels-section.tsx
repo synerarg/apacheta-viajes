@@ -64,7 +64,7 @@ export function HotelsSection({ hotels }: HotelsSectionProps) {
 
         {/* CTA Button */}
         <div className="mt-12 text-center">
-          <Link href="/#contacto">
+          <Link href="/hoteleria">
             <Button
               variant="default"
               size="lg"

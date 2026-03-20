@@ -25,14 +25,13 @@ export function CartView() {
   }
 
   return (
-    <main className="min-h-screen bg-off-white pt-28 pb-16">
+    <main className="min-h-screen bg-off-white pt-36 pb-16">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
-        {/* Page Header */}
         <div className="mb-10">
           <p className="text-sm text-subtle font-sans tracking-[0.15em] uppercase mb-2">
             Resumen
           </p>
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-[64px] font-normal text-dark-brown italic mb-2">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal text-dark-brown italic mb-2">
             Tu Selección
           </h1>
           <p className="text-base text-subtle font-sans">
@@ -40,9 +39,7 @@ export function CartView() {
           </p>
         </div>
 
-        {/* Two Column Layout */}
         <div className="flex flex-col lg:flex-row gap-8 lg:gap-12">
-          {/* Left Column - Cart Items */}
           <div className="flex-1">
             {!isEmpty ? (
               <div className="flex flex-col">
@@ -72,7 +69,7 @@ export function CartView() {
                       {/* Delete Button */}
                       <button
                         onClick={() => removeItem(item.id)}
-                        className="absolute top-0 right-0 text-primary hover:text-primary/80 transition-colors"
+                        className="absolute top-0 right-0 text-primary hover:text-primary/80 transition-colors cursor-pointer"
                         aria-label="Eliminar item"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -98,20 +95,20 @@ export function CartView() {
                         </p>
 
                         {/* Quantity Stepper */}
-                        <div className="flex items-center border border-dark-brown h-8">
+                        <div className="flex items-center border border-dark-brown h-10 md:h-8">
                           <button
                             onClick={() => updateQuantity(item.id, -1)}
-                            className="w-8 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors"
+                            className="w-10 md:w-8 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors cursor-pointer"
                             aria-label="Disminuir cantidad"
                           >
                             <Minus className="w-3 h-3 text-dark-brown" />
                           </button>
-                          <span className="w-8 h-full flex items-center justify-center text-sm font-sans text-dark-brown border-x border-dark-brown">
+                          <span className="w-10 md:w-8 h-full flex items-center justify-center text-sm font-sans text-dark-brown border-x border-dark-brown">
                             {item.quantity}
                           </span>
                           <button
                             onClick={() => updateQuantity(item.id, 1)}
-                            className="w-8 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors"
+                            className="w-10 md:w-8 h-full flex items-center justify-center hover:bg-dark-brown/10 transition-colors cursor-pointer"
                             aria-label="Aumentar cantidad"
                           >
                             <Plus className="w-3 h-3 text-dark-brown" />
@@ -138,8 +135,8 @@ export function CartView() {
           </div>
 
           {/* Right Column - Order Summary */}
-          <div className="lg:w-[380px] flex-shrink-0">
-            <div className="sticky top-28 bg-white border border-dark-brown/20 p-8">
+          <div className="lg:w-[340px] xl:w-[380px] flex-shrink-0">
+            <div className="sticky top-28 bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
               <h2 className="font-serif text-2xl font-semibold text-dark-brown mb-6">
                 Resumen
               </h2>

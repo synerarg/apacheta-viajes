@@ -6,7 +6,7 @@ interface HeroSectionProps {
 
 export function HeroSection({ image }: HeroSectionProps) {
   return (
-    <section className="min-h-[80vh] pt-24 pb-16 bg-off-white">
+    <section className="min-h-[80vh] pt-36 pb-16 bg-off-white">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="grid lg:grid-cols-[55fr_45fr] gap-8 lg:gap-12 items-center min-h-[calc(80vh-6rem)]">
           {/* Left Column - Text */}
@@ -29,8 +29,11 @@ export function HeroSection({ image }: HeroSectionProps) {
               src={image}
               alt="Avión en pista de aeropuerto"
               fill
-              className="object-cover"
+              quality={100}
               priority
+              loading="eager"
+              sizes="(max-width: 1024px) 100vw, 45vw"
+              className="object-cover object-center"
             />
           </div>
         </div>

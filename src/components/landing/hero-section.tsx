@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 
 export function HeroSection() {
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section className="relative h-screen flex items-center justify-center overflow-hidden pt-36 pb-10">
       {/* Background Image */}
       <div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -17,7 +17,7 @@ export function HeroSection() {
       <div className="absolute inset-0 bg-black/40" />
 
       {/* Content */}
-      <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto pt-20">
+      <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto ">
         {/* Badge */}
         <div className="bg-primary px-4 py-2 rounded mb-8">
           <span className="text-white text-sm font-medium tracking-wide uppercase">
@@ -44,7 +44,8 @@ export function HeroSection() {
           <Button
             asChild
             size="lg"
-            className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-base"
+            variant="outline"
+            className="bg-primary hover:bg-primary/90 hover:text-white border-primary text-white px-8 py-6 text-base"
           >
             <Link href="/#paquetes">Explorar Paquetes</Link>
           </Button>
@@ -52,7 +53,7 @@ export function HeroSection() {
             asChild
             size="lg"
             variant="outline"
-            className="border-white text-white hover:bg-white/10 bg-transparent px-8 py-6 text-base"
+            className="border-white text-white hover:bg-white/10 hover:text-white bg-transparent px-8 py-6 text-base"
           >
             <Link href="/#contacto">Armar mi viaje</Link>
           </Button>

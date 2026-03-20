@@ -48,7 +48,7 @@ export function AboutSection() {
           </div>
 
           {/* Image */}
-          <div className="relative w-full h-full">
+          <div className="relative w-full min-h-[280px] sm:min-h-[360px] lg:min-h-[480px]">
             <Image
               src="/landing/about.png"
               alt="Vista panorámica de Salta con montañas y la iglesia San Bernardo"

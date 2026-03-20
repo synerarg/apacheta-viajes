@@ -9,7 +9,7 @@ export interface ContactRequestPayload {
   numeroPasajeros?: number
   mensaje?: string
   metadata?: {
-    source: "landing" | "para-agencias"
+    source: "landing" | "para-agencias" | "contacto"
     agencyName?: string
     phone?: string
   }

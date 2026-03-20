@@ -7,7 +7,7 @@ const footerColumns = [
     links: [
       { label: "Paquetes NOA", href: "/paquetes" },
       { label: "Experiencias", href: "/experiencias" },
-      { label: "Hotelería", href: "/#hoteleria" },
+      { label: "Hotelería", href: "/hoteleria" },
       { label: "Emisivo", href: "/emisivo" },
     ],
   },

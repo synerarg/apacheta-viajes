@@ -1,72 +1,8 @@
 "use client"
 
-import { useState } from "react"
-import { toast } from "sonner"
-
-import { Button } from "@/components/ui/button"
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
-import { submitContactRequest } from "@/lib/contact/contact-request"
+import { TravelInquiryForm } from "@/components/shared/travel-inquiry-form"
 
 export function ContactSection() {
-  const [formData, setFormData] = useState({
-    nombreCompleto: "",
-    agenciaEmpresa: "",
-    tipoViaje: "",
-    presupuestoEstimado: "",
-    fechasEstimadas: "",
-    numeroPasajeros: "",
-    mensaje: "",
-  })
-  const [isSubmitting, setIsSubmitting] = useState(false)
-
-  async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-
-    try {
-      setIsSubmitting(true)
-
-      await submitContactRequest({
-        nombreCompleto: formData.nombreCompleto,
-        tipoViaje: formData.tipoViaje || undefined,
-        presupuestoEstimado: formData.presupuestoEstimado || undefined,
-        fechasEstimadas: formData.fechasEstimadas || undefined,
-        numeroPasajeros: formData.numeroPasajeros
-          ? Number(formData.numeroPasajeros)
-          : undefined,
-        mensaje: formData.mensaje || undefined,
-        metadata: {
-          source: "landing",
-          agencyName: formData.agenciaEmpresa || undefined,
-        },
-      })
-
-      setFormData({
-        nombreCompleto: "",
-        agenciaEmpresa: "",
-        tipoViaje: "",
-        presupuestoEstimado: "",
-        fechasEstimadas: "",
-        numeroPasajeros: "",
-        mensaje: "",
-      })
-      toast.success("Recibimos tu solicitud.")
-    } catch (error) {
-      toast.error(
-        error instanceof Error
-          ? error.message
-          : "No se pudo enviar la solicitud.",
-      )
-    } finally {
-      setIsSubmitting(false)
-    }
-  }
-
   return (
     <section id="contacto" className="py-16 md:py-24">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
@@ -81,9 +17,9 @@ export function ContactSection() {
         </div>
 
         {/* Content */}
-        <div className="grid lg:grid-cols-2 gap-12 mx-auto">
-          {/* Left Column - Contact Info */}
-          <div>
+        <div className="grid lg:grid-cols-2 gap-12 mx-auto items-stretch">
+          {/* Left Column - Contact Info + Map */}
+          <div className="flex flex-col">
             <h3 className="text-xl font-medium text-foreground mb-6">
               Datos de Contacto
             </h3>
@@ -143,189 +79,29 @@ export function ContactSection() {
             </div>
 
             {/* Map */}
-            <div className="rounded-lg overflow-hidden border border-border">
+            <div className="flex-1 min-h-[200px] overflow-hidden border border-border">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14687.441542044857!2d-65.41499!3d-24.7859!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941bc3a0d5a94a3d%3A0x7a7e0c8c7c5c5c5c!2sSalta%2C%20Argentina!5e0!3m2!1sen!2sus!4v1234567890"
                 width="100%"
-                height="200"
-                style={{ border: 0 }}
+                height="100%"
+                style={{ border: 0, display: "block" }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Ubicación Apacheta Viajes"
-                className="grayscale"
               />
             </div>
           </div>
 
-          {/* Right Column - Contact Form */}
+          {/* Right Column - Form */}
           <div>
             <h3 className="text-xl font-medium text-foreground mb-2">
               Envíenos un mensaje
             </h3>
             <p className="text-muted-foreground text-sm mb-6">
-              Cuéntenos sobre sus planes de viaje y diseñaremos una experiencia
-              a medida.
+              Cuéntenos sobre sus planes de viaje y diseñaremos una experiencia a medida.
             </p>
-
-            <form
-              autoComplete="off"
-              className="flex flex-col gap-5"
-              onSubmit={handleSubmit}
-            >
-              {/* Row 1 */}
-              <div className="grid md:grid-cols-2 gap-5">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm text-muted-foreground">
-                    Nombre Completo
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="name"
-                    value={formData.nombreCompleto}
-                    onChange={(event) =>
-                      setFormData((currentData) => ({
-                        ...currentData,
-                        nombreCompleto: event.target.value,
-                      }))
-                    }
-                    className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm text-muted-foreground">
-                    Agencia / Empresa (Opcional)
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="organization"
-                    value={formData.agenciaEmpresa}
-                    onChange={(event) =>
-                      setFormData((currentData) => ({
-                        ...currentData,
-                        agenciaEmpresa: event.target.value,
-                      }))
-                    }
-                    className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Row 2 */}
-              <div className="grid md:grid-cols-2 gap-5">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm text-muted-foreground">
-                    Tipo de Viaje
-                  </label>
-                  <Select
-                    value={formData.tipoViaje}
-                    onValueChange={(value) =>
-                      setFormData((currentData) => ({
-                        ...currentData,
-                        tipoViaje: value,
-                      }))
-                    }
-                  >
-                    <SelectTrigger className="bg-transparent border-0 border-b border-border rounded-none px-0 py-2 h-auto focus:ring-0 focus:ring-offset-0">
-                      <SelectValue placeholder="Seleccionar..." />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="receptivo">
-                        Turismo Receptivo
-                      </SelectItem>
-                      <SelectItem value="emisivo">Turismo Emisivo</SelectItem>
-                      <SelectItem value="corporativo">
-                        Viaje Corporativo
-                      </SelectItem>
-                      <SelectItem value="grupos">Grupos</SelectItem>
-                      <SelectItem value="otro">Otro</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm text-muted-foreground">
-                    Presupuesto Estimado
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    value={formData.presupuestoEstimado}
-                    onChange={(event) =>
-                      setFormData((currentData) => ({
-                        ...currentData,
-                        presupuestoEstimado: event.target.value,
-                      }))
-                    }
-                    className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Row 3 */}
-              <div className="grid md:grid-cols-2 gap-5">
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm text-muted-foreground">
-                    Fechas Estimadas
-                  </label>
-                  <input
-                    type="text"
-                    autoComplete="off"
-                    value={formData.fechasEstimadas}
-                    onChange={(event) =>
-                      setFormData((currentData) => ({
-                        ...currentData,
-                        fechasEstimadas: event.target.value,
-                      }))
-                    }
-                    className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-                <div className="flex flex-col gap-1.5">
-                  <label className="text-sm text-muted-foreground">
-                    Número de Pasajeros Estimado
-                  </label>
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    autoComplete="off"
-                    value={formData.numeroPasajeros}
-                    onChange={(event) =>
-                      setFormData((currentData) => ({
-                        ...currentData,
-                        numeroPasajeros: event.target.value,
-                      }))
-                    }
-                    className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors"
-                  />
-                </div>
-              </div>
-
-              {/* Message */}
-              <div className="flex flex-col gap-1.5">
-                <label className="text-sm text-muted-foreground">Mensaje</label>
-                <textarea
-                  rows={3}
-                  autoComplete="off"
-                  value={formData.mensaje}
-                  onChange={(event) =>
-                    setFormData((currentData) => ({
-                      ...currentData,
-                      mensaje: event.target.value,
-                    }))
-                  }
-                  className="bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors resize-none"
-                />
-              </div>
-
-              {/* Submit */}
-              <Button
-                type="submit"
-                disabled={isSubmitting}
-                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2"
-              >
-                Enviar Solicitud
-              </Button>
-            </form>
+            <TravelInquiryForm source="landing" />
           </div>
         </div>
       </div>

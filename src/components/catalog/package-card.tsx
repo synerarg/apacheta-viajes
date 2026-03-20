@@ -10,9 +10,9 @@ interface PackageCardProps {
 
 export function PackageCard({ paquete }: PackageCardProps) {
   return (
-    <div className="flex flex-col md:flex-row gap-0 border-b border-dark-brown/15 pb-10 mb-10">
+    <div className="flex flex-col md:flex-row gap-0 border-b border-dark-brown/15 pb-6 mb-6 md:pb-10 md:mb-10">
       {/* Image */}
-      <div className="relative w-full md:w-[572px] h-[220px] md:h-[313px] flex-shrink-0 overflow-hidden bg-muted">
+      <div className="relative w-full md:w-[572px] h-[200px] sm:h-[240px] md:h-[313px] flex-shrink-0 overflow-hidden bg-muted">
         {paquete.image && (
           <Image
             src={paquete.image}
@@ -32,7 +32,7 @@ export function PackageCard({ paquete }: PackageCardProps) {
           </span>
 
           {/* Title */}
-          <h3 className="font-serif text-2xl md:text-3xl font-medium text-dark-brown mb-4 leading-tight">
+          <h3 className="font-serif text-xl md:text-2xl lg:text-3xl font-medium text-dark-brown mb-4 leading-tight">
             {paquete.name}
           </h3>
 
@@ -72,7 +72,7 @@ export function PackageCard({ paquete }: PackageCardProps) {
             <p className="text-xs uppercase tracking-wide text-subtle font-sans mb-1">
               Desde
             </p>
-            <p className="font-sans text-2xl md:text-3xl font-bold text-primary">
+            <p className="font-sans text-xl md:text-2xl lg:text-3xl font-bold text-primary">
               {paquete.currency} ${paquete.price.toLocaleString("es-AR")}
             </p>
           </div>

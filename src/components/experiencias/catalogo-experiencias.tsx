@@ -34,14 +34,14 @@ export function CatalogoExperiencias({
   }
 
   return (
-    <main className="min-h-screen bg-off-white pt-28 pb-20">
+    <main className="min-h-screen bg-off-white pt-36 pb-20">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Header */}
         <div className="mb-12">
           <span className="text-xs uppercase tracking-[0.22em] text-subtle font-sans block mb-4">
             Elegí tu Experiencia
           </span>
-          <h1 className="font-serif text-4xl md:text-[64px] font-normal italic text-dark-brown mb-5 leading-tight">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal italic text-dark-brown mb-5 leading-tight">
             El Norte Argentino tiene algo
             <br className="hidden md:block" /> para cada viajero
           </h1>

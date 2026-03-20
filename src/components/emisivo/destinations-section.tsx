@@ -22,13 +22,11 @@ export function DestinationsSection({ destinations }: DestinationsSectionProps) 
     <section className="py-20 lg:py-28 bg-off-white">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         <div className="grid lg:grid-cols-[55fr_45fr] gap-8 lg:gap-12">
-          {/* Left Column - Destination List */}
           <div className="lg:sticky lg:top-28 lg:self-start">
             <span className="text-xs uppercase tracking-[0.2em] text-muted-foreground mb-8 block">
               Nuestros Destinos
             </span>
 
-            {/* Mobile: Horizontal scrollable tabs */}
             <div className="flex lg:hidden gap-3 overflow-x-auto pb-4 -mx-4 px-4">
               {destinations.map((destination) => (
                 <button
@@ -51,7 +49,7 @@ export function DestinationsSection({ destinations }: DestinationsSectionProps) 
                 <button
                   key={destination.id}
                   onClick={() => setActiveDestination(destination)}
-                  className={`text-left py-5 border-b border-dark-brown/20 transition-all duration-300 ${
+                  className={`text-left py-5 border-b border-dark-brown/20 transition-all duration-300 cursor-pointer ${
                     activeDestination.id === destination.id
                       ? "opacity-100"
                       : "opacity-30 hover:opacity-60"
@@ -67,8 +65,8 @@ export function DestinationsSection({ destinations }: DestinationsSectionProps) 
           </div>
 
           {/* Right Column - Destination Image with terracotta shadow */}
-          <div className="relative h-[350px] md:h-[500px] lg:h-[620px] rounded-[2px] overflow-hidden shadow-[8px_8px_0px_0px_rgba(180,83,56,0.15)]">
-            {destinations.map((destination) => (
+          <div className="relative h-[280px] sm:h-[350px] md:h-[500px] lg:h-[620px] rounded-[2px] overflow-hidden shadow-[4px_4px_0px_0px_rgba(180,83,56,0.15)] md:shadow-[8px_8px_0px_0px_rgba(180,83,56,0.15)]">
+            {destinations.map((destination, index) => (
               <div
                 key={destination.id}
                 className={`absolute inset-0 transition-opacity duration-500 ${
@@ -81,7 +79,11 @@ export function DestinationsSection({ destinations }: DestinationsSectionProps) 
                   src={destination.image}
                   alt={destination.name}
                   fill
-                  className="object-cover"
+                  quality={100}
+                  priority={index === 0}
+                  loading={index === 0 ? "eager" : "lazy"}
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 100vw, 45vw"
+                  className="object-cover object-center"
                 />
               </div>
             ))}

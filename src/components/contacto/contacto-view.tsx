@@ -1,31 +1,10 @@
 "use client"
 
-import { useState } from "react"
-import { MapPin, Mail, Phone, ChevronDown } from "lucide-react"
+import { MapPin, Mail, Phone } from "lucide-react"
+
+import { TravelInquiryForm } from "@/components/shared/travel-inquiry-form"
 
 export function ContactoView() {
-  const [formData, setFormData] = useState({
-    nombre: "",
-    email: "",
-    tipoViaje: "",
-    presupuesto: "",
-    fechas: "",
-    pasajeros: "",
-    mensaje: ""
-  })
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    console.log("Form submitted:", formData)
-  }
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-    setFormData(prev => ({
-      ...prev,
-      [e.target.name]: e.target.value
-    }))
-  }
-
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-20">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
@@ -34,7 +13,7 @@ export function ContactoView() {
           <p className="font-sans text-xs font-light tracking-[0.2em] uppercase text-subtle mb-3">
             Contacto
           </p>
-          <h1 className="font-serif text-5xl md:text-[64px] font-normal italic text-dark-brown">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal italic text-dark-brown">
             Hablemos
           </h1>
         </div>
@@ -124,100 +103,7 @@ export function ContactoView() {
             <p className="font-sans text-lg md:text-xl text-dark-brown mb-8">
               Cuéntenos sobre sus planes de viaje y diseñaremos una experiencia a medida.
             </p>
-
-            <form onSubmit={handleSubmit} autoComplete="off" className="space-y-6">
-              {/* Row 1 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <input
-                  type="text"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  placeholder="Nombre Completo"
-                  autoComplete="name"
-                  className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-b-2 focus:border-primary transition-all"
-                />
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleChange}
-                  placeholder="Correo Electrónico"
-                  autoComplete="email"
-                  className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-b-2 focus:border-primary transition-all"
-                />
-              </div>
-
-              {/* Row 2 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="relative">
-                  <select
-                    name="tipoViaje"
-                    value={formData.tipoViaje}
-                    onChange={handleChange}
-                    autoComplete="off"
-                    className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown focus:outline-none focus:border-b-2 focus:border-primary transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="">Tipo de Viaje</option>
-                    <option value="paquete-noa">Paquete NOA</option>
-                    <option value="experiencia">Experiencia</option>
-                    <option value="hoteleria">Hotelería</option>
-                    <option value="emisivo">Emisivo</option>
-                  </select>
-                  <ChevronDown className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 text-dark-brown pointer-events-none" />
-                </div>
-                <input
-                  type="text"
-                  name="presupuesto"
-                  value={formData.presupuesto}
-                  onChange={handleChange}
-                  placeholder="Presupuesto Estimado"
-                  autoComplete="off"
-                  className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-b-2 focus:border-primary transition-all"
-                />
-              </div>
-
-              {/* Row 3 */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <input
-                  type="text"
-                  name="fechas"
-                  value={formData.fechas}
-                  onChange={handleChange}
-                  placeholder="Fechas Estimadas"
-                  autoComplete="off"
-                  className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-b-2 focus:border-primary transition-all"
-                />
-                <input
-                  type="text"
-                  inputMode="numeric"
-                  name="pasajeros"
-                  value={formData.pasajeros}
-                  onChange={handleChange}
-                  placeholder="Número de Pasajeros"
-                  autoComplete="off"
-                  className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-b-2 focus:border-primary transition-all"
-                />
-              </div>
-
-              {/* Row 4 - Message */}
-              <textarea
-                name="mensaje"
-                value={formData.mensaje}
-                onChange={handleChange}
-                placeholder="Mensaje"
-                rows={5}
-                autoComplete="off"
-                className="w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-b-2 focus:border-primary transition-all resize-none"
-              />
-
-              <button
-                type="submit"
-                className="w-full bg-primary hover:bg-primary/80 text-off-white font-sans text-lg font-bold py-4 rounded-none transition-colors"
-              >
-                Enviar Solicitud
-              </button>
-            </form>
+            <TravelInquiryForm source="contacto" />
           </div>
         </div>
       </div>

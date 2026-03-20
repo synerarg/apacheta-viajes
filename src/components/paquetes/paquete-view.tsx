@@ -69,7 +69,7 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
   return (
     <main className="min-h-screen bg-off-white">
       {/* Hero — full width with gradient overlay */}
-      <div className="relative w-full h-[60vh] min-h-[420px] md:h-[80vh] md:min-h-[540px] overflow-hidden bg-dark-brown">
+      <div className="relative w-full h-[60vh] min-h-[420px] md:h-screen md:min-h-[540px] overflow-hidden bg-dark-brown">
         {paquete.imagen_url && (
           <Image
             src={paquete.imagen_url}
@@ -80,7 +80,7 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
           />
         )}
         {/* Dark gradient */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent" />
+        <div className="absolute inset-0 bg-linear-to-t from-black/75 via-black/30 to-transparent" />
 
         {/* Title overlay — bottom left */}
         <div className="absolute bottom-0 left-0 right-0 px-6 md:px-12 lg:px-20 pb-10 md:pb-14">

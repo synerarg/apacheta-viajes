@@ -1,16 +1,17 @@
 import Link from "next/link"
 
 import { Button } from "@/components/ui/button"
+import Image from "next/image"
 
 export function HeroSection() {
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-      <div
+      <Image
+        alt="Hero Agencias"
+        fill
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-        style={{
-          backgroundImage: `url('https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600')`,
-        }}
-      />
+        src="/para-agencias/hero.png"
+      ></Image>
       <div className="absolute inset-0 bg-black/50" />
 
       <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-3xl mx-auto pt-20">

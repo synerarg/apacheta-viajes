@@ -13,9 +13,9 @@ export function ContactSection() {
           </h2>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-12 items-stretch">
           {/* Left Column - Contact Info */}
-          <div>
+          <div className="flex flex-col">
             <h3 className="text-xl font-medium text-foreground mb-6">
               Datos de Contacto
             </h3>
@@ -62,17 +62,16 @@ export function ContactSection() {
               </div>
             </div>
 
-            <div className="rounded-lg overflow-hidden border border-border">
+            <div className="flex-1 min-h-[200px] overflow-hidden border border-border">
               <iframe
                 src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d14687.441542044857!2d-65.41499!3d-24.7859!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x941bc3a0d5a94a3d%3A0x7a7e0c8c7c5c5c5c!2sSalta%2C%20Argentina!5e0!3m2!1sen!2sus!4v1234567890"
                 width="100%"
-                height="200"
-                style={{ border: 0 }}
+                height="100%"
+                style={{ border: 0, display: "block" }}
                 allowFullScreen
                 loading="lazy"
                 referrerPolicy="no-referrer-when-downgrade"
                 title="Ubicación Apacheta Viajes"
-                className="grayscale"
               />
             </div>
           </div>

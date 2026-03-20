@@ -127,7 +127,7 @@ export function CheckoutView() {
   }
 
   return (
-    <main className="min-h-screen bg-off-white pt-28 pb-16">
+    <main className="min-h-screen bg-off-white pt-36 pb-16">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
         {/* Back link */}
         <Link
@@ -143,7 +143,7 @@ export function CheckoutView() {
           <p className="text-sm text-subtle font-sans tracking-[0.15em] uppercase mb-2">
             Paso 2 de 2
           </p>
-          <h1 className="font-serif text-4xl md:text-5xl lg:text-[64px] font-normal text-dark-brown italic mb-2">
+          <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal text-dark-brown italic mb-2">
             Datos de la Reserva
           </h1>
           <p className="text-base text-subtle font-sans">
@@ -155,7 +155,7 @@ export function CheckoutView() {
           {/* Left Column - Forms */}
           <div className="flex-1 space-y-8">
             {/* Contact Info */}
-            <div className="bg-white border border-dark-brown/20 p-8">
+            <div className="bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
               <h2 className="font-serif text-xl font-semibold text-dark-brown mb-6">
                 Datos de Contacto
               </h2>
@@ -232,7 +232,7 @@ export function CheckoutView() {
             </div>
 
             {/* Passenger Info */}
-            <div className="bg-white border border-dark-brown/20 p-8">
+            <div className="bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
               <h2 className="font-serif text-xl font-semibold text-dark-brown mb-6">
                 Datos del Pasajero
               </h2>
@@ -327,7 +327,7 @@ export function CheckoutView() {
             </div>
 
             {/* Payment Method */}
-            <div className="bg-white border border-dark-brown/20 p-8">
+            <div className="bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
               <h2 className="font-serif text-xl font-semibold text-dark-brown mb-6">
                 Método de Pago
               </h2>
@@ -390,8 +390,8 @@ export function CheckoutView() {
           </div>
 
           {/* Right Column - Order Summary */}
-          <div className="lg:w-[380px] shrink-0">
-            <div className="sticky top-28 bg-white border border-dark-brown/20 p-8">
+          <div className="lg:w-[340px] xl:w-[380px] shrink-0">
+            <div className="sticky top-28 bg-white border border-dark-brown/20 p-5 sm:p-6 md:p-8">
               <h2 className="font-serif text-xl font-semibold text-dark-brown mb-6">
                 Tu pedido
               </h2>

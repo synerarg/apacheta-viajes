@@ -47,6 +47,24 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
+/* ─── Radix UI: prevent scroll-lock layout shift ─── */
+/*
+  scrollbar-gutter: stable reserves the scrollbar lane at all times,
+  so when Radix hides it (overflow: hidden) the layout never shifts.
+  The padding-right overrides cancel the compensating inline style
+  that react-remove-scroll injects.
+*/
+html {
+  scrollbar-gutter: stable;
+}
+
+html[data-scroll-locked],
+body[data-scroll-locked] {
+  overflow: auto !important;
+  padding-right: 0 !important;
+  margin-right: 0 !important;
+}
+
 /* ─── Apacheta Design System ─── */
 @theme {
   --color-primary: #8B1A1A;
