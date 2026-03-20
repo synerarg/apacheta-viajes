@@ -40,6 +40,9 @@ export function NavbarClient({ user }: NavbarClientProps) {
   const { totalItems } = useCart()
   const router = useRouter()
   const displayName = resolveDisplayName(user)
+  const resolvedNavLinks = user
+    ? [...navLinks, { href: "/mis-reservas", label: "Mis reservas" }]
+    : navLinks
 
   function handleSignOut() {
     startSigningOut(async () => {
@@ -157,7 +160,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
       {/* Mobile Drawer — manual, sin Radix Portal, sin scroll lock */}
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 z-[60] bg-black/50 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-60 bg-black/50 transition-opacity duration-300 lg:hidden ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsOpen(false)}
@@ -166,7 +169,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
 
       {/* Panel */}
       <div
-        className={`fixed top-0 right-0 z-[70] h-full w-[min(320px,90vw)] bg-primary flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 right-0 z-70 h-full w-[min(320px,90vw)] bg-primary flex flex-col transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "translate-x-full"
         }`}
       >

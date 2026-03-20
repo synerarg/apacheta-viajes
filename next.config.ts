@@ -1,10 +1,11 @@
-import type { NextConfig } from "next";
+import type { NextConfig } from "next"
 
 const nextConfig: NextConfig = {
   images: {
     remotePatterns: [
       {
         protocol: "https",
+<<<<<<< HEAD
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
@@ -15,5 +16,13 @@ const nextConfig: NextConfig = {
     minimumCacheTTL: 60 * 60 * 24 * 30, // 30 días de cache
   },
 };
+=======
+        hostname: "lnsljictakzrerskzgym.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+    ],
+  },
+}
+>>>>>>> e6393b6262c225370970ab7409ffe1a0e44530d4
 
-export default nextConfig;
+export default nextConfig

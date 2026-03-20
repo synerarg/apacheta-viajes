@@ -102,11 +102,15 @@ export async function getMercadoPagoPayment(paymentId: string) {
 }
 
 export function buildMercadoPagoPreferenceBody(input: {
-  reservationId: string
-  title: string
-  description?: string
-  amount: number
-  currency: string
+  externalReference: string
+  items: {
+    id: string
+    title: string
+    description?: string
+    quantity: number
+    unit_price: number
+    currency_id: string
+  }[]
   payerEmail?: string | null
   successPath: string
   failurePath: string
@@ -118,16 +122,7 @@ export function buildMercadoPagoPreferenceBody(input: {
   const expiresAt = new Date(now.getTime() + 24 * 60 * 60 * 1000)
 
   return {
-    items: [
-      {
-        id: input.reservationId,
-        title: input.title,
-        description: input.description,
-        quantity: 1,
-        unit_price: input.amount,
-        currency_id: input.currency,
-      },
-    ],
+    items: input.items,
     ...(input.payerEmail ? { payer: { email: input.payerEmail } } : {}),
     back_urls: {
       success: `${appUrl}${input.successPath}`,
@@ -137,7 +132,7 @@ export function buildMercadoPagoPreferenceBody(input: {
     ...(appUrl.startsWith("https")
       ? { auto_return: "approved" as const }
       : {}),
-    external_reference: input.reservationId,
+    external_reference: input.externalReference,
     notification_url: `${appUrl}/api/webhooks/mercadopago`,
     statement_descriptor: statementDescriptor,
     expires: true as const,

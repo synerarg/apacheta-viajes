@@ -1,8 +1,8 @@
-export type SolicitudContactoEstado =
-  | "nuevo"
-  | "en_proceso"
-  | "respondido"
-  | "cerrado"
+export type { SolicitudEstado } from "@/types/shared/enums"
+import type { SolicitudEstado } from "@/types/shared/enums"
+
+// Re-export legacy alias
+export type SolicitudContactoEstado = SolicitudEstado
 
 export interface SolicitudesContactoRow {
   id: string
@@ -13,7 +13,7 @@ export interface SolicitudesContactoRow {
   fechas_estimadas: string | null
   numero_pasajeros: number | null
   mensaje: string | null
-  estado: SolicitudContactoEstado | null
+  estado: SolicitudEstado | null
   created_at: string | null
   updated_at: string | null
 }
@@ -27,7 +27,7 @@ export interface SolicitudesContactoInsert {
   fechas_estimadas?: string | null
   numero_pasajeros?: number | null
   mensaje?: string | null
-  estado?: SolicitudContactoEstado | null
+  estado?: SolicitudEstado | null
   created_at?: string | null
   updated_at?: string | null
 }
@@ -41,7 +41,7 @@ export interface SolicitudesContactoUpdate {
   fechas_estimadas?: string | null
   numero_pasajeros?: number | null
   mensaje?: string | null
-  estado?: SolicitudContactoEstado | null
+  estado?: SolicitudEstado | null
   created_at?: string | null
   updated_at?: string | null
 }

@@ -2,7 +2,14 @@
   "permissions": {
     "allow": [
       "Bash(pnpm add lucide-react)",
-      "mcp__claude_ai_Figma__get_design_context"
+      "mcp__claude_ai_Figma__get_design_context",
+      "Bash(ls \"D:/valentin-gonzalez/dev/apacheta-viajes/src/app/\\(auth\\)/\")",
+      "Bash(npm install:*)",
+      "Bash(npx tsc:*)",
+      "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes -maxdepth 3 -name tailwind.config.* -o -name globals.css -o -name variables.css)",
+      "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes -maxdepth 3 \\\\\\(-name *tailwind* -o -name *theme* \\\\\\) -type f)",
+      "Bash(ls -la /d/valentin-gonzalez/dev/apacheta-viajes/*.config.*)",
+      "Bash(find /d/valentin-gonzalez/dev/apacheta-viajes/src -type f -name *notification* -o -name *email*)"
     ]
   }
 }

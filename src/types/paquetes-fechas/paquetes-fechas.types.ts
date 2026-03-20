@@ -1,10 +1,12 @@
+import type { Moneda } from "@/types/shared/enums"
+
 export interface PaquetesFechasRow {
   id: string
   paquete_id: string
   fecha_inicio: string
   fecha_fin: string
   precio_por_persona: number
-  moneda: string | null
+  moneda: Moneda | null
   cupo_total: number
   cupo_disponible: number
   activo: boolean | null
@@ -18,7 +20,7 @@ export interface PaquetesFechasInsert {
   fecha_inicio: string
   fecha_fin: string
   precio_por_persona: number
-  moneda?: string | null
+  moneda?: Moneda | null
   cupo_total: number
   cupo_disponible: number
   activo?: boolean | null
@@ -32,7 +34,7 @@ export interface PaquetesFechasUpdate {
   fecha_inicio?: string
   fecha_fin?: string
   precio_por_persona?: number
-  moneda?: string | null
+  moneda?: Moneda | null
   cupo_total?: number
   cupo_disponible?: number
   activo?: boolean | null

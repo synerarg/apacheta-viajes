@@ -1,3 +1,5 @@
+import type { Moneda } from "@/types/shared/enums"
+
 export interface ExperienciasRow {
   id: string
   nombre: string
@@ -6,7 +8,7 @@ export interface ExperienciasRow {
   descripcion_corta: string | null
   duracion_horas: number | null
   precio: number | null
-  moneda: string | null
+  moneda: Moneda | null
   imagen_url: string | null
   ubicacion: string | null
   latitud: number | null
@@ -28,7 +30,7 @@ export interface ExperienciasInsert {
   descripcion_corta?: string | null
   duracion_horas?: number | null
   precio?: number | null
-  moneda?: string | null
+  moneda?: Moneda | null
   imagen_url?: string | null
   ubicacion?: string | null
   latitud?: number | null
@@ -50,7 +52,7 @@ export interface ExperienciasUpdate {
   descripcion_corta?: string | null
   duracion_horas?: number | null
   precio?: number | null
-  moneda?: string | null
+  moneda?: Moneda | null
   imagen_url?: string | null
   ubicacion?: string | null
   latitud?: number | null

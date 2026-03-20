@@ -3,10 +3,11 @@ import { Playfair_Display, Lato } from "next/font/google"
 import { Toaster } from "sonner"
 
 import { AuthSessionSync } from "@/components/auth/auth-session-sync"
-import { Navbar } from "@/components/layout/navbar"
-import { Footer } from "@/components/layout/footer"
+import { TooltipProvider } from "@/components/ui/tooltip"
 
 import "./globals.css"
+import { Navbar } from "@/components/layout/navbar"
+import { Footer } from "@/components/layout/footer"
 
 const playfairDisplay = Playfair_Display({
   variable: "--font-playfair-display",

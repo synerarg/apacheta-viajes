@@ -24,6 +24,7 @@ export async function Navbar() {
         nombre: profile?.nombre ?? null,
         apellido: profile?.apellido ?? null,
         avatarUrl: profile?.avatar_url ?? null,
+        tipo: profile?.tipo ?? null,
       }}
     />
   )

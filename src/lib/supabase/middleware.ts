@@ -17,7 +17,9 @@ export async function updateSession(request: NextRequest) {
         return request.cookies.getAll()
       },
       setAll(cookiesToSet) {
-        cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value))
+        cookiesToSet.forEach(({ name, value }) =>
+          request.cookies.set(name, value),
+        )
         response = NextResponse.next({
           request,
         })
@@ -28,7 +30,6 @@ export async function updateSession(request: NextRequest) {
     },
   })
 
-  // getUser() valida el JWT en el servidor; getSession() solo lee el token y puede estar vencido
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -54,6 +55,19 @@ export async function updateSession(request: NextRequest) {
         return NextResponse.json({ error: "No autenticado" }, { status: 401 })
       }
       return NextResponse.redirect(new URL("/login", request.url))
+    }
+
+    const { data: profile } = await supabase
+      .from("usuarios")
+      .select("tipo")
+      .eq("id", user.id)
+      .maybeSingle()
+
+    if (profile?.tipo !== "admin") {
+      if (isApiRoute) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 })
+      }
+      return NextResponse.redirect(new URL("/", request.url))
     }
   }
 

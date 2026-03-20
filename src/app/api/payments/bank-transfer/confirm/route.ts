@@ -4,7 +4,7 @@ import { z } from "zod"
 import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
 
 const confirmBankTransferSchema = z.object({
-  reservationId: z.string().uuid(),
+  paymentId: z.string().uuid(),
   payer: z
     .object({
       email: z.string().email().optional(),

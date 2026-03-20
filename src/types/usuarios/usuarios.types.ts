@@ -1,4 +1,5 @@
-export type UsuarioTipo = "cliente" | "agencia" | "admin"
+export type { UsuarioTipo } from "@/types/shared/enums"
+import type { UsuarioTipo } from "@/types/shared/enums"
 
 export interface UsuariosRow {
   id: string

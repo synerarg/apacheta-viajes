@@ -3,6 +3,7 @@ import { MapPin } from "lucide-react"
 import { ImageGallery } from "@/components/product/image-gallery"
 import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
 import { UbicacionMap } from "@/components/product/ubicacion-map"
+import type { Moneda } from "@/types/shared/enums"
 
 export interface ExperienciaViewData {
   id: string
@@ -11,7 +12,7 @@ export interface ExperienciaViewData {
   descripcion_corta: string
   duracion_horas: number
   precio: number
-  moneda: string
+  moneda: Moneda
   imagen_url: string
   ubicacion: string
   latitud: number
