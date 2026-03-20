@@ -21,6 +21,90 @@ function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
 }
 
+const CHECKOUT_FORM_STORAGE_KEY = "apacheta:checkout-form"
+
+const EMPTY_CONTACT = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
+}
+
+const EMPTY_PASSENGER = {
+  fullName: "",
+  documentNumber: "",
+  birthDate: "",
+  nationality: "",
+  specialRequirements: "",
+}
+
+function isBrowser() {
+  return typeof window !== "undefined"
+}
+
+function loadCheckoutFormState(): {
+  paymentMethod: CheckoutPaymentMethod
+  contact: typeof EMPTY_CONTACT
+  passenger: typeof EMPTY_PASSENGER
+} | null {
+  if (!isBrowser()) {
+    return null
+  }
+
+  const rawValue = window.localStorage.getItem(CHECKOUT_FORM_STORAGE_KEY)
+
+  if (!rawValue) {
+    return null
+  }
+
+  try {
+    const parsed = JSON.parse(rawValue) as {
+      paymentMethod?: CheckoutPaymentMethod
+      contact?: typeof EMPTY_CONTACT
+      passenger?: typeof EMPTY_PASSENGER
+    }
+
+    return {
+      paymentMethod:
+        parsed.paymentMethod === "mercadopago" ||
+        parsed.paymentMethod === "transferencia" ||
+        parsed.paymentMethod === "efectivo"
+          ? parsed.paymentMethod
+          : "mercadopago",
+      contact: {
+        ...EMPTY_CONTACT,
+        ...parsed.contact,
+      },
+      passenger: {
+        ...EMPTY_PASSENGER,
+        ...parsed.passenger,
+      },
+    }
+  } catch {
+    return null
+  }
+}
+
+function saveCheckoutFormState(input: {
+  paymentMethod: CheckoutPaymentMethod
+  contact: typeof EMPTY_CONTACT
+  passenger: typeof EMPTY_PASSENGER
+}) {
+  if (!isBrowser()) {
+    return
+  }
+
+  window.localStorage.setItem(CHECKOUT_FORM_STORAGE_KEY, JSON.stringify(input))
+}
+
+function clearCheckoutFormState() {
+  if (!isBrowser()) {
+    return
+  }
+
+  window.localStorage.removeItem(CHECKOUT_FORM_STORAGE_KEY)
+}
+
 function formatBirthDateInput(value: string) {
   const digits = value.replace(/\D/g, "").slice(0, 6)
 
@@ -43,19 +127,20 @@ export function CheckoutView() {
   const [paymentMethod, setPaymentMethod] =
     useState<CheckoutPaymentMethod>("mercadopago")
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [contact, setContact] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
-  })
-  const [passenger, setPassenger] = useState({
-    fullName: "",
-    documentNumber: "",
-    birthDate: "",
-    nationality: "",
-    specialRequirements: "",
-  })
+  const [contact, setContact] = useState(EMPTY_CONTACT)
+  const [passenger, setPassenger] = useState(EMPTY_PASSENGER)
+
+  useEffect(() => {
+    const persistedState = loadCheckoutFormState()
+
+    if (!persistedState) {
+      return
+    }
+
+    setPaymentMethod(persistedState.paymentMethod)
+    setContact(persistedState.contact)
+    setPassenger(persistedState.passenger)
+  }, [])
 
   useEffect(() => {
     let active = true
@@ -83,6 +168,14 @@ export function CheckoutView() {
       active = false
     }
   }, [])
+
+  useEffect(() => {
+    saveCheckoutFormState({
+      paymentMethod,
+      contact,
+      passenger,
+    })
+  }, [contact, passenger, paymentMethod])
 
   const handleCheckoutSubmit = async () => {
     if (isEmpty) {
@@ -142,6 +235,10 @@ export function CheckoutView() {
           : null,
       })
 
+      clearCheckoutFormState()
+      setContact(EMPTY_CONTACT)
+      setPassenger(EMPTY_PASSENGER)
+      setPaymentMethod("mercadopago")
       clearCart()
 
       if (result.redirectUrl?.startsWith("http")) {
