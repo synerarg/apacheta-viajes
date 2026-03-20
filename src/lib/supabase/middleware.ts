@@ -37,7 +37,6 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isApiRoute = pathname.startsWith("/api/")
 
-  // Rutas que requieren estar autenticado
   const authRoutes = ["/checkout", "/account"]
   const needsAuth = authRoutes.some((route) => pathname.startsWith(route))
 
