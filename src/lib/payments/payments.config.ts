@@ -110,26 +110,5 @@ export function getBankTransferConfig() {
       getEnvironmentVariable("BANK_TRANSFER_RECEIPT_SIGNED_URL_TTL_SECONDS") ??
         "300",
     ),
-    receiptBucket: getRequiredEnvironmentVariable(
-      "BANK_TRANSFER_RECEIPT_BUCKET",
-      BankTransferConfigurationException,
-    ),
-    receiptMaxBytes: Number(
-      getEnvironmentVariable("BANK_TRANSFER_RECEIPT_MAX_BYTES") ?? "10485760",
-    ),
-    allowedReceiptMimeTypes: (
-      getEnvironmentVariable("BANK_TRANSFER_ALLOWED_MIME_TYPES") ??
-      "application/pdf,image/jpeg,image/png,image/webp"
-    )
-      .split(",")
-      .map((value) => value.trim())
-      .filter(Boolean),
-    receiptMaxReuploads: Number(
-      getEnvironmentVariable("BANK_TRANSFER_RECEIPT_MAX_REUPLOADS") ?? "3",
-    ),
-    receiptSignedUrlTtlSeconds: Number(
-      getEnvironmentVariable("BANK_TRANSFER_RECEIPT_SIGNED_URL_TTL_SECONDS") ??
-        "300",
-    ),
   }
 }
