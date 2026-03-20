@@ -7,6 +7,14 @@ import {
 } from "@/lib/mercadopago/webhook"
 
 function resolvePaymentId(requestUrl: URL, body: unknown) {
+  const paymentIdFromQuery =
+    requestUrl.searchParams.get("data.id") ??
+    requestUrl.searchParams.get("id")
+
+  if (paymentIdFromQuery) {
+    return paymentIdFromQuery
+  }
+
   if (
     body &&
     typeof body === "object" &&
@@ -19,11 +27,7 @@ function resolvePaymentId(requestUrl: URL, body: unknown) {
     return String(body.data.id)
   }
 
-  return (
-    requestUrl.searchParams.get("data.id") ??
-    requestUrl.searchParams.get("id") ??
-    null
-  )
+  return null
 }
 
 export async function POST(request: Request) {

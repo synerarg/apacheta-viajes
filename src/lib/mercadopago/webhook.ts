@@ -57,8 +57,20 @@ function isTimestampWithinTolerance(ts: string) {
   return Math.abs(Date.now() - timestamp) <= toleranceMs
 }
 
-function buildManifest(dataId: string, requestId: string, ts: string) {
-  return `id:${dataId.toLowerCase()};request-id:${requestId};ts:${ts};`
+function buildManifest(input: {
+  dataId: string
+  requestId?: string | null
+  ts: string
+}) {
+  const parts = [`id:${input.dataId.toLowerCase()};`]
+
+  if (input.requestId) {
+    parts.push(`request-id:${input.requestId};`)
+  }
+
+  parts.push(`ts:${input.ts};`)
+
+  return parts.join("")
 }
 
 function compareHexDigests(expectedDigest: string, receivedDigest: string) {
@@ -108,14 +120,6 @@ export function validateMercadoPagoWebhookSignature(input: {
     }
   }
 
-  if (!input.requestIdHeader) {
-    return {
-      enabled: true,
-      isValid: false,
-      reason: "missing x-request-id header",
-    }
-  }
-
   if (!isTimestampWithinTolerance(parsedSignature.ts)) {
     return {
       enabled: true,
@@ -125,9 +129,11 @@ export function validateMercadoPagoWebhookSignature(input: {
   }
 
   const manifest = buildManifest(
-    input.dataId,
-    input.requestIdHeader,
-    parsedSignature.ts,
+    {
+      dataId: input.dataId,
+      requestId: input.requestIdHeader,
+      ts: parsedSignature.ts,
+    },
   )
   const expectedDigest = createHmac("sha256", secret).update(manifest).digest("hex")
   const isValid = compareHexDigests(expectedDigest, parsedSignature.v1)
