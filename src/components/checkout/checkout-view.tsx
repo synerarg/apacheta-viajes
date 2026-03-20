@@ -1,11 +1,14 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ChevronLeft } from "lucide-react"
 import { toast } from "sonner"
 
+import { Landmark, Banknote } from "lucide-react"
+
+import { MercadoPagoIcon } from "@/components/icons/mercadopago"
 import { useCart } from "@/hooks/use-cart"
 import {
   clearCart,
@@ -369,34 +372,38 @@ export function CheckoutView() {
                       id: "mercadopago",
                       label: "MercadoPago",
                       description: "Tarjeta de crédito, débito o saldo MP",
+                      icon: <MercadoPagoIcon className="w-10 h-7 shrink-0" />,
                     },
                     {
                       id: "transferencia",
                       label: "Transferencia bancaria",
                       description: "Se enviarán los datos por email",
+                      icon: <Landmark className="w-6 h-6 shrink-0 text-dark-brown/60" />,
                     },
                     {
                       id: "efectivo",
                       label: "Efectivo en sucursal",
                       description: "Caseros 450, Salta Capital",
+                      icon: <Banknote className="w-6 h-6 shrink-0 text-dark-brown/60" />,
                     },
                   ] as {
                     id: CheckoutPaymentMethod
                     label: string
                     description: string
+                    icon: ReactNode
                   }[]
                 ).map((method) => (
                   <button
                     key={method.id}
                     onClick={() => setPaymentMethod(method.id)}
-                    className={`flex items-start gap-4 p-4 border text-left transition-colors ${
+                    className={`flex items-center gap-4 p-4 border text-left transition-colors ${
                       paymentMethod === method.id
                         ? "border-primary bg-primary/5"
                         : "border-dark-brown/20 hover:border-dark-brown/40"
                     }`}
                   >
                     <div
-                      className={`mt-0.5 w-4 h-4 rounded-full border-2 hrink-0 flex items-center justify-center transition-colors ${
+                      className={`w-4 h-4 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${
                         paymentMethod === method.id
                           ? "border-primary"
                           : "border-dark-brown/30"
@@ -406,6 +413,7 @@ export function CheckoutView() {
                         <div className="w-2 h-2 rounded-full bg-primary" />
                       )}
                     </div>
+                    {method.icon}
                     <div>
                       <p className="text-sm font-sans font-semibold text-dark-brown">
                         {method.label}
