@@ -18,6 +18,20 @@ function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
 }
 
+function formatBirthDateInput(value: string) {
+  const digits = value.replace(/\D/g, "").slice(0, 6)
+
+  if (digits.length <= 2) {
+    return digits
+  }
+
+  if (digits.length <= 4) {
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  }
+
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+}
+
 const supabase = createClient()
 
 export function CheckoutView() {
@@ -290,12 +304,15 @@ export function CheckoutView() {
                     Fecha de nacimiento *
                   </label>
                   <input
-                    type="date"
+                    type="text"
+                    inputMode="numeric"
+                    maxLength={8}
+                    placeholder="dd/mm/aa"
                     value={passenger.birthDate}
                     onChange={(event) =>
                       setPassenger((currentPassenger) => ({
                         ...currentPassenger,
-                        birthDate: event.target.value,
+                        birthDate: formatBirthDateInput(event.target.value),
                       }))
                     }
                     className="h-11 border border-dark-brown/30 bg-transparent px-3 text-sm font-sans text-dark-brown focus:outline-none focus:border-primary transition-colors"
