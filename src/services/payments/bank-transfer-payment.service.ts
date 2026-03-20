@@ -84,7 +84,7 @@ export class BankTransferPaymentService {
     const { order } = await this.paymentsRepository.getOrderContext(input.orderId)
     const config = getBankTransferConfig()
     const expiresAt = new Date(
-      Date.now() + config.paymentWindowHours * 60 * 60 * 1000,
+      Date.now() + config.paymentWindowMinutes * 60 * 1000,
     ).toISOString()
     const reference = buildReference(order.codigo_referencia)
     const payment = await this.paymentsRepository.createPayment({

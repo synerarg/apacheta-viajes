@@ -58,6 +58,17 @@ export function getMercadoPagoWebhookToleranceMs() {
 }
 
 export function getBankTransferConfig() {
+  const paymentWindowMinutes = Number(
+    getEnvironmentVariable("BANK_TRANSFER_PAYMENT_WINDOW_MINUTES") ??
+      (getEnvironmentVariable("BANK_TRANSFER_PAYMENT_WINDOW_HOURS")
+        ? String(
+            Number(
+              getEnvironmentVariable("BANK_TRANSFER_PAYMENT_WINDOW_HOURS"),
+            ) * 60,
+          )
+        : "30"),
+  )
+
   return {
     bankName: getRequiredEnvironmentVariable(
       "BANK_TRANSFER_BANK_NAME",
@@ -77,9 +88,7 @@ export function getBankTransferConfig() {
       BankTransferConfigurationException,
     ),
     receiptEmail: getEnvironmentVariable("BANK_TRANSFER_RECEIPT_EMAIL") ?? null,
-    paymentWindowHours: Number(
-      getEnvironmentVariable("BANK_TRANSFER_PAYMENT_WINDOW_HOURS") ?? "24",
-    ),
+    paymentWindowMinutes,
     receiptBucket: getRequiredEnvironmentVariable(
       "BANK_TRANSFER_RECEIPT_BUCKET",
       BankTransferConfigurationException,
