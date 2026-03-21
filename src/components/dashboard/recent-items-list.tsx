@@ -38,8 +38,9 @@ export function RecentItemsList({ items }: RecentItemsListProps) {
   return (
     <div className="divide-y divide-neutral-100">
       {items.map((item) => (
-        <div key={item.id} className="flex items-center gap-4 py-3">
-          <div className="relative h-14 w-20 shrink-0 overflow-hidden bg-neutral-100">
+        <div key={item.id} className="flex items-center gap-3 sm:gap-4 py-3">
+          {/* Image — hidden on xs, visible on sm+ */}
+          <div className="relative hidden sm:block h-14 w-20 shrink-0 overflow-hidden bg-neutral-100">
             {item.imagen_url ? (
               <Image
                 src={item.imagen_url}
@@ -54,9 +55,19 @@ export function RecentItemsList({ items }: RecentItemsListProps) {
           </div>
 
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-0.5">
+            <div className="flex items-center gap-2 mb-0.5 flex-wrap">
               <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-medium text-white">
                 {item.tipo}
+              </span>
+              {/* Status badge inline on xs (next to tipo badge) */}
+              <span
+                className={`sm:hidden rounded px-1.5 py-0.5 text-[10px] font-medium ${
+                  item.activo
+                    ? "bg-green-50 text-green-700"
+                    : "bg-neutral-100 text-neutral-500"
+                }`}
+              >
+                {item.activo ? "Activo" : "Borrador"}
               </span>
             </div>
             <p className="text-sm font-medium text-neutral-800 truncate">{item.nombre}</p>
@@ -67,9 +78,10 @@ export function RecentItemsList({ items }: RecentItemsListProps) {
             )}
           </div>
 
-          <div className="flex items-center gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+            {/* Status badge — hidden on xs (shown inline above), visible on sm+ */}
             <span
-              className={`rounded px-2 py-1 text-xs font-medium ${
+              className={`hidden sm:inline-flex rounded px-2 py-1 text-xs font-medium ${
                 item.activo
                   ? "bg-green-50 text-green-700"
                   : "bg-neutral-100 text-neutral-500"
@@ -79,7 +91,7 @@ export function RecentItemsList({ items }: RecentItemsListProps) {
             </span>
             <Link
               href={item.editHref}
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:underline whitespace-nowrap"
             >
               Editar <ArrowRight className="h-4 w-4" />
             </Link>

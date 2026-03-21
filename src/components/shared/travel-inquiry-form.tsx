@@ -35,6 +35,8 @@ type SourceConfig = {
   tipoViajeOptions: { value: string; label: string }[]
   /** true = labels encima + placeholders de ayuda; false = solo placeholders */
   showLabels: boolean
+  /** true = solo muestra nombre + secondField + mensaje (sin tipo viaje, presupuesto, fechas, pasajeros) */
+  simpleMode: boolean
   /** "default" = tokens foreground/border; "branded" = dark-brown/off-white */
   variant: "default" | "branded"
   inputClass: string
@@ -43,16 +45,17 @@ type SourceConfig = {
 
 const SOURCE_CONFIG: Record<Source, SourceConfig> = {
   landing: {
-    secondField: "agency",
-    secondFieldLabel: "Agencia / Empresa (Opcional)",
-    secondFieldAutoComplete: "organization",
-    tipoViajeOptions: TIPO_VIAJE_AGENCIAS,
-    showLabels: true,
-    variant: "default",
+    secondField: "email",
+    secondFieldLabel: "Correo Electrónico",
+    secondFieldAutoComplete: "email",
+    tipoViajeOptions: TIPO_VIAJE_CONTACTO,
+    showLabels: false,
+    simpleMode: true,
+    variant: "branded",
     inputClass:
-      "bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors",
+      "w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-all",
     submitClass:
-      "w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2",
+      "w-full bg-primary hover:bg-primary/80 text-off-white font-sans text-lg font-bold py-4 rounded-none transition-colors cursor-pointer",
   },
   "para-agencias": {
     secondField: "email",
@@ -60,11 +63,12 @@ const SOURCE_CONFIG: Record<Source, SourceConfig> = {
     secondFieldAutoComplete: "email",
     tipoViajeOptions: TIPO_VIAJE_AGENCIAS,
     showLabels: true,
+    simpleMode: false,
     variant: "default",
     inputClass:
       "bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors",
     submitClass:
-      "w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2",
+      "w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2 cursor-pointer",
   },
   contacto: {
     secondField: "email",
@@ -72,11 +76,12 @@ const SOURCE_CONFIG: Record<Source, SourceConfig> = {
     secondFieldAutoComplete: "email",
     tipoViajeOptions: TIPO_VIAJE_CONTACTO,
     showLabels: false,
+    simpleMode: false,
     variant: "branded",
     inputClass:
       "w-full bg-transparent border-0 border-b border-dark-brown rounded-none px-0 py-3 font-sans text-base text-dark-brown placeholder:text-subtle focus:outline-none focus:border-primary transition-all",
     submitClass:
-      "w-full bg-primary hover:bg-primary/80 text-off-white font-sans text-lg font-bold py-4 rounded-none transition-colors",
+      "w-full bg-primary hover:bg-primary/80 text-off-white font-sans text-lg font-bold py-4 rounded-none transition-colors cursor-pointer",
   },
 }
 
@@ -198,68 +203,71 @@ export function TravelInquiryForm({ source, className }: Props) {
         </Field>
       </div>
 
-      {/* Fila 2 – Tipo de viaje + presupuesto */}
-      <div className="grid md:grid-cols-2 gap-5">
-        <Field label="Tipo de Viaje">
-          <CustomSelect
-            value={form.tipoViaje}
-            onChange={(val) => setForm((prev) => ({ ...prev, tipoViaje: val }))}
-            placeholder={cfg.showLabels ? "Seleccionar..." : "Tipo de Viaje"}
-            options={cfg.tipoViajeOptions}
-            variant={cfg.variant}
-          />
-        </Field>
+      {/* Campos extendidos – solo si NO es simpleMode */}
+      {!cfg.simpleMode && (
+        <>
+          {/* Fila 2 – Tipo de viaje + presupuesto */}
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Tipo de Viaje">
+              <CustomSelect
+                value={form.tipoViaje}
+                onChange={(val) => setForm((prev) => ({ ...prev, tipoViaje: val }))}
+                placeholder={cfg.showLabels ? "Seleccionar..." : "Tipo de Viaje"}
+                options={cfg.tipoViajeOptions}
+                variant={cfg.variant}
+              />
+            </Field>
 
-        <Field label="Presupuesto Estimado">
-          <input
-            type="text"
-            autoComplete="off"
-            placeholder={
-              cfg.showLabels ? "Ej: USD 2.000 por persona" : "Presupuesto Estimado"
-            }
-            value={form.presupuestoEstimado}
-            onChange={field("presupuestoEstimado")}
-            className={cfg.inputClass}
-          />
-        </Field>
-      </div>
+            <Field label="Presupuesto Estimado">
+              <input
+                type="text"
+                autoComplete="off"
+                placeholder={
+                  cfg.showLabels ? "Ej: USD 2.000 por persona" : "Presupuesto Estimado"
+                }
+                value={form.presupuestoEstimado}
+                onChange={field("presupuestoEstimado")}
+                className={cfg.inputClass}
+              />
+            </Field>
+          </div>
 
-      {/* Fila 3 – Fechas + pasajeros */}
-      <div className="grid md:grid-cols-2 gap-5">
-        <Field label="Fechas Estimadas">
-          <input
-            type="text"
-            autoComplete="off"
-            placeholder={
-              cfg.showLabels ? "Ej: vacaciones de julio" : "Fechas Estimadas"
-            }
-            value={form.fechasEstimadas}
-            onChange={field("fechasEstimadas")}
-            className={cfg.inputClass}
-          />
-        </Field>
+          {/* Fila 3 – Fechas + pasajeros */}
+          <div className="grid md:grid-cols-2 gap-5">
+            <Field label="Fechas Estimadas">
+              <input
+                type="text"
+                autoComplete="off"
+                placeholder={
+                  cfg.showLabels ? "Ej: vacaciones de julio" : "Fechas Estimadas"
+                }
+                value={form.fechasEstimadas}
+                onChange={field("fechasEstimadas")}
+                className={cfg.inputClass}
+              />
+            </Field>
 
-        <Field label="Número de Pasajeros">
-          <input
-            type="text"
-            inputMode="numeric"
-            autoComplete="off"
-            placeholder={cfg.showLabels ? "Ej: 4" : "Número de Pasajeros"}
-            value={form.numeroPasajeros}
-            onChange={field("numeroPasajeros")}
-            className={cfg.inputClass}
-          />
-        </Field>
-      </div>
+            <Field label="Número de Pasajeros">
+              <input
+                type="text"
+                inputMode="numeric"
+                autoComplete="off"
+                placeholder={cfg.showLabels ? "Ej: 4" : "Número de Pasajeros"}
+                value={form.numeroPasajeros}
+                onChange={field("numeroPasajeros")}
+                className={cfg.inputClass}
+              />
+            </Field>
+          </div>
+        </>
+      )}
 
       {/* Mensaje */}
       <Field label="Mensaje">
         <textarea
-          rows={cfg.showLabels ? 3 : 5}
+          rows={cfg.simpleMode ? 6 : cfg.showLabels ? 3 : 5}
           autoComplete="off"
-          placeholder={
-            cfg.showLabels ? "Contanos sobre tu viaje ideal..." : "Mensaje"
-          }
+          placeholder={cfg.showLabels ? "Contanos sobre tu viaje ideal..." : "Mensaje"}
           value={form.mensaje}
           onChange={field("mensaje")}
           className={`${cfg.inputClass} resize-none`}
@@ -267,7 +275,7 @@ export function TravelInquiryForm({ source, className }: Props) {
       </Field>
 
       <button type="submit" disabled={isSubmitting} className={cfg.submitClass}>
-        Enviar Solicitud
+        {isSubmitting ? "Enviando..." : "Enviar Solicitud"}
       </button>
     </form>
   )

@@ -68,7 +68,7 @@ export default async function EditarExperienciaPage({ params }: EditarExperienci
 
   return (
     <div className="min-h-full bg-neutral-50 pb-16">
-      <div className="border-b border-neutral-200 bg-white px-8 py-5">
+      <div className="border-b border-neutral-200 bg-white px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
         <Link
           href="/dashboard/experiencias"
           className="mb-3 inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-700"
@@ -76,14 +76,14 @@ export default async function EditarExperienciaPage({ params }: EditarExperienci
           <CaretLeft className="h-3.5 w-3.5" />
           Volver a Experiencias
         </Link>
-        <div className="flex items-center justify-between">
-          <h1 className="font-playfair text-2xl font-bold text-neutral-900">{experiencia.nombre}</h1>
-          <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h1 className="font-playfair text-xl sm:text-2xl font-bold text-neutral-900 leading-snug">{experiencia.nombre}</h1>
+          <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <DeleteItemButton action={deleteAction} label="Eliminar experiencia" />
             <Link
               href={`/experiencias/${experiencia.slug}`}
               target="_blank"
-              className="inline-flex items-center gap-2 bg-primary px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+              className="inline-flex items-center gap-2 bg-primary px-3 sm:px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90"
             >
               <ArrowSquareOut className="h-4 w-4" />
               Ver en la Web
@@ -92,7 +92,7 @@ export default async function EditarExperienciaPage({ params }: EditarExperienci
         </div>
       </div>
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         <ExperienciaForm
           action={updateAction}
           initialData={{

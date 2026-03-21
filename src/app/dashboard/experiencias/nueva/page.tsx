@@ -41,7 +41,7 @@ export default async function NuevaExperienciaPage() {
 
   return (
     <div className="min-h-full bg-neutral-50 pb-16">
-      <div className="border-b border-neutral-200 bg-white px-8 py-5">
+      <div className="border-b border-neutral-200 bg-white px-4 sm:px-6 lg:px-8 py-4 sm:py-5">
         <Link
           href="/dashboard/experiencias"
           className="mb-3 inline-flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-700"
@@ -50,11 +50,11 @@ export default async function NuevaExperienciaPage() {
           Volver a Experiencias
         </Link>
         <div className="flex items-center justify-between">
-          <h1 className="font-playfair text-2xl font-bold text-neutral-900">Nueva Experiencia</h1>
+          <h1 className="font-playfair text-xl sm:text-2xl font-bold text-neutral-900">Nueva Experiencia</h1>
         </div>
       </div>
 
-      <div className="px-8 pt-6">
+      <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
         <ExperienciaForm
           action={createExperiencia}
           categorias={categorias}

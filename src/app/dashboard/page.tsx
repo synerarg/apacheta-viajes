@@ -67,9 +67,9 @@ export default async function DashboardPage() {
     .slice(0, 8)
 
   return (
-    <div className="p-8">
-      <div className="mb-8">
-        <h1 className="font-playfair text-3xl font-bold text-neutral-900">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-neutral-900">
           Dashboard
         </h1>
         <p className="mt-1 text-sm text-neutral-500">
@@ -78,7 +78,7 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <div className="mb-8 sm:mb-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
         <StatsCard
           icon={<Suitcase className="h-6 w-6" />}
           label="Paquetes de viaje"
@@ -95,11 +95,11 @@ export default async function DashboardPage() {
 
       {/* Recent items */}
       <div>
-        <div className="mb-4 flex items-center justify-between">
-          <h2 className="font-playfair text-xl font-semibold text-primary">
+        <div className="mb-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <h2 className="font-playfair text-lg sm:text-xl font-semibold text-primary">
             Últimos Agregados
           </h2>
-          <div className="flex gap-4 text-xs text-neutral-500">
+          <div className="flex gap-3 sm:gap-4 text-xs text-neutral-500">
             <Link href="/dashboard/paquetes" className="flex items-center gap-1 hover:text-primary">
               Ver paquetes <ArrowRight className="h-3.5 w-3.5" />
             </Link>

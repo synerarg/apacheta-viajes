@@ -16,10 +16,10 @@ export default async function DashboardExperienciasPage() {
   )
 
   return (
-    <div className="p-8">
-      <div className="mb-8 flex items-center justify-between">
+    <div className="p-4 sm:p-6 lg:p-8">
+      <div className="mb-6 sm:mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-3 sm:gap-4">
         <div>
-          <h1 className="font-playfair text-3xl font-bold text-neutral-900">
+          <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-neutral-900">
             Experiencias
           </h1>
           <p className="mt-1 text-sm text-neutral-500">
@@ -28,7 +28,7 @@ export default async function DashboardExperienciasPage() {
         </div>
         <Link
           href="/dashboard/experiencias/nueva"
-          className="inline-flex items-center gap-2 bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
+          className="inline-flex self-start sm:self-auto items-center gap-2 bg-primary px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90 shrink-0"
         >
           + Nueva Experiencia
         </Link>
