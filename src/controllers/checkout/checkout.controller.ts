@@ -20,6 +20,10 @@ export class CheckoutController {
   async listUserOrders(user: CheckoutUserContext | null) {
     return this.checkoutService.listUserOrders(user)
   }
+
+  async getSavedProfile(user: CheckoutUserContext | null) {
+    return this.checkoutService.getSavedProfile(user)
+  }
 }
 
 export async function createServerCheckoutController() {

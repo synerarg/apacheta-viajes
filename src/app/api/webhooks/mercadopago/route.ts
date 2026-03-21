@@ -49,6 +49,13 @@ export async function POST(request: Request) {
     })
 
     if (!validation.isValid) {
+      console.warn("Mercado Pago webhook signature rejected", {
+        reason: validation.reason,
+        paymentId,
+        hasSignatureHeader: Boolean(request.headers.get("x-signature")),
+        hasRequestIdHeader: Boolean(request.headers.get("x-request-id")),
+      })
+
       return NextResponse.json(
         {
           error: `Invalid Mercado Pago webhook signature: ${validation.reason}`,

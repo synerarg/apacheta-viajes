@@ -26,6 +26,7 @@ const cartItemSchema = z.object({
 const checkoutSubmitSchema = z.object({
   items: z.array(cartItemSchema).min(1),
   paymentMethod: z.enum(["mercadopago", "transferencia", "efectivo"]),
+  saveProfile: z.boolean(),
   contact: z.object({
     firstName: z.string().min(1),
     lastName: z.string().min(1),

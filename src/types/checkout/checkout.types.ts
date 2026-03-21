@@ -25,6 +25,7 @@ export interface CheckoutPassengerInput {
 export interface CheckoutSubmitInput {
   items: CartItem[]
   paymentMethod: CheckoutPaymentMethod
+  saveProfile: boolean
   contact: CheckoutContactInput
   passenger: CheckoutPassengerInput
 }
@@ -52,3 +53,8 @@ export interface CheckoutSubmitResult {
 }
 
 export type CheckoutOrderDetailResult = CheckoutOrderSummary
+
+export interface CheckoutProfileResult {
+  contact: CheckoutContactInput
+  passenger: CheckoutPassengerInput
+}

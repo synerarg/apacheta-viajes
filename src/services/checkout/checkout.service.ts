@@ -12,11 +12,13 @@ import {
   getMercadoPagoConfig,
 } from "@/lib/payments/payments.config"
 import { createExperienciasRepository } from "@/repositories/experiencias/experiencias.repository"
+import { createCheckoutProfilesRepository } from "@/repositories/checkout-profiles/checkout-profiles.repository"
 import { createOrdenesItemsRepository } from "@/repositories/ordenes-items/ordenes-items.repository"
 import { createOrdenesRepository } from "@/repositories/ordenes/ordenes.repository"
 import { createPaquetesFechasRepository } from "@/repositories/paquetes-fechas/paquetes-fechas.repository"
 import { createReservasRepository } from "@/repositories/reservas/reservas.repository"
 import { createExperienciasService } from "@/services/experiencias/experiencias.service"
+import { createCheckoutProfilesService } from "@/services/checkout-profiles/checkout-profiles.service"
 import { createOrdenesItemsService } from "@/services/ordenes-items/ordenes-items.service"
 import { createOrdenesService } from "@/services/ordenes/ordenes.service"
 import { createPaquetesFechasService } from "@/services/paquetes-fechas/paquetes-fechas.service"
@@ -25,6 +27,7 @@ import { createReservasService } from "@/services/reservas/reservas.service"
 import { createTransactionalEmailService } from "@/services/notifications/transactional-email.service"
 import type { CartItem } from "@/types/cart/cart.types"
 import type {
+  CheckoutProfileResult,
   CheckoutSubmitInput,
   CheckoutSubmitResult,
   CheckoutUserContext,
@@ -113,6 +116,7 @@ function assertCheckoutPaymentConfigured(
 }
 
 export class CheckoutService {
+  private readonly checkoutProfilesService
   private readonly reservasService
   private readonly paquetesFechasService
   private readonly experienciasService
@@ -122,6 +126,9 @@ export class CheckoutService {
   private readonly transactionalEmailService
 
   constructor(supabase: DatabaseClient) {
+    this.checkoutProfilesService = createCheckoutProfilesService(
+      createCheckoutProfilesRepository(supabase),
+    )
     this.reservasService = createReservasService(createReservasRepository(supabase))
     this.paquetesFechasService = createPaquetesFechasService(
       createPaquetesFechasRepository(supabase),
@@ -143,6 +150,29 @@ export class CheckoutService {
     } catch (error) {
       console.error("Failed to send order created email", error)
     }
+  }
+
+  private async syncSavedProfile(
+    input: CheckoutSubmitInput,
+    user: CheckoutUserContext,
+  ) {
+    if (input.saveProfile) {
+      await this.checkoutProfilesService.upsertByUsuarioId(user.id, {
+        contact_first_name: input.contact.firstName,
+        contact_last_name: input.contact.lastName,
+        contact_email: input.contact.email,
+        contact_phone: input.contact.phone,
+        passenger_full_name: input.passenger.fullName,
+        passenger_document_number: input.passenger.documentNumber,
+        passenger_birth_date: input.passenger.birthDate,
+        passenger_nationality: input.passenger.nationality,
+        passenger_special_requirements:
+          input.passenger.specialRequirements || null,
+      })
+      return
+    }
+
+    await this.checkoutProfilesService.deleteByUsuarioId(user.id)
   }
 
   async submitCheckout(
@@ -237,6 +267,8 @@ export class CheckoutService {
         total: Number(order.total),
         currency: order.moneda,
       }
+
+      await this.syncSavedProfile(input, user)
 
       if (input.paymentMethod === "mercadopago") {
         const payment = await this.paymentsService.createMercadoPagoCheckoutPro({
@@ -390,6 +422,44 @@ export class CheckoutService {
       }
 
       throw new CheckoutServiceException("listUserOrders", error)
+    }
+  }
+
+  async getSavedProfile(
+    user: CheckoutUserContext | null,
+  ): Promise<CheckoutProfileResult | null> {
+    try {
+      if (!user) {
+        throw new CheckoutAuthenticationException()
+      }
+
+      const profile = await this.checkoutProfilesService.getByUsuarioId(user.id)
+
+      if (!profile) {
+        return null
+      }
+
+      return {
+        contact: {
+          firstName: profile.contact_first_name ?? "",
+          lastName: profile.contact_last_name ?? "",
+          email: profile.contact_email ?? "",
+          phone: profile.contact_phone ?? "",
+        },
+        passenger: {
+          fullName: profile.passenger_full_name ?? "",
+          documentNumber: profile.passenger_document_number ?? "",
+          birthDate: profile.passenger_birth_date ?? "",
+          nationality: profile.passenger_nationality ?? "",
+          specialRequirements: profile.passenger_special_requirements ?? "",
+        },
+      }
+    } catch (error) {
+      if (error instanceof CheckoutAuthenticationException) {
+        throw error
+      }
+
+      throw new CheckoutServiceException("getSavedProfile", error)
     }
   }
 

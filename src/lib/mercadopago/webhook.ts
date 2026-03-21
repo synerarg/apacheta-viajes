@@ -46,11 +46,14 @@ function parseSignatureHeader(signatureHeader: string | null): ParsedSignatureHe
 }
 
 function isTimestampWithinTolerance(ts: string) {
-  const timestamp = Number(ts)
+  const rawTimestamp = Number(ts)
 
-  if (!Number.isFinite(timestamp)) {
+  if (!Number.isFinite(rawTimestamp)) {
     return false
   }
+
+  const timestamp =
+    rawTimestamp < 1_000_000_000_000 ? rawTimestamp * 1000 : rawTimestamp
 
   const toleranceMs = getMercadoPagoWebhookToleranceMs()
 

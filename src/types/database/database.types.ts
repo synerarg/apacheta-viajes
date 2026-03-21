@@ -11,6 +11,11 @@ import type {
   CategoriasExperienciaUpdate,
 } from "@/types/categorias-experiencia/categorias-experiencia.types"
 import type {
+  CheckoutProfilesInsert,
+  CheckoutProfilesRow,
+  CheckoutProfilesUpdate,
+} from "@/types/checkout-profiles/checkout-profiles.types"
+import type {
   DestinosInsert,
   DestinosRow,
   DestinosUpdate,
@@ -141,6 +146,20 @@ export interface Database {
         Insert: CategoriasExperienciaInsert
         Update: CategoriasExperienciaUpdate
         Relationships: []
+      }
+      checkout_profiles: {
+        Row: CheckoutProfilesRow
+        Insert: CheckoutProfilesInsert
+        Update: CheckoutProfilesUpdate
+        Relationships: [
+          {
+            foreignKeyName: "checkout_profiles_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: true
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       destinos: {
         Row: DestinosRow

@@ -15,13 +15,17 @@ import {
   saveLastCheckoutSnapshot,
 } from "@/lib/cart/cart-storage"
 import { createClient } from "@/lib/supabase/client"
-import type { CheckoutPaymentMethod, CheckoutSubmitResult } from "@/types/checkout/checkout.types"
+import type {
+  CheckoutPaymentMethod,
+  CheckoutProfileResult,
+  CheckoutSubmitResult,
+} from "@/types/checkout/checkout.types"
 
 function formatPrice(price: number): string {
   return `$${price.toLocaleString("es-AR")}`
 }
 
-const CHECKOUT_FORM_STORAGE_KEY = "apacheta:checkout-form"
+const CHECKOUT_FORM_DRAFT_STORAGE_KEY = "apacheta:checkout-form-draft"
 
 const EMPTY_CONTACT = {
   firstName: "",
@@ -42,17 +46,11 @@ function isBrowser() {
   return typeof window !== "undefined"
 }
 
-function loadCheckoutFormState(): {
+function parseCheckoutFormState(rawValue: string | null): {
   paymentMethod: CheckoutPaymentMethod
   contact: typeof EMPTY_CONTACT
   passenger: typeof EMPTY_PASSENGER
 } | null {
-  if (!isBrowser()) {
-    return null
-  }
-
-  const rawValue = window.localStorage.getItem(CHECKOUT_FORM_STORAGE_KEY)
-
   if (!rawValue) {
     return null
   }
@@ -85,7 +83,17 @@ function loadCheckoutFormState(): {
   }
 }
 
-function saveCheckoutFormState(input: {
+function loadCheckoutDraftState() {
+  if (!isBrowser()) {
+    return null
+  }
+
+  return parseCheckoutFormState(
+    window.localStorage.getItem(CHECKOUT_FORM_DRAFT_STORAGE_KEY),
+  )
+}
+
+function saveCheckoutDraftState(input: {
   paymentMethod: CheckoutPaymentMethod
   contact: typeof EMPTY_CONTACT
   passenger: typeof EMPTY_PASSENGER
@@ -94,15 +102,18 @@ function saveCheckoutFormState(input: {
     return
   }
 
-  window.localStorage.setItem(CHECKOUT_FORM_STORAGE_KEY, JSON.stringify(input))
+  window.localStorage.setItem(
+    CHECKOUT_FORM_DRAFT_STORAGE_KEY,
+    JSON.stringify(input),
+  )
 }
 
-function clearCheckoutFormState() {
+function clearCheckoutDraftState() {
   if (!isBrowser()) {
     return
   }
 
-  window.localStorage.removeItem(CHECKOUT_FORM_STORAGE_KEY)
+  window.localStorage.removeItem(CHECKOUT_FORM_DRAFT_STORAGE_KEY)
 }
 
 function formatBirthDateInput(value: string) {
@@ -126,12 +137,13 @@ export function CheckoutView() {
   const { items, isEmpty, subtotal } = useCart()
   const [paymentMethod, setPaymentMethod] =
     useState<CheckoutPaymentMethod>("mercadopago")
+  const [rememberDetails, setRememberDetails] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [contact, setContact] = useState(EMPTY_CONTACT)
   const [passenger, setPassenger] = useState(EMPTY_PASSENGER)
 
   useEffect(() => {
-    const persistedState = loadCheckoutFormState()
+    const persistedState = loadCheckoutDraftState()
 
     if (!persistedState) {
       return
@@ -162,6 +174,46 @@ export function CheckoutView() {
         lastName:
           currentContact.lastName || user.user_metadata?.apellido || "",
       }))
+
+      if (loadCheckoutDraftState()) {
+        return
+      }
+
+      const profileResponse = await fetch("/api/checkout/profile", {
+        cache: "no-store",
+      })
+
+      if (!profileResponse.ok) {
+        return
+      }
+
+      const profile =
+        (await profileResponse.json()) as CheckoutProfileResult | null
+
+      if (!active || !profile) {
+        return
+      }
+
+      setRememberDetails(true)
+      setContact((currentContact) => ({
+        ...currentContact,
+        firstName: profile.contact.firstName || currentContact.firstName,
+        lastName: profile.contact.lastName || currentContact.lastName,
+        email: profile.contact.email || currentContact.email,
+        phone: profile.contact.phone || currentContact.phone,
+      }))
+      setPassenger((currentPassenger) => ({
+        ...currentPassenger,
+        fullName: profile.passenger.fullName || currentPassenger.fullName,
+        documentNumber:
+          profile.passenger.documentNumber || currentPassenger.documentNumber,
+        birthDate: profile.passenger.birthDate || currentPassenger.birthDate,
+        nationality:
+          profile.passenger.nationality || currentPassenger.nationality,
+        specialRequirements:
+          profile.passenger.specialRequirements ||
+          currentPassenger.specialRequirements,
+      }))
     })()
 
     return () => {
@@ -170,7 +222,7 @@ export function CheckoutView() {
   }, [])
 
   useEffect(() => {
-    saveCheckoutFormState({
+    saveCheckoutDraftState({
       paymentMethod,
       contact,
       passenger,
@@ -194,6 +246,7 @@ export function CheckoutView() {
         body: JSON.stringify({
           items,
           paymentMethod,
+          saveProfile: rememberDetails,
           contact,
           passenger,
         }),
@@ -235,7 +288,7 @@ export function CheckoutView() {
           : null,
       })
 
-      clearCheckoutFormState()
+      clearCheckoutDraftState()
       setContact(EMPTY_CONTACT)
       setPassenger(EMPTY_PASSENGER)
       setPaymentMethod("mercadopago")
@@ -462,6 +515,17 @@ export function CheckoutView() {
               <h2 className="font-serif text-xl font-semibold text-dark-brown mb-6">
                 Método de Pago
               </h2>
+              <label className="mb-6 flex items-start gap-3 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={rememberDetails}
+                  onChange={(event) => setRememberDetails(event.target.checked)}
+                  className="mt-0.5 h-4 w-4 accent-primary"
+                />
+                <span className="font-sans text-sm text-dark-brown leading-relaxed">
+                  Guardar mis datos para futuras reservas.
+                </span>
+              </label>
               <div className="flex flex-col gap-3">
                 {(
                   [
