@@ -26,7 +26,6 @@ const supabase = createClient()
 
 const navLinks = [
   { href: "/", label: "Inicio" },
-  { href: "/paquetes", label: "Paquetes NOA" },
   { href: "/experiencias", label: "Experiencias" },
   { href: "/hoteleria", label: "Hotelería" },
   { href: "/para-agencias", label: "Para Agencias" },
@@ -51,7 +50,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
   const router = useRouter()
   const displayName = resolveDisplayName(user)
   const resolvedNavLinks = user
-    ? [...navLinks, { href: "/mis-reservas", label: "Mis reservas" }]
+    ? [...navLinks]
     : navLinks
 
   function handleSignOut() {

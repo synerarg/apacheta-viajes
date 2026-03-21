@@ -30,7 +30,7 @@ export function ContactSection() {
               <div className="flex items-start gap-4">
                 <MapPin className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <div>
-                  <p className="font-sans text-[11px] uppercase tracking-[0.1em] text-subtle mb-1">
+                  <p className="font-sans text-[11px] uppercase tracking-widest text-subtle mb-1">
                     Oficina Central
                   </p>
                   <p className="font-sans text-base text-dark-brown">
@@ -42,7 +42,7 @@ export function ContactSection() {
               <div className="flex items-start gap-4">
                 <Mail className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <div>
-                  <p className="font-sans text-[11px] uppercase tracking-[0.1em] text-subtle mb-1">
+                  <p className="font-sans text-[11px] uppercase tracking-widest text-subtle mb-1">
                     Escribinos
                   </p>
                   <a
@@ -57,7 +57,7 @@ export function ContactSection() {
               <div className="flex items-start gap-4">
                 <Phone className="w-5 h-5 text-primary mt-1 shrink-0" />
                 <div>
-                  <p className="font-sans text-[11px] uppercase tracking-[0.1em] text-subtle mb-1">
+                  <p className="font-sans text-[11px] uppercase tracking-widest text-subtle mb-1">
                     Llamanos
                   </p>
                   <a
