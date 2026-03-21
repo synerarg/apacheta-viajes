@@ -333,7 +333,7 @@ function TransferenciaPageContent() {
                   {item.copyable && (
                     <button
                       onClick={() => copyToClipboard(item.value, item.label)}
-                      className="text-primary hover:text-primary/70 transition-colors"
+                      className="text-primary hover:text-primary/70 transition-colors cursor-pointer"
                       aria-label={`Copiar ${item.label}`}
                     >
                       {copiedField === item.label ? (
@@ -378,7 +378,7 @@ function TransferenciaPageContent() {
               />
               <button
                 onClick={() => fileInputRef.current?.click()}
-                className="w-24 h-24 border border-dark-brown/20 bg-off-white flex flex-col items-center justify-center gap-1.5 hover:bg-dark-brown/5 transition-colors"
+                className="w-24 h-24 border border-dark-brown/20 bg-off-white flex flex-col items-center justify-center gap-1.5 hover:bg-dark-brown/5 transition-colors cursor-pointer"
               >
                 <Plus className="w-5 h-5 text-primary" />
                 <span className="text-[11px] text-dark-brown font-sans font-medium text-center leading-tight">

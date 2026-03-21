@@ -113,7 +113,7 @@ export function FormGalleryUploader({
             <button
               type="button"
               onClick={() => removeUrl(i)}
-              className="absolute inset-0 flex items-center justify-center bg-black/0 text-transparent transition-all group-hover:bg-black/40 group-hover:text-white"
+              className="absolute inset-0 flex items-center justify-center bg-black/0 text-transparent transition-all group-hover:bg-black/40 group-hover:text-white cursor-pointer"
             >
               <Trash className="h-4 w-4" />
             </button>

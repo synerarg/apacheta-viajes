@@ -67,7 +67,7 @@ function SidebarContent({
           <button
             type="button"
             onClick={onClose}
-            className="text-white/60 hover:text-white transition-colors"
+            className="text-white/60 hover:text-white transition-colors cursor-pointer"
             aria-label="Cerrar menú"
           >
             <X className="h-5 w-5" />
@@ -162,7 +162,7 @@ export function DashboardSidebarClient() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-center p-1.5 text-white/70 hover:text-white transition-colors"
+          className="flex items-center justify-center p-1.5 text-white/70 hover:text-white transition-colors cursor-pointer"
           aria-label="Abrir menú"
         >
           <List className="h-6 w-6" />

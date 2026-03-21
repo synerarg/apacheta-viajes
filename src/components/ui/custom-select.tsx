@@ -50,7 +50,7 @@ export function CustomSelect({
         type="button"
         onClick={() => setOpen((prev) => !prev)}
         className={cn(
-          "w-full flex items-center justify-between bg-transparent border-0 border-b",
+          "w-full flex items-center justify-between bg-transparent border-0 border-b cursor-pointer",
           "px-0 font-sans text-base text-left focus:outline-none transition-colors duration-200",
           branded
             ? ["py-3", open ? "border-primary" : "border-dark-brown", selected ? "text-dark-brown" : "text-subtle"]

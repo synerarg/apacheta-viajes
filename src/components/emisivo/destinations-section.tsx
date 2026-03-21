@@ -32,7 +32,7 @@ export function DestinationsSection({ destinations }: DestinationsSectionProps) 
                 <button
                   key={destination.id}
                   onClick={() => setActiveDestination(destination)}
-                  className={`whitespace-nowrap px-4 py-2 border transition-all text-sm ${
+                  className={`whitespace-nowrap px-4 py-2 border transition-all text-sm cursor-pointer ${
                     activeDestination.id === destination.id
                       ? "bg-primary text-white border-primary"
                       : "bg-transparent text-muted-foreground border-border hover:border-primary hover:text-foreground"

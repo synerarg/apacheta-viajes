@@ -79,7 +79,7 @@ export function CatalogoPaquetes({
           <div className="flex justify-center mt-4">
             <button
               onClick={() => setVisibleCount((c) => c + ITEMS_PER_PAGE)}
-              className="border border-dark-brown text-dark-brown font-sans text-sm px-10 py-3 hover:bg-dark-brown hover:text-off-white transition-colors"
+              className="border border-dark-brown text-dark-brown font-sans text-sm px-10 py-3 hover:bg-dark-brown hover:text-off-white transition-colors cursor-pointer"
             >
               Cargar Más
             </button>

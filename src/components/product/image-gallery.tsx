@@ -43,14 +43,14 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
         <>
           <button
             onClick={prev}
-            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white flex items-center justify-center transition-colors"
+            className="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Imagen anterior"
           >
             <ChevronLeft className="w-5 h-5 text-dark-brown" />
           </button>
           <button
             onClick={next}
-            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white flex items-center justify-center transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/80 hover:bg-white flex items-center justify-center transition-colors cursor-pointer"
             aria-label="Siguiente imagen"
           >
             <ChevronRight className="w-5 h-5 text-dark-brown" />
@@ -62,7 +62,7 @@ export function ImageGallery({ images, alt }: ImageGalleryProps) {
               <button
                 key={i}
                 onClick={() => setCurrent(i)}
-                className={`w-2 h-2 rounded-full transition-colors ${
+                className={`w-2 h-2 rounded-full transition-colors cursor-pointer ${
                   i === current ? "bg-primary" : "bg-white/60"
                 }`}
                 aria-label={`Ir a imagen ${i + 1}`}

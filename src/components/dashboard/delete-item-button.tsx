@@ -30,7 +30,7 @@ export function DeleteItemButton({ action, label = "Eliminar" }: DeleteItemButto
       type="button"
       onClick={handleClick}
       disabled={isPending}
-      className="transition-colors hover:text-red-500 disabled:opacity-50"
+      className="transition-colors hover:text-red-500 disabled:opacity-50 cursor-pointer"
       title={label}
     >
       <Trash className="h-4 w-4" />

@@ -153,7 +153,7 @@ export function ExperienciaForm({
                   }}
                   className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${
                     destacado ? "bg-primary" : "bg-neutral-200"
-                  } ${!canToggleDestacado && !destacado ? "cursor-not-allowed opacity-50" : ""}`}
+                  } ${!canToggleDestacado && !destacado ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                 >
                   <span
                     className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
@@ -266,7 +266,7 @@ export function ExperienciaForm({
           <button
             type="button"
             onClick={() => setSelectedCategoria("__none__")}
-            className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+            className={`rounded px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
               selectedCategoria === "__none__"
                 ? "bg-primary text-white"
                 : "border border-neutral-200 bg-white text-neutral-600 hover:border-primary hover:text-primary"
@@ -279,7 +279,7 @@ export function ExperienciaForm({
               key={categoria.id}
               type="button"
               onClick={() => setSelectedCategoria(categoria.id)}
-              className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+              className={`rounded px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
                 selectedCategoria === categoria.id
                   ? "bg-primary text-white"
                   : "border border-neutral-200 bg-white text-neutral-600 hover:border-primary hover:text-primary"
@@ -355,7 +355,7 @@ export function ExperienciaForm({
         <button
           type="submit"
           disabled={isPending}
-          className="flex items-center gap-2 bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
+          className="flex items-center gap-2 bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-60 cursor-pointer"
         >
           <FloppyDisk className="h-4 w-4" />
           {isPending ? "Guardando..." : "Guardar"}

@@ -65,6 +65,15 @@ body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 
+/* ─── Scrollbar hide utility ─── */
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
 /* ─── Apacheta Design System ─── */
 @theme {
   --color-primary: #8B1A1A;

@@ -338,7 +338,7 @@ export function PaqueteForm({
                   }}
                   className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${
                     destacado ? "bg-primary" : "bg-neutral-200"
-                  } ${!canToggleDestacado && !destacado ? "cursor-not-allowed opacity-50" : ""}`}
+                  } ${!canToggleDestacado && !destacado ? "cursor-not-allowed opacity-50" : "cursor-pointer"}`}
                 >
                   <span
                     className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
@@ -486,7 +486,7 @@ export function PaqueteForm({
                     [item.key]: !currentValue[item.key as keyof typeof currentValue],
                   }))
                 }
-                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${
+                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors cursor-pointer ${
                   includes[item.key as keyof typeof includes] ? "bg-primary" : "bg-neutral-200"
                 }`}
               >
@@ -516,7 +516,7 @@ export function PaqueteForm({
                 key={categoria.id}
                 type="button"
                 onClick={() => toggleCategory(categoria.id)}
-                className={`rounded px-3 py-1.5 text-xs font-medium transition-colors ${
+                className={`rounded px-3 py-1.5 text-xs font-medium transition-colors cursor-pointer ${
                   selected
                     ? "bg-primary text-white"
                     : "border border-neutral-200 bg-white text-neutral-600 hover:border-primary hover:text-primary"
@@ -617,7 +617,7 @@ export function PaqueteForm({
                     <button
                       type="button"
                       onClick={() => updateDate(date.clientId, "activo", !date.activo)}
-                      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors ${
+                      className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors cursor-pointer ${
                         date.activo ? "bg-primary" : "bg-neutral-200"
                       }`}
                     >
@@ -632,7 +632,7 @@ export function PaqueteForm({
                   <button
                     type="button"
                     onClick={() => removeDate(date.clientId)}
-                    className="inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-red-500"
+                    className="inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-red-500 cursor-pointer"
                   >
                     <Trash className="h-4 w-4" />
                     Quitar
@@ -644,7 +644,7 @@ export function PaqueteForm({
           <button
             type="button"
             onClick={addDate}
-            className="inline-flex items-center gap-2 border border-primary px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
+            className="inline-flex items-center gap-2 border border-primary px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Agregar salida
@@ -694,7 +694,7 @@ export function PaqueteForm({
                 <button
                   type="button"
                   onClick={() => removeItineraryDay(item.clientId)}
-                  className="inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-red-500"
+                  className="inline-flex items-center gap-2 text-sm text-neutral-500 transition-colors hover:text-red-500 cursor-pointer"
                 >
                   <Trash className="h-4 w-4" />
                   Quitar día
@@ -705,7 +705,7 @@ export function PaqueteForm({
           <button
             type="button"
             onClick={addItineraryDay}
-            className="inline-flex items-center gap-2 border border-primary px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5"
+            className="inline-flex items-center gap-2 border border-primary px-4 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/5 cursor-pointer"
           >
             <Plus className="h-4 w-4" />
             Agregar día
@@ -723,7 +723,7 @@ export function PaqueteForm({
         <button
           type="submit"
           disabled={isPending}
-          className="flex items-center gap-2 bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-60"
+          className="flex items-center gap-2 bg-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-60 cursor-pointer"
         >
           <FloppyDisk className="h-4 w-4" />
           {isPending ? "Guardando..." : "Guardar"}

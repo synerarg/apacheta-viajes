@@ -13,7 +13,8 @@
       "Bash(Remove-Item -Recurse -Force \"C:\\\\Users\\\\tomas\\\\OneDrive\\\\Documentos\\\\synera\\\\apacheta\\\\.next\" -ErrorAction SilentlyContinue)",
       "Bash(Write-Host \"Cache .next eliminado\")",
       "Bash(find /c/Users/tomas/OneDrive/Documentos/synera/apacheta -type f -name *admin*)",
-      "Bash(xargs ls:*)"
+      "Bash(xargs ls:*)",
+      "Bash(xargs grep:*)"
     ]
   }
 }

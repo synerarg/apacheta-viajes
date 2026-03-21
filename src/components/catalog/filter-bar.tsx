@@ -17,7 +17,7 @@ export function FilterBar({
         <button
           key={cat}
           onClick={() => onCategoriaChange(cat)}
-          className={`px-5 py-2 text-sm font-sans transition-all duration-200 ${
+          className={`px-5 py-2 text-sm font-sans transition-all duration-200 cursor-pointer ${
             activeCategoria === cat
               ? "bg-primary text-off-white border border-primary"
               : "bg-transparent text-dark-brown border border-dark-brown hover:border-primary hover:text-primary"

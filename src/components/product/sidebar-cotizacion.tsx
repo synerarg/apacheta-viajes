@@ -91,7 +91,7 @@ export function SidebarCotizacion({
       {/* CTA */}
       <button
         onClick={handleAgregar}
-        className={`w-full py-4 font-sans text-base font-bold transition-colors ${
+        className={`w-full py-4 font-sans text-base font-bold transition-colors cursor-pointer ${
           added
             ? "bg-dark-brown text-off-white"
             : "bg-primary hover:bg-primary/80 text-off-white"

@@ -92,7 +92,7 @@ export function FormImageUploader({
           <button
             type="button"
             onClick={() => setPreview(null)}
-            className="absolute right-2 top-2 rounded bg-black/50 p-1 text-white transition-colors hover:bg-black/70"
+            className="absolute right-2 top-2 rounded bg-black/50 p-1 text-white transition-colors hover:bg-black/70 cursor-pointer"
           >
             <X className="h-4 w-4" />
           </button>

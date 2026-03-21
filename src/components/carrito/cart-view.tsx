@@ -175,7 +175,7 @@ export function CartView() {
               <Link
                 href={isEmpty ? "/carrito" : "/checkout"}
                 aria-disabled={isEmpty}
-                className={`block w-full text-off-white font-sans text-sm sm:text-base font-bold py-4 text-center transition-colors ${
+                className={`block w-full text-off-white font-sans text-sm sm:text-base font-bold py-4 text-center transition-colors cursor-pointer ${
                   isEmpty
                     ? "pointer-events-none bg-primary/50"
                     : "bg-primary hover:bg-primary/80"

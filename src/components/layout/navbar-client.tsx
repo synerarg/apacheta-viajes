@@ -187,7 +187,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
             <button
               type="button"
               onClick={() => setIsOpen(true)}
-              className="flex h-10 w-10 items-center justify-center text-white transition-colors hover:bg-white/10"
+              className="flex h-10 w-10 items-center justify-center text-white transition-colors hover:bg-white/10 cursor-pointer"
               aria-label="Abrir menú"
             >
               <MenuIcon className="h-5 w-5" />
@@ -226,7 +226,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
           <button
             type="button"
             onClick={() => setIsOpen(false)}
-            className="flex h-9 w-9 items-center justify-center text-white/80 hover:text-white transition-colors"
+            className="flex h-9 w-9 items-center justify-center text-white/80 hover:text-white transition-colors cursor-pointer"
             aria-label="Cerrar menú"
           >
             <XIcon className="h-5 w-5" />
@@ -255,7 +255,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
           <Link
             href="/paquetes"
             onClick={() => setIsOpen(false)}
-            className="block w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3 transition-colors hover:bg-white/90"
+            className="block w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3 transition-colors hover:bg-white/90 cursor-pointer"
           >
             Explorar Paquetes
           </Link>
@@ -264,7 +264,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
             {user ? (
               <button
                 type="button"
-                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
+                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm cursor-pointer"
                 onClick={() => {
                   setIsOpen(false)
                   handleSignOut()

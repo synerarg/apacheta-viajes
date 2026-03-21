@@ -344,7 +344,7 @@ export function LoginForm() {
                   <button
                     type="button"
                     onClick={handleResendCode}
-                    className="text-primary hover:underline font-medium"
+                    className="text-primary hover:underline font-medium cursor-pointer"
                     disabled={isResendDisabled}
                   >
                     {pendingAction === "resend-code"
