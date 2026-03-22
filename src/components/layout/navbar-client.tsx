@@ -94,8 +94,8 @@ export function NavbarClient({ user }: NavbarClientProps) {
           <div className="hidden items-center gap-6 lg:flex">
             <Button
               asChild
-              variant="outline"
-              className="h-12 text-sm text-primary hover:text-primary"
+              variant="default"
+              className="h-12 text-sm text-primary hover:text-primary bg-white hover:bg-white/90"
             >
               <Link href="/paquetes">Explorar Paquetes</Link>
             </Button>
@@ -250,63 +250,60 @@ export function NavbarClient({ user }: NavbarClientProps) {
         </nav>
 
         {/* Footer del panel */}
-        <div className="px-6 pb-8 pt-4 border-t border-white/15 flex flex-col gap-3">
+        <div className="px-6 pb-safe-or-8 pb-8 pt-4 border-t border-white/15 flex flex-col gap-1">
           <Link
             href="/paquetes"
             onClick={() => setIsOpen(false)}
-            className="block w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3 transition-colors hover:bg-white/90 cursor-pointer"
+            className="block w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3.5 mb-2 transition-colors hover:bg-white/90 cursor-pointer"
           >
             Explorar Paquetes
           </Link>
 
-          <div className="flex items-center justify-between pt-1">
-            {user ? (
-              <button
-                type="button"
-                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm cursor-pointer"
-                onClick={() => {
-                  setIsOpen(false)
-                  handleSignOut()
-                }}
-                disabled={isSigningOut}
-              >
-                <UserIcon className="h-4 w-4" />
-                <span>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</span>
-              </button>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
-              >
-                <UserIcon className="h-4 w-4" />
-                <span>Ingresar</span>
-              </Link>
-            )}
+          {/* Links secundarios — uno por fila */}
+          <Link
+            href="/carrito"
+            onClick={() => setIsOpen(false)}
+            className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm border-b border-white/10"
+          >
+            <ShoppingCartIcon className="h-4 w-4 shrink-0" />
+            <span>Carrito{totalItems > 0 ? ` (${totalItems})` : ""}</span>
+          </Link>
 
-            <div className="flex items-center gap-4">
-              {user?.tipo === "admin" && (
-                <Link
-                  href="/dashboard"
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
-                  aria-label="Dashboard"
-                >
-                  <SquaresFourIcon className="h-4 w-4" />
-                  <span>Dashboard</span>
-                </Link>
-              )}
+          {user?.tipo === "admin" && (
+            <Link
+              href="/dashboard"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm border-b border-white/10"
+              aria-label="Dashboard"
+            >
+              <SquaresFourIcon className="h-4 w-4 shrink-0" />
+              <span>Dashboard</span>
+            </Link>
+          )}
 
-              <Link
-                href="/carrito"
-                onClick={() => setIsOpen(false)}
-                className="flex items-center gap-2 text-white/80 hover:text-white transition-colors text-sm"
-              >
-                <ShoppingCartIcon className="h-4 w-4" />
-                <span>Carrito{totalItems > 0 ? ` (${totalItems})` : ""}</span>
-              </Link>
-            </div>
-          </div>
+          {user ? (
+            <button
+              type="button"
+              className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm w-full cursor-pointer"
+              onClick={() => {
+                setIsOpen(false)
+                handleSignOut()
+              }}
+              disabled={isSigningOut}
+            >
+              <LogOutIcon className="h-4 w-4 shrink-0" />
+              <span>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</span>
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm"
+            >
+              <UserIcon className="h-4 w-4 shrink-0" />
+              <span>Ingresar</span>
+            </Link>
+          )}
         </div>
       </div>
     </>
