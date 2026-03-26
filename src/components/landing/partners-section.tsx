@@ -1,7 +1,6 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import { Button } from "@/components/ui/button"
 import type { StorefrontEmisivoDestinationItem } from "@/types/storefront/storefront.types"
 
 interface PartnersSectionProps {
@@ -26,12 +25,12 @@ export function PartnersSection({ destinations }: PartnersSectionProps) {
               logística propia y un equipo que se hace cargo. Trabajamos con
               agencias de Argentina, USA, Europa y Brasil.
             </p>
-            <Button
-              asChild
-              className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
+            <Link
+              href="/para-agencias#contacto"
+              className="inline-flex items-center justify-center bg-[#8B1A1A] hover:bg-[#7a1616] text-white text-base h-12 px-6 transition-colors cursor-pointer"
             >
-              <Link href="/para-agencias#contacto">Contactate</Link>
-            </Button>
+              Contactate
+            </Link>
           </div>
           <div className="relative aspect-4/3 rounded-lg overflow-hidden">
             <Image
@@ -80,14 +79,12 @@ export function PartnersSection({ destinations }: PartnersSectionProps) {
         </div>
 
         <div className="text-center">
-          <Button
-            asChild
-            variant="default"
-            size="lg"
-            className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
+          <Link
+            href="/emisivo"
+            className="inline-flex items-center justify-center bg-[#8B1A1A] hover:bg-[#7a1616] text-white text-base h-12 px-8 transition-colors cursor-pointer"
           >
-            <Link href="/emisivo">Consultar Viajes al Exterior</Link>
-          </Button>
+            Consultar Viajes al Exterior
+          </Link>
         </div>
       </div>
     </section>

@@ -91,17 +91,17 @@ export function NavbarClient({ user }: NavbarClientProps) {
           </div>
 
           {/* Desktop — actions */}
-          <div className="hidden items-center gap-6 lg:flex">
+          <div className="hidden items-center gap-4 lg:flex">
             <Button
               asChild
               variant="default"
-              className="h-12 text-sm text-primary hover:text-primary bg-white hover:bg-white/90"
+              className="h-10 text-sm text-primary hover:text-primary bg-white hover:bg-white/90 cursor-pointer"
             >
               <Link href="/paquetes">Explorar Paquetes</Link>
             </Button>
 
-            <div className="flex items-center gap-2 text-white/90">
-              {/* 1 — Dashboard (solo admin) */}
+            <div className="flex items-center gap-1 text-white/90">
+              {/* Dashboard (solo admin) */}
               {user?.tipo === "admin" && (
                 <Tooltip>
                   <TooltipTrigger asChild>
@@ -113,21 +113,17 @@ export function NavbarClient({ user }: NavbarClientProps) {
                       <SquaresFourIcon className="h-5 w-5" />
                     </Link>
                   </TooltipTrigger>
-                  <TooltipContent side="bottom">
-                    <p>Dashboard</p>
-                  </TooltipContent>
+                  <TooltipContent side="bottom"><p>Dashboard</p></TooltipContent>
                 </Tooltip>
               )}
 
-              {/* 2 — Carrito */}
+              {/* Carrito */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
                     href="/carrito"
                     className="relative flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                    aria-label={
-                      totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"
-                    }
+                    aria-label={totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
                   >
                     <ShoppingCartIcon className="h-5 w-5" />
                     {totalItems > 0 && (
@@ -138,15 +134,13 @@ export function NavbarClient({ user }: NavbarClientProps) {
                   </Link>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>
-                    {totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}
-                  </p>
+                  <p>{totalItems > 0 ? `Carrito (${totalItems})` : "Carrito"}</p>
                 </TooltipContent>
               </Tooltip>
 
-              {/* 3 — Mis reservas / Cerrar sesión (solo si hay usuario) */}
-              {user && (
+              {user ? (
                 <>
+                  {/* Mis reservas */}
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <Link
@@ -157,11 +151,41 @@ export function NavbarClient({ user }: NavbarClientProps) {
                         <UserIcon className="h-5 w-5" />
                       </Link>
                     </TooltipTrigger>
+                    <TooltipContent side="bottom"><p>{displayName}</p></TooltipContent>
+                  </Tooltip>
+
+                  {/* Cerrar sesión */}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={handleSignOut}
+                        disabled={isSigningOut}
+                        className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+                        aria-label="Cerrar sesión"
+                      >
+                        <LogOutIcon className="h-5 w-5" />
+                      </button>
+                    </TooltipTrigger>
                     <TooltipContent side="bottom">
-                      <p>{displayName}</p>
+                      <p>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</p>
                     </TooltipContent>
                   </Tooltip>
                 </>
+              ) : (
+                /* Ingresar (solo cuando no hay usuario) */
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Link
+                      href="/login"
+                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
+                      aria-label="Ingresar"
+                    >
+                      <UserIcon className="h-5 w-5" />
+                    </Link>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom"><p>Ingresar</p></TooltipContent>
+                </Tooltip>
               )}
             </div>
           </div>

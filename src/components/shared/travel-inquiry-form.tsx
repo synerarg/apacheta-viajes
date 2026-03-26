@@ -68,7 +68,7 @@ const SOURCE_CONFIG: Record<Source, SourceConfig> = {
     inputClass:
       "bg-transparent border-b border-border py-2 text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary transition-colors",
     submitClass:
-      "w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 text-base mt-2 cursor-pointer",
+      "w-full bg-primary hover:bg-primary/90 text-white py-6 text-base mt-2 cursor-pointer",
   },
   contacto: {
     secondField: "email",

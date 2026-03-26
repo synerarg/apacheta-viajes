@@ -247,7 +247,7 @@ export function LoginForm() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm h-11 text-base cursor-pointer"
+                  className="w-full bg-primary hover:bg-primary/90 text-white rounded-sm h-11 text-base cursor-pointer"
                   disabled={isLoading}
                 >
                   {pendingAction === "send-code"
@@ -280,7 +280,7 @@ export function LoginForm() {
                       fill="#EA4335"
                     />
                   </svg>
-                  <span className="text-primary group-hover/button:text-primary-foreground text-base">
+                  <span className="text-primary group-hover/button:text-white text-base">
                     {pendingAction === "google"
                       ? "Continuando..."
                       : "Continuar con Google"}
@@ -359,7 +359,7 @@ export function LoginForm() {
               <div className="space-y-4">
                 <Button
                   type="submit"
-                  className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-sm h-11"
+                  className="w-full bg-primary hover:bg-primary/90 text-white rounded-sm h-11"
                   disabled={isLoading || otp.length !== 6}
                 >
                   {pendingAction === "verify-code"
