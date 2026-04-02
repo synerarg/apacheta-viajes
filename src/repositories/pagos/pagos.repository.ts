@@ -1,7 +1,7 @@
 import { PagosRepositoryException } from "@/exceptions/pagos/pagos.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { PagosUpdate } from "@/types/pagos/pagos.types"
+import type { PagosRow, PagosUpdate } from "@/types/pagos/pagos.types"
 
 export class PagosRepository extends BaseRepository<"pagos"> {
   constructor(supabase: DatabaseClient) {
@@ -22,6 +22,27 @@ export class PagosRepository extends BaseRepository<"pagos"> {
 
   async listByOrdenId(ordenId: string) {
     return this.findMany({ orden_id: ordenId })
+  }
+
+  async listExpiredOpenBankTransfers(referenceDate: string) {
+    const { data, error } = (await this.supabase
+      .from(this.tableName)
+      .select("*")
+      .eq("metodo", "bank_transfer")
+      .in("estado", ["requires_action", "reported"])
+      .lt("expires_at", referenceDate)) as unknown as {
+      data: PagosRow[] | null
+      error: unknown
+    }
+
+    if (error) {
+      throw this.createRepositoryException(
+        "listExpiredOpenBankTransfers",
+        error,
+      )
+    }
+
+    return data ?? []
   }
 
   async updateById(id: string, payload: PagosUpdate) {

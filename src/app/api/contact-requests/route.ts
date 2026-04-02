@@ -17,7 +17,7 @@ const contactRequestSchema = z.object({
   mensaje: z.string().optional(),
   metadata: z
     .object({
-      source: z.enum(["landing", "para-agencias"]),
+      source: z.enum(["landing", "para-agencias", "contacto"]),
       agencyName: z.string().optional(),
       phone: z.string().optional(),
     })

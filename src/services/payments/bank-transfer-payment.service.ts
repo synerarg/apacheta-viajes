@@ -13,6 +13,7 @@ import type {
   BankTransferReceiptUploadResult,
   ConfirmBankTransferInput,
   CreateBankTransferPaymentInput,
+  ExpireBankTransferPaymentsResult,
   RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
 } from "@/types/payments/payments.types"
@@ -82,6 +83,18 @@ export class BankTransferPaymentService {
       await this.transactionalEmailService.sendPaymentApproved(paymentId)
     } catch (error) {
       console.error("Failed to send payment approved email", error)
+    }
+  }
+
+  private async notifyPaymentPendingOrError(paymentId: string) {
+    if (!this.transactionalEmailService) {
+      return
+    }
+
+    try {
+      await this.transactionalEmailService.sendPaymentPendingOrError(paymentId)
+    } catch (error) {
+      console.error("Failed to send payment pending/error email", error)
     }
   }
 
@@ -589,6 +602,38 @@ export class BankTransferPaymentService {
       status: "approved",
       confirmedAt,
       reference,
+    }
+  }
+
+  async expireOpenTransfers(
+    referenceDate = new Date().toISOString(),
+  ): Promise<ExpireBankTransferPaymentsResult> {
+    const payments =
+      await this.paymentsRepository.listExpiredOpenBankTransfers(referenceDate)
+    const expiredPayments: ExpireBankTransferPaymentsResult["expiredPayments"] = []
+
+    for (const payment of payments) {
+      const wasExpired = await this.expirePaymentIfNeeded({
+        paymentId: payment.id,
+        orderId: payment.orden_id,
+        expiresAt: payment.expires_at,
+        status: payment.estado,
+      })
+
+      if (!wasExpired) {
+        continue
+      }
+
+      expiredPayments.push({
+        orderId: payment.orden_id,
+        paymentId: payment.id,
+      })
+      await this.notifyPaymentPendingOrError(payment.id)
+    }
+
+    return {
+      processedAt: referenceDate,
+      expiredPayments,
     }
   }
 }

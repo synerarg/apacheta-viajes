@@ -9,7 +9,7 @@ export type CheckoutPaymentMethod = "mercadopago" | "transferencia" | "efectivo"
 
 export interface CheckoutContactInput {
   firstName: string
-  lastName: string
+  lastName?: string
   email: string
   phone: string
 }
@@ -17,9 +17,9 @@ export interface CheckoutContactInput {
 export interface CheckoutPassengerInput {
   fullName: string
   documentNumber: string
-  birthDate: string
-  nationality: string
-  specialRequirements: string
+  birthDate?: string
+  nationality?: string
+  specialRequirements?: string
 }
 
 export interface CheckoutSubmitInput {

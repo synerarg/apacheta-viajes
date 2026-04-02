@@ -173,6 +173,14 @@ export interface BankTransferReceiptUploadAuthorizationResult {
   maxBytes: number
 }
 
+export interface ExpireBankTransferPaymentsResult {
+  processedAt: string
+  expiredPayments: Array<{
+    orderId: string
+    paymentId: string
+  }>
+}
+
 export interface CreatePaymentInput {
   method: OrdenMetodoPago
   orderId: string

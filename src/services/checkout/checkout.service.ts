@@ -42,18 +42,24 @@ function buildReservationNotes(
   user: CheckoutUserContext,
   orderReference: string,
 ) {
+  const contactName = [input.contact.firstName, input.contact.lastName]
+    .filter(Boolean)
+    .join(" ")
+
   return [
     `Order reference: ${orderReference}`,
     `Checkout item: ${item.kind}`,
     `Checkout label: ${item.name}`,
     `Usuario autenticado: ${user.id}`,
-    `Contacto: ${input.contact.firstName} ${input.contact.lastName}`,
+    `Contacto: ${contactName || input.passenger.fullName}`,
     `Email contacto: ${input.contact.email}`,
     `Telefono contacto: ${input.contact.phone}`,
     `Pasajero: ${input.passenger.fullName}`,
     `Documento: ${input.passenger.documentNumber}`,
-    `Nacimiento: ${input.passenger.birthDate}`,
-    `Nacionalidad: ${input.passenger.nationality}`,
+    input.passenger.birthDate ? `Nacimiento: ${input.passenger.birthDate}` : null,
+    input.passenger.nationality
+      ? `Nacionalidad: ${input.passenger.nationality}`
+      : null,
     input.passenger.specialRequirements
       ? `Observaciones: ${input.passenger.specialRequirements}`
       : null,
@@ -69,6 +75,20 @@ function buildOrderReference() {
   const randomSuffix = Math.random().toString(36).slice(2, 8).toUpperCase()
 
   return `AP-${year}-${randomSuffix}`
+}
+
+function normalizeOptionalText(value?: string | null) {
+  const normalized = value?.trim()
+
+  return normalized ? normalized : undefined
+}
+
+function buildPaymentPayer(input: CheckoutSubmitInput) {
+  return {
+    email: input.contact.email,
+    fullName: input.passenger.fullName,
+    documentNumber: input.passenger.documentNumber,
+  }
 }
 
 function mapCheckoutPaymentMethod(method: CheckoutSubmitInput["paymentMethod"]): OrdenMetodoPago {
@@ -159,15 +179,15 @@ export class CheckoutService {
     if (input.saveProfile) {
       await this.checkoutProfilesService.upsertByUsuarioId(user.id, {
         contact_first_name: input.contact.firstName,
-        contact_last_name: input.contact.lastName,
+        contact_last_name: input.contact.lastName ?? null,
         contact_email: input.contact.email,
         contact_phone: input.contact.phone,
         passenger_full_name: input.passenger.fullName,
         passenger_document_number: input.passenger.documentNumber,
-        passenger_birth_date: input.passenger.birthDate,
-        passenger_nationality: input.passenger.nationality,
+        passenger_birth_date: input.passenger.birthDate ?? null,
+        passenger_nationality: input.passenger.nationality ?? null,
         passenger_special_requirements:
-          input.passenger.specialRequirements || null,
+          input.passenger.specialRequirements ?? null,
       })
       return
     }
@@ -180,51 +200,71 @@ export class CheckoutService {
     user: CheckoutUserContext | null,
   ): Promise<CheckoutSubmitResult> {
     try {
+      const normalizedInput: CheckoutSubmitInput = {
+        ...input,
+        contact: {
+          firstName: input.contact.firstName.trim(),
+          lastName: normalizeOptionalText(input.contact.lastName),
+          email: input.contact.email.trim(),
+          phone: input.contact.phone.trim(),
+        },
+        passenger: {
+          fullName: input.passenger.fullName.trim(),
+          documentNumber: input.passenger.documentNumber.trim(),
+          birthDate: normalizeOptionalText(input.passenger.birthDate),
+          nationality: normalizeOptionalText(input.passenger.nationality),
+          specialRequirements: normalizeOptionalText(
+            input.passenger.specialRequirements,
+          ),
+        },
+      }
+
       if (!user) {
         throw new CheckoutAuthenticationException()
       }
 
-      if (input.items.length === 0) {
+      if (normalizedInput.items.length === 0) {
         throw new CheckoutValidationException("Cart is empty")
       }
 
-      assertCheckoutPaymentConfigured(input.paymentMethod)
+      assertCheckoutPaymentConfigured(normalizedInput.paymentMethod)
 
       const orderReference = buildOrderReference()
-      const paymentMethod = mapCheckoutPaymentMethod(input.paymentMethod)
+      const paymentMethod = mapCheckoutPaymentMethod(normalizedInput.paymentMethod)
       const order = await this.ordenesService.create({
         usuario_id: user.id,
         codigo_referencia: orderReference,
         estado: "pendiente",
         estado_pago: "pending",
         metodo_pago: paymentMethod,
-        total: input.items.reduce(
+        total: normalizedInput.items.reduce(
           (total, item) => total + item.unitPrice * item.quantity,
           0,
         ),
-        moneda: input.items[0]?.moneda ?? "ARS",
+        moneda: normalizedInput.items[0]?.moneda ?? "ARS",
         contacto: {
-          firstName: input.contact.firstName,
-          lastName: input.contact.lastName,
-          email: input.contact.email,
-          phone: input.contact.phone,
+          firstName: normalizedInput.contact.firstName,
+          lastName: normalizedInput.contact.lastName ?? null,
+          email: normalizedInput.contact.email,
+          phone: normalizedInput.contact.phone,
         },
         pasajero_principal: {
-          fullName: input.passenger.fullName,
-          documentNumber: input.passenger.documentNumber,
-          birthDate: input.passenger.birthDate,
-          nationality: input.passenger.nationality,
-          specialRequirements: input.passenger.specialRequirements,
+          fullName: normalizedInput.passenger.fullName,
+          documentNumber: normalizedInput.passenger.documentNumber,
+          birthDate: normalizedInput.passenger.birthDate ?? null,
+          nationality: normalizedInput.passenger.nationality ?? null,
+          specialRequirements:
+            normalizedInput.passenger.specialRequirements ?? null,
         },
         notas: `Checkout iniciado ${new Date().toISOString()}`,
       })
 
       const reservations = []
 
-      for (const item of input.items) {
+      for (const item of normalizedInput.items) {
         const reservation = await this.createReservationForItem(
           item,
-          input,
+          normalizedInput,
           user,
           orderReference,
         )
@@ -256,9 +296,9 @@ export class CheckoutService {
         })
       }
 
-      const successUrl = `/checkout/success?orderId=${order.id}&paymentMethod=${input.paymentMethod}`
-      const errorUrl = `/checkout/error?orderId=${order.id}&paymentMethod=${input.paymentMethod}`
-      const transferUrl = `/checkout/transferencia?orderId=${order.id}&paymentMethod=${input.paymentMethod}`
+      const successUrl = `/checkout/success?orderId=${order.id}&paymentMethod=${normalizedInput.paymentMethod}`
+      const errorUrl = `/checkout/error?orderId=${order.id}&paymentMethod=${normalizedInput.paymentMethod}`
+      const transferUrl = `/checkout/transferencia?orderId=${order.id}&paymentMethod=${normalizedInput.paymentMethod}`
       const initialOrderSummary = {
         orderId: order.id,
         reference: order.codigo_referencia,
@@ -268,16 +308,12 @@ export class CheckoutService {
         currency: order.moneda,
       }
 
-      await this.syncSavedProfile(input, user)
+      await this.syncSavedProfile(normalizedInput, user)
 
-      if (input.paymentMethod === "mercadopago") {
+      if (normalizedInput.paymentMethod === "mercadopago") {
         const payment = await this.paymentsService.createMercadoPagoCheckoutPro({
           orderId: order.id,
-          payer: {
-            email: input.contact.email,
-            fullName: input.passenger.fullName,
-            documentNumber: input.passenger.documentNumber,
-          },
+          payer: buildPaymentPayer(normalizedInput),
           successPath: successUrl,
           failurePath: errorUrl,
           pendingPath: successUrl,
@@ -288,7 +324,7 @@ export class CheckoutService {
         await this.notifyOrderCreated(order.id)
 
         return {
-          paymentMethod: input.paymentMethod,
+          paymentMethod: normalizedInput.paymentMethod,
           order: {
             orderId: orderDetail.orderId,
             reference: orderDetail.reference,
@@ -305,14 +341,10 @@ export class CheckoutService {
         }
       }
 
-      if (input.paymentMethod === "transferencia") {
+      if (normalizedInput.paymentMethod === "transferencia") {
         const bankTransfer = await this.paymentsService.createBankTransfer({
           orderId: order.id,
-          payer: {
-            email: input.contact.email,
-            fullName: input.passenger.fullName,
-            documentNumber: input.passenger.documentNumber,
-          },
+          payer: buildPaymentPayer(normalizedInput),
           note: `Checkout web ${new Date().toISOString()}`,
         })
         const orderDetail = await this.paymentsService.getCheckoutOrderSummary(
@@ -321,7 +353,7 @@ export class CheckoutService {
         await this.notifyOrderCreated(order.id)
 
         return {
-          paymentMethod: input.paymentMethod,
+          paymentMethod: normalizedInput.paymentMethod,
           order: {
             orderId: orderDetail.orderId,
             reference: orderDetail.reference,
@@ -345,7 +377,7 @@ export class CheckoutService {
       await this.notifyOrderCreated(order.id)
 
       return {
-        paymentMethod: input.paymentMethod,
+        paymentMethod: normalizedInput.paymentMethod,
         order: {
           ...initialOrderSummary,
           status: "pago_pendiente",

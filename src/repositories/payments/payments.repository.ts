@@ -163,6 +163,19 @@ export class PaymentsRepository {
     }
   }
 
+  async listExpiredOpenBankTransfers(referenceDate: string) {
+    try {
+      return await this.pagosRepository.listExpiredOpenBankTransfers(
+        referenceDate,
+      )
+    } catch (error) {
+      throw new PaymentsRepositoryException(
+        "listExpiredOpenBankTransfers",
+        error,
+      )
+    }
+  }
+
   async getOrderContext(orderId: string): Promise<OrderPaymentContext> {
     try {
       const order = await this.ordenesRepository.findById(orderId)

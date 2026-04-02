@@ -71,6 +71,10 @@ export class PaymentsController {
       userId,
     })
   }
+
+  async expireOpenBankTransfers(referenceDate?: string) {
+    return this.paymentsService.expireOpenBankTransfers(referenceDate)
+  }
 }
 
 export async function createServerPaymentsController() {

@@ -18,6 +18,7 @@ import { createClient } from "@/lib/supabase/client"
 import type {
   CheckoutPaymentMethod,
   CheckoutProfileResult,
+  CheckoutSubmitInput,
   CheckoutSubmitResult,
 } from "@/types/checkout/checkout.types"
 
@@ -97,11 +98,56 @@ function clearCheckoutDraftState() {
   window.localStorage.removeItem(CHECKOUT_FORM_DRAFT_STORAGE_KEY)
 }
 
-function formatBirthDateInput(value: string) {
-  const digits = value.replace(/\D/g, "").slice(0, 6)
-  if (digits.length <= 2) return digits
-  if (digits.length <= 4) return `${digits.slice(0, 2)}/${digits.slice(2)}`
-  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`
+function normalizeOptionalText(value: string) {
+  const normalized = value.trim()
+
+  return normalized.length > 0 ? normalized : undefined
+}
+
+function splitFullName(fullName: string) {
+  const parts = fullName.trim().split(/\s+/).filter(Boolean)
+
+  return {
+    firstName: parts[0] ?? "",
+    lastName: parts.slice(1).join(" "),
+  }
+}
+
+function buildCheckoutSubmitPayload(input: {
+  items: ReturnType<typeof useCart>["items"]
+  paymentMethod: CheckoutPaymentMethod
+  saveProfile: boolean
+  contact: typeof EMPTY_CONTACT
+  passenger: typeof EMPTY_PASSENGER
+}): CheckoutSubmitInput {
+  const normalizedFullName = input.passenger.fullName.trim()
+  const derivedName = splitFullName(normalizedFullName)
+  const firstName = input.contact.firstName.trim() || derivedName.firstName
+  const lastName = normalizeOptionalText(input.contact.lastName || derivedName.lastName)
+  const birthDate = normalizeOptionalText(input.passenger.birthDate)
+  const nationality = normalizeOptionalText(input.passenger.nationality)
+  const specialRequirements = normalizeOptionalText(
+    input.passenger.specialRequirements,
+  )
+
+  return {
+    items: input.items,
+    paymentMethod: input.paymentMethod,
+    saveProfile: input.saveProfile,
+    contact: {
+      firstName,
+      ...(lastName ? { lastName } : {}),
+      email: input.contact.email.trim(),
+      phone: input.contact.phone.trim(),
+    },
+    passenger: {
+      fullName: normalizedFullName,
+      documentNumber: input.passenger.documentNumber.trim(),
+      ...(birthDate ? { birthDate } : {}),
+      ...(nationality ? { nationality } : {}),
+      ...(specialRequirements ? { specialRequirements } : {}),
+    },
+  }
 }
 
 // ─── Underline field ────────────────────────────────────────────────────────
@@ -262,14 +308,12 @@ function CartCarousel({
 
 // ─── Payment Method Row ──────────────────────────────────────────────────────
 function PaymentRow({
-  id,
   label,
   description,
   icon,
   selected,
   onSelect,
 }: {
-  id: CheckoutPaymentMethod
   label: string
   description: string
   icon: ReactNode
@@ -342,6 +386,14 @@ export function CheckoutView() {
         firstName: c.firstName || user.user_metadata?.nombre || "",
         lastName: c.lastName || user.user_metadata?.apellido || "",
       }))
+      setPassenger((p) => ({
+        ...p,
+        fullName:
+          p.fullName ||
+          [user.user_metadata?.nombre, user.user_metadata?.apellido]
+            .filter(Boolean)
+            .join(" "),
+      }))
       if (loadCheckoutDraftState()) return
       const profileResponse = await fetch("/api/checkout/profile", { cache: "no-store" })
       if (!profileResponse.ok) return
@@ -357,7 +409,12 @@ export function CheckoutView() {
       }))
       setPassenger((p) => ({
         ...p,
-        fullName: profile.passenger.fullName || p.fullName,
+        fullName:
+          profile.passenger.fullName ||
+          [profile.contact.firstName, profile.contact.lastName]
+            .filter(Boolean)
+            .join(" ") ||
+          p.fullName,
         documentNumber: profile.passenger.documentNumber || p.documentNumber,
         birthDate: profile.passenger.birthDate || p.birthDate,
         nationality: profile.passenger.nationality || p.nationality,
@@ -378,10 +435,17 @@ export function CheckoutView() {
     }
     setIsSubmitting(true)
     try {
+      const payload = buildCheckoutSubmitPayload({
+        items,
+        paymentMethod,
+        saveProfile: rememberDetails,
+        contact,
+        passenger,
+      })
       const response = await fetch("/api/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ items, paymentMethod, saveProfile: rememberDetails, contact, passenger }),
+        body: JSON.stringify(payload),
       })
       const result = (await response.json()) as CheckoutSubmitResult & { error?: string }
       if (response.status === 401) {
@@ -523,12 +587,11 @@ export function CheckoutView() {
                 onChange={(e) => {
                   const val = e.target.value
                   setPassenger((p) => ({ ...p, fullName: val }))
-                  // Sync to contact firstName/lastName for API
-                  const parts = val.trim().split(" ")
+                  const parts = splitFullName(val)
                   setContact((c) => ({
                     ...c,
-                    firstName: parts[0] ?? "",
-                    lastName: parts.slice(1).join(" ") || c.lastName,
+                    firstName: parts.firstName,
+                    lastName: parts.lastName,
                   }))
                 }}
                 className={fieldClass}

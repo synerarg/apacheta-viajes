@@ -16,6 +16,7 @@ import type {
   CheckoutOrderSummary,
   OrderPaymentContext,
   CreateBankTransferPaymentInput,
+  ExpireBankTransferPaymentsResult,
   CreateMercadoPagoCheckoutProInput,
   CreatePaymentInput,
   MercadoPagoCheckoutProResult,
@@ -299,6 +300,12 @@ export class PaymentsService {
       url,
       expiresInSeconds: config.receiptSignedUrlTtlSeconds,
     }
+  }
+
+  async expireOpenBankTransfers(
+    referenceDate?: string,
+  ): Promise<ExpireBankTransferPaymentsResult> {
+    return this.bankTransferPaymentService.expireOpenTransfers(referenceDate)
   }
 }
 

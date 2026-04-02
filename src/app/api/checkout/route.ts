@@ -23,22 +23,32 @@ const cartItemSchema = z.object({
   experienciaId: z.string().uuid().nullable(),
 })
 
+const optionalNonEmptyString = z.preprocess((value) => {
+  if (typeof value !== "string") {
+    return value
+  }
+
+  const normalized = value.trim()
+
+  return normalized.length > 0 ? normalized : undefined
+}, z.string().min(1).optional())
+
 const checkoutSubmitSchema = z.object({
   items: z.array(cartItemSchema).min(1),
   paymentMethod: z.enum(["mercadopago", "transferencia", "efectivo"]),
   saveProfile: z.boolean(),
   contact: z.object({
-    firstName: z.string().min(1),
-    lastName: z.string().min(1),
-    email: z.string().email(),
-    phone: z.string().min(1),
+    firstName: z.string().trim().min(1),
+    lastName: optionalNonEmptyString,
+    email: z.string().trim().email(),
+    phone: z.string().trim().min(1),
   }),
   passenger: z.object({
-    fullName: z.string().min(1),
-    documentNumber: z.string().min(1),
-    birthDate: z.string().min(1),
-    nationality: z.string().min(1),
-    specialRequirements: z.string(),
+    fullName: z.string().trim().min(1),
+    documentNumber: z.string().trim().min(1),
+    birthDate: optionalNonEmptyString,
+    nationality: optionalNonEmptyString,
+    specialRequirements: optionalNonEmptyString,
   }),
 })
 

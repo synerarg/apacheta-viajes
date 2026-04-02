@@ -34,7 +34,7 @@ export function HeroSection() {
             size="lg"
             className="bg-primary hover:bg-primary/90 text-white px-8 py-6 text-base cursor-pointer"
           >
-            <Link href="/#contacto">Ver Tarifario</Link>
+            <Link href="#contacto">Ver Tarifario</Link>
           </Button>
           <Button
             asChild
