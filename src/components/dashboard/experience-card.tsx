@@ -76,6 +76,7 @@ export function ExperienceCard({ experiencia }: ExperienceCardProps) {
             <DeleteItemButton
               action={deleteExperiencia.bind(null, experiencia.id)}
               label="Eliminar experiencia"
+              redirectTo="/dashboard/experiencias"
             />
           </div>
         </div>

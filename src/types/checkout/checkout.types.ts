@@ -5,7 +5,7 @@ import type {
   CheckoutPaymentSummary,
 } from "@/types/payments/payments.types"
 
-export type CheckoutPaymentMethod = "mercadopago" | "transferencia" | "efectivo"
+export type CheckoutPaymentMethod = "mercadopago" | "transferencia"
 
 export interface CheckoutContactInput {
   firstName: string

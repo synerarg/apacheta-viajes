@@ -6,7 +6,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ChevronLeft, ChevronRight } from "lucide-react"
 import { toast } from "sonner"
-import { Landmark, Banknote } from "lucide-react"
+import { Landmark } from "lucide-react"
 
 import { MercadoPagoIcon } from "@/components/icons/mercadopago"
 import { useCart } from "@/hooks/use-cart"
@@ -62,8 +62,7 @@ function parseCheckoutFormState(rawValue: string | null): {
     return {
       paymentMethod:
         parsed.paymentMethod === "mercadopago" ||
-        parsed.paymentMethod === "transferencia" ||
-        parsed.paymentMethod === "efectivo"
+        parsed.paymentMethod === "transferencia"
           ? parsed.paymentMethod
           : "mercadopago",
       contact: { ...EMPTY_CONTACT, ...parsed.contact },
@@ -505,12 +504,6 @@ export function CheckoutView() {
       label: "Transferencia Bancaria",
       description: "Acreditación en 24hs hábiles",
       icon: <Landmark className="w-5 h-5 text-dark-brown/60" />,
-    },
-    {
-      id: "efectivo",
-      label: "Efectivo en sucursal",
-      description: "Caseros 450, Salta Capital",
-      icon: <Banknote className="w-5 h-5 text-dark-brown/60" />,
     },
     {
       id: "mercadopago",

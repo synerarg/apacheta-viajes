@@ -35,7 +35,7 @@ const optionalNonEmptyString = z.preprocess((value) => {
 
 const checkoutSubmitSchema = z.object({
   items: z.array(cartItemSchema).min(1),
-  paymentMethod: z.enum(["mercadopago", "transferencia", "efectivo"]),
+  paymentMethod: z.enum(["mercadopago", "transferencia"]),
   saveProfile: z.boolean(),
   contact: z.object({
     firstName: z.string().trim().min(1),

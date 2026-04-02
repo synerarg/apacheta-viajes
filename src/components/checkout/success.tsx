@@ -127,9 +127,7 @@ export function ConfirmacionView() {
       ? "mercadopago_checkout_pro"
       : checkoutSnapshot?.paymentMethod === "transferencia"
         ? "bank_transfer"
-        : checkoutSnapshot?.paymentMethod === "efectivo"
-          ? "cash_local"
-          : null)
+        : null)
   const paymentStatus =
     orderDetail?.payment?.status ??
     checkoutSnapshot?.payment?.status ??

@@ -517,5 +517,5 @@ export async function deletePaquete(id: string): Promise<void> {
   await adminClient.from("paquetes_fechas").delete().eq("paquete_id", id)
   await adminClient.from("paquetes").delete().eq("id", id)
   revalidatePath("/dashboard/paquetes")
-  redirect("/dashboard/paquetes")
+  revalidatePath(`/dashboard/paquetes/${id}/editar`)
 }

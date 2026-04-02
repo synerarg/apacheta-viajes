@@ -73,6 +73,7 @@ export function PackageCard({ paquete }: PackageCardProps) {
             <DeleteItemButton
               action={deletePaquete.bind(null, paquete.id)}
               label="Eliminar paquete"
+              redirectTo="/dashboard/paquetes"
             />
           </div>
         </div>

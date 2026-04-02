@@ -30,7 +30,7 @@ export interface CheckoutReservationSnapshot {
 
 export interface LastCheckoutSnapshot {
   submittedAt: string
-  paymentMethod: "mercadopago" | "transferencia" | "efectivo"
+  paymentMethod: "mercadopago" | "transferencia"
   items: CartItem[]
   order: {
     orderId: string

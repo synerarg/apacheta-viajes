@@ -100,7 +100,7 @@ function mapCheckoutPaymentMethod(method: CheckoutSubmitInput["paymentMethod"]):
     return "bank_transfer"
   }
 
-  return "cash_local"
+  throw new CheckoutValidationException("Unsupported checkout payment method")
 }
 
 function assertCheckoutPaymentConfigured(
@@ -299,15 +299,6 @@ export class CheckoutService {
       const successUrl = `/checkout/success?orderId=${order.id}&paymentMethod=${normalizedInput.paymentMethod}`
       const errorUrl = `/checkout/error?orderId=${order.id}&paymentMethod=${normalizedInput.paymentMethod}`
       const transferUrl = `/checkout/transferencia?orderId=${order.id}&paymentMethod=${normalizedInput.paymentMethod}`
-      const initialOrderSummary = {
-        orderId: order.id,
-        reference: order.codigo_referencia,
-        status: order.estado,
-        paymentStatus: order.estado_pago,
-        total: Number(order.total),
-        currency: order.moneda,
-      }
-
       await this.syncSavedProfile(normalizedInput, user)
 
       if (normalizedInput.paymentMethod === "mercadopago") {
@@ -370,38 +361,7 @@ export class CheckoutService {
         }
       }
 
-      const cashPayment = await this.paymentsService.createCashLocalPayment(
-        order.id,
-        "Reserva para pago presencial en sucursal",
-      )
-      await this.notifyOrderCreated(order.id)
-
-      return {
-        paymentMethod: normalizedInput.paymentMethod,
-        order: {
-          ...initialOrderSummary,
-          status: "pago_pendiente",
-          paymentStatus: "requires_action",
-        },
-        payment: {
-          paymentId: cashPayment.paymentId,
-          method: "cash_local",
-          provider: "cash_local",
-          status: cashPayment.status,
-          amount: cashPayment.amount,
-          currency: cashPayment.currency,
-          externalReference: `cash:${cashPayment.paymentId}`,
-          redirectUrl: null,
-          expiresAt: null,
-          receiptReference: null,
-          hasReceipt: false,
-          receiptUrl: null,
-        },
-        reservations,
-        redirectUrl: successUrl,
-        successUrl,
-        bankTransfer: null,
-      }
+      throw new CheckoutValidationException("Unsupported checkout payment method")
     } catch (error) {
       if (
         error instanceof CheckoutAuthenticationException ||

@@ -273,5 +273,5 @@ export async function deleteExperiencia(id: string): Promise<void> {
   await adminClient.from("experiencias_imagenes").delete().eq("experiencia_id", id)
   await adminClient.from("experiencias").delete().eq("id", id)
   revalidatePath("/dashboard/experiencias")
-  redirect("/dashboard/experiencias")
+  revalidatePath(`/dashboard/experiencias/${id}/editar`)
 }

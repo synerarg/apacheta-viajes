@@ -79,7 +79,11 @@ export default async function EditarExperienciaPage({ params }: EditarExperienci
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h1 className="font-playfair text-xl sm:text-2xl font-bold text-neutral-900 leading-snug">{experiencia.nombre}</h1>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <DeleteItemButton action={deleteAction} label="Eliminar experiencia" />
+            <DeleteItemButton
+              action={deleteAction}
+              label="Eliminar experiencia"
+              redirectTo="/dashboard/experiencias"
+            />
             <Link
               href={`/experiencias/${experiencia.slug}`}
               target="_blank"

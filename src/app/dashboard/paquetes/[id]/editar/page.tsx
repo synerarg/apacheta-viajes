@@ -108,7 +108,11 @@ export default async function EditarPaquetePage({ params }: EditarPaquetePagePro
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h1 className="font-playfair text-xl sm:text-2xl font-bold text-neutral-900 leading-snug">{paquete.nombre}</h1>
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
-            <DeleteItemButton action={deleteAction} label="Eliminar paquete" />
+            <DeleteItemButton
+              action={deleteAction}
+              label="Eliminar paquete"
+              redirectTo="/dashboard/paquetes"
+            />
             <Link
               href={`/paquetes/${paquete.slug}`}
               target="_blank"
