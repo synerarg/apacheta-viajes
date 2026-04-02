@@ -79,7 +79,7 @@ export function OrdersView({
   return (
     <main className="min-h-screen bg-off-white pb-16 pt-28">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
-        <div className="max-w-[960px]">
+        <div className="mx-auto max-w-[960px]">
           <p className="mb-3 font-sans text-xs uppercase tracking-[0.16em] text-subtle">
             Mi cuenta
           </p>

@@ -27,6 +27,10 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
 }
 
 const RESEND_COOLDOWN_SECONDS = 30
+const PUBLIC_APP_URL =
+  process.env.NEXT_PUBLIC_APP_URL?.trim() ||
+  process.env.NEXT_PUBLIC_SITE_URL?.trim() ||
+  ""
 
 function getSafeNext(next: string | null) {
   if (!next || !next.startsWith("/")) {
@@ -34,6 +38,16 @@ function getSafeNext(next: string | null) {
   }
 
   return next
+}
+
+function getOAuthCallbackUrl(next: string) {
+  const baseUrl =
+    PUBLIC_APP_URL.replace(/\/+$/, "") || window.location.origin.trim()
+  const redirectTo = new URL("/auth/callback", baseUrl)
+
+  redirectTo.searchParams.set("next", next)
+
+  return redirectTo.toString()
 }
 
 export function LoginForm() {
@@ -186,13 +200,10 @@ export function LoginForm() {
     setPendingAction("google")
 
     try {
-      const redirectTo = new URL("/auth/callback", window.location.origin)
-      redirectTo.searchParams.set("next", next)
-
       const { error } = await supabase.auth.signInWithOAuth({
         provider: "google",
         options: {
-          redirectTo: redirectTo.toString(),
+          redirectTo: getOAuthCallbackUrl(next),
         },
       })
 
