@@ -1,52 +1,75 @@
 import Image from "next/image"
 import Link from "next/link"
 
-import type { StorefrontExperienceCategoryItem } from "@/types/storefront/storefront.types"
+const EXPERIENCES = [
+  {
+    label: "Cultura",
+    image: "/landing/experiences/experience-1.jpg",
+    href: "/experiencias?categoria=Cultura",
+  },
+  {
+    label: "Paisaje",
+    image: "/landing/experiences/experience-2.jpg",
+    href: "/experiencias?categoria=Paisaje",
+  },
+  {
+    label: "Altura",
+    image: "/landing/experiences/experience-3.jpg",
+    href: "/experiencias?categoria=Altura",
+  },
+  {
+    label: "Vino",
+    image: "/landing/experiences/experience-4.jpg",
+    href: "/experiencias?categoria=Vino",
+  },
+  {
+    label: "Aventura",
+    image: "/landing/experiences/experience-5.jpg",
+    href: "/experiencias?categoria=Aventura",
+  },
+  {
+    label: "4x4",
+    image: "/landing/experiences/experience-6.jpg",
+    href: "/experiencias?categoria=4x4",
+  },
+]
 
-interface ExperiencesSectionProps {
-  experiences: StorefrontExperienceCategoryItem[]
-}
-
-export function ExperiencesSection({ experiences }: ExperiencesSectionProps) {
+export function ExperiencesSection() {
   return (
-    <section id="experiencias" className="py-16 md:py-24 bg-background">
-      <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">
-        {/* Header */}
-        <div className="text-center mb-10 md:mb-14">
-          <p className="text-xs tracking-[0.2em] uppercase text-muted-foreground mb-3">
-            Elegi Tu Experiencia
-          </p>
-          <h2 className="font-serif italic text-3xl md:text-4xl lg:text-5xl text-foreground">
-            El Norte Argentino tiene algo para cada viajero
-          </h2>
-        </div>
+    <section id="experiencias" className="bg-white">
+      {/* Header */}
+      <div className="px-4 pb-8 pt-12 text-center md:pb-10 md:pt-16">
+        <p className="mb-2 text-[10px] font-medium uppercase tracking-[0.22em] text-neutral-400">
+          Elegi Tu Experiencia
+        </p>
+        <h2 className="font-serif text-4xl leading-tight text-neutral-900 md:text-5xl">
+          El Norte Argentino tiene algo para cada viajero
+        </h2>
+      </div>
 
-        {/* Experience Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 gap-1 md:gap-2">
-          {experiences.map((experience) => (
-            <Link
-              key={experience.id}
-              href={experience.href}
-              className="group relative aspect-square overflow-hidden"
-            >
-              <Image
-                src={experience.image}
-                alt={experience.name}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              {/* Overlay on hover */}
-              <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors duration-300" />
+      {/* Grid */}
+      <div className="grid grid-cols-2 gap-px bg-neutral-200 md:grid-cols-3">
+        {EXPERIENCES.map((exp) => (
+          <Link
+            key={exp.label}
+            href={exp.href}
+            className="group relative aspect-square overflow-hidden bg-neutral-300"
+          >
+            <Image
+              src={exp.image}
+              alt={exp.label}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-black/10 transition-colors duration-300 group-hover:bg-black/25" />
 
-              {/* Label */}
-              <div className="absolute bottom-4 left-4">
-                <span className="inline-block bg-neutral-700/90 text-white text-xs font-medium tracking-wide uppercase px-3 py-1.5">
-                  {experience.name}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
+            <div className="absolute bottom-3 left-3 md:bottom-4 md:left-4">
+              <span className="inline-block bg-[#8b1a1a] px-3 py-1 text-[0.65rem] font-semibold uppercase tracking-[0.15em] text-white">
+                {exp.label}
+              </span>
+            </div>
+          </Link>
+        ))}
       </div>
     </section>
   )

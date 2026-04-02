@@ -10,6 +10,7 @@ import {
   loadLastCheckoutSnapshot,
   saveLastCheckoutSnapshot,
 } from "@/lib/cart/cart-storage"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/client"
 import type { CheckoutOrderDetailResult } from "@/types/checkout/checkout.types"
 
@@ -245,7 +246,12 @@ function TransferenciaPageContent() {
         )
 
       if (uploadError) {
-        toast.error(uploadError.message)
+        toast.error(
+          getUserFacingErrorMessage(
+            uploadError,
+            "No se pudo subir el comprobante.",
+          ),
+        )
         return
       }
 
@@ -405,7 +411,7 @@ function TransferenciaPageContent() {
         </button>
 
         <p className="text-[12px] text-subtle font-sans text-center mt-4">
-          Pago Seguro • Apacheta Travel Agency
+          Pago seguro • Apacheta Viajes
         </p>
       </div>
     </main>

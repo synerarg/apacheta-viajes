@@ -104,8 +104,7 @@ export class BankTransferPaymentService {
 
     if (orderContext.order.usuario_id !== userId) {
       throw new PaymentReceiptAccessDeniedException(
-        "bankTransferReceipt",
-        new Error("Payment does not belong to the authenticated user"),
+        new Error("No tenes permiso para acceder a este comprobante."),
       )
     }
 

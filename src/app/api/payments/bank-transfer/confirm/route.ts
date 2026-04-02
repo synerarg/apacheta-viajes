@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import { createAdminPaymentsController } from "@/controllers/payments/payments.controller"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
 
 const confirmBankTransferSchema = z.object({
@@ -36,10 +37,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Bank transfer confirmation failed",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo confirmar la transferencia bancaria.",
+        ),
       },
       { status },
     )

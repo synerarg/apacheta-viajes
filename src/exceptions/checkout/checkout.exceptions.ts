@@ -9,7 +9,7 @@ export class CheckoutServiceException extends ServiceException {
 
 export class CheckoutAuthenticationException extends BaseException {
   constructor() {
-    super("Checkout requires an authenticated user")
+    super("Necesitas iniciar sesion para continuar.")
   }
 }
 

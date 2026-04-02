@@ -5,6 +5,8 @@ import { usePathname, useRouter } from "next/navigation"
 import { Trash } from "@phosphor-icons/react"
 import { toast } from "sonner"
 
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
+
 interface DeleteItemButtonProps {
   action: () => Promise<void>
   label?: string
@@ -35,7 +37,10 @@ export function DeleteItemButton({
         router.refresh()
       } catch (error) {
         toast.error(
-          error instanceof Error ? error.message : `No se pudo ${label.toLowerCase()}.`,
+          getUserFacingErrorMessage(
+            error,
+            `No se pudo ${label.toLowerCase()}.`,
+          ),
         )
       }
     })

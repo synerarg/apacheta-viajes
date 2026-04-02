@@ -273,7 +273,7 @@ export class PaymentsService {
     }
 
     if (!payment.receipt_storage_path) {
-      throw new PaymentReceiptUnavailableException(`paymentId ${payment.id}`)
+      throw new PaymentReceiptUnavailableException()
     }
 
     const [profile, orderContext] = await Promise.all([
@@ -285,8 +285,7 @@ export class PaymentsService {
 
     if (!isOwner && !isAdmin) {
       throw new PaymentReceiptAccessDeniedException(
-        "getBankTransferReceiptDownloadUrl",
-        new Error("The authenticated user cannot access this receipt"),
+        new Error("No tenes permiso para acceder a este comprobante."),
       )
     }
 

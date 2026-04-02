@@ -7,6 +7,7 @@ import {
   CheckoutAuthenticationException,
   CheckoutValidationException,
 } from "@/exceptions/checkout/checkout.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 const createBankTransferSchema = z.object({
@@ -58,10 +59,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "Bank transfer initialization failed",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo iniciar la transferencia bancaria.",
+        ),
       },
       { status: 400 },
     )

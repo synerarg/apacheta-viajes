@@ -14,6 +14,7 @@ import {
   InputOTPSeparator,
 } from "@/components/ui/input-otp"
 import { Label } from "@/components/ui/label"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/client"
 
 const supabase = createClient()
@@ -103,9 +104,10 @@ export function LoginForm() {
       toast.success("Código enviado. Revisa tu correo electrónico.")
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "No pudimos enviar el código. Intenta nuevamente.",
+        getUserFacingErrorMessage(
+          error,
+          "No pudimos enviar el codigo. Intenta nuevamente.",
+        ),
       )
     } finally {
       setPendingAction(null)
@@ -137,9 +139,10 @@ export function LoginForm() {
       router.refresh()
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "No pudimos verificar el código. Intenta nuevamente.",
+        getUserFacingErrorMessage(
+          error,
+          "No pudimos verificar el codigo. Intenta nuevamente.",
+        ),
       )
     } finally {
       setPendingAction(null)
@@ -169,9 +172,10 @@ export function LoginForm() {
       toast.success("Código reenviado. Revisa tu correo nuevamente.")
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "No pudimos reenviar el código. Intenta nuevamente.",
+        getUserFacingErrorMessage(
+          error,
+          "No pudimos reenviar el codigo. Intenta nuevamente.",
+        ),
       )
     } finally {
       setPendingAction(null)
@@ -197,9 +201,10 @@ export function LoginForm() {
       }
     } catch (error) {
       toast.error(
-        error instanceof Error
-          ? error.message
-          : "No pudimos iniciar el acceso con Google.",
+        getUserFacingErrorMessage(
+          error,
+          "No pudimos iniciar el acceso con Google.",
+        ),
       )
       setPendingAction(null)
     }

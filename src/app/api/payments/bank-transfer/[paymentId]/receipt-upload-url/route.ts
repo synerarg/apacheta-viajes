@@ -6,6 +6,7 @@ import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptValidationException,
 } from "@/exceptions/payments/payments.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 const authorizeReceiptUploadSchema = z.object({
@@ -46,22 +47,38 @@ export async function POST(
     return NextResponse.json(result, { status: 200 })
   } catch (error) {
     if (error instanceof PaymentReceiptAccessDeniedException) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json(
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "No tenes permiso para cargar este comprobante.",
+          ),
+        },
+        { status: 403 },
+      )
     }
 
     if (error instanceof PaymentReceiptValidationException || error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: error instanceof z.ZodError ? "Metadata de comprobante inválida." : error.message },
+        {
+          error:
+            error instanceof z.ZodError
+              ? "Metadata de comprobante invalida."
+              : getUserFacingErrorMessage(
+                  error,
+                  "No se pudo validar el comprobante.",
+                ),
+        },
         { status: 400 },
       )
     }
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "No se pudo autorizar la carga del comprobante.",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo autorizar la carga del comprobante.",
+        ),
       },
       { status: 400 },
     )

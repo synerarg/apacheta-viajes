@@ -2,7 +2,7 @@ import { BaseException } from "@/exceptions/base/base.exception"
 
 export class ServiceException extends BaseException {
   constructor(domain: string, operation: string, cause?: unknown) {
-    super(`Service error in ${domain}.${operation}`, {
+    super(`Ocurrio un error interno en ${domain}.${operation}`, {
       cause,
       details: {
         domain,

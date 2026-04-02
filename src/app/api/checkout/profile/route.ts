@@ -2,6 +2,7 @@ import { NextResponse } from "next/server"
 
 import { createServerCheckoutController } from "@/controllers/checkout/checkout.controller"
 import { CheckoutAuthenticationException } from "@/exceptions/checkout/checkout.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET() {
@@ -29,10 +30,10 @@ export async function GET() {
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "No se pudo cargar el perfil de checkout.",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo cargar el perfil del checkout.",
+        ),
       },
       { status: 500 },
     )

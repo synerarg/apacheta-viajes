@@ -6,6 +6,7 @@ import {
   PaymentReceiptUnavailableException,
   PaymentReceiptValidationException,
 } from "@/exceptions/payments/payments.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 export async function GET(
@@ -35,23 +36,47 @@ export async function GET(
     return NextResponse.redirect(result.url)
   } catch (error) {
     if (error instanceof PaymentReceiptAccessDeniedException) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json(
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "No tenes permiso para ver este comprobante.",
+          ),
+        },
+        { status: 403 },
+      )
     }
 
     if (error instanceof PaymentReceiptUnavailableException) {
-      return NextResponse.json({ error: error.message }, { status: 404 })
+      return NextResponse.json(
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "El comprobante todavia no esta disponible.",
+          ),
+        },
+        { status: 404 },
+      )
     }
 
     if (error instanceof PaymentReceiptValidationException) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "No se pudo validar el comprobante.",
+          ),
+        },
+        { status: 400 },
+      )
     }
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "No se pudo generar el acceso al comprobante.",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo generar el acceso al comprobante.",
+        ),
       },
       { status: 500 },
     )

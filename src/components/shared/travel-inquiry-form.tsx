@@ -4,6 +4,7 @@ import { useState } from "react"
 import { toast } from "sonner"
 
 import { CustomSelect } from "@/components/ui/custom-select"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { submitContactRequest } from "@/lib/contact/contact-request"
 
 // ─── Opciones de tipo de viaje ────────────────────────────────────────────────
@@ -146,9 +147,7 @@ export function TravelInquiryForm({ source, className }: Props) {
       setForm(EMPTY)
       toast.success("Recibimos tu solicitud.")
     } catch (error) {
-      toast.error(
-        error instanceof Error ? error.message : "No se pudo enviar la solicitud.",
-      )
+      toast.error(getUserFacingErrorMessage(error, "No se pudo enviar la solicitud."))
     } finally {
       setIsSubmitting(false)
     }

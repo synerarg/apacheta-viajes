@@ -54,7 +54,7 @@ export abstract class BaseRepository<TTableName extends PublicTableName> {
     if (!filters || Object.keys(filters).length === 0) {
       throw this.createRepositoryException(
         operation,
-        new Error("At least one filter is required"),
+        new Error("Faltan datos para completar la operacion."),
       )
     }
   }
@@ -127,7 +127,7 @@ export abstract class BaseRepository<TTableName extends PublicTableName> {
     if (!data) {
       throw this.createRepositoryException(
         "create",
-        new Error("No record returned after insert"),
+        new Error("No se pudo completar la operacion."),
       )
     }
 

@@ -5,6 +5,7 @@ import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptValidationException,
 } from "@/exceptions/payments/payments.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 const JSON_CONTENT_TYPE = "application/json"
@@ -98,19 +99,35 @@ export async function POST(
     return result
   } catch (error) {
     if (error instanceof PaymentReceiptAccessDeniedException) {
-      return NextResponse.json({ error: error.message }, { status: 403 })
+      return NextResponse.json(
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "No tenes permiso para cargar este comprobante.",
+          ),
+        },
+        { status: 403 },
+      )
     }
 
     if (error instanceof PaymentReceiptValidationException) {
-      return NextResponse.json({ error: error.message }, { status: 400 })
+      return NextResponse.json(
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "No se pudo validar el comprobante.",
+          ),
+        },
+        { status: 400 },
+      )
     }
 
     return NextResponse.json(
       {
-        error:
-          error instanceof Error
-            ? error.message
-            : "No se pudo cargar el comprobante.",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo cargar el comprobante.",
+        ),
       },
       { status: 400 },
     )

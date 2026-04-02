@@ -14,7 +14,7 @@ export function HeroSection() {
       />
 
       {/* Dark Overlay */}
-      <div className="absolute inset-0 bg-black/40" />
+      <div className="absolute inset-0 bg-black/60" />
 
       {/* Content */}
       <div className="relative z-10 flex flex-col items-center text-center px-4 max-w-4xl mx-auto ">
@@ -41,22 +41,22 @@ export function HeroSection() {
 
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4">
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="bg-primary hover:bg-primary/90 hover:text-white border-primary text-white px-8 py-6 text-base"
-          >
-            <Link href="/#paquetes">Explorar Paquetes</Link>
-          </Button>
-          <Button
-            asChild
-            size="lg"
-            variant="outline"
-            className="border-white text-white hover:bg-white/10 hover:text-white bg-transparent px-8 py-6 text-base"
-          >
-            <Link href="/#contacto">Armar mi viaje</Link>
-          </Button>
+          <Link href="/#paquetes">
+            <Button
+              size="lg"
+              className="bg-primary hover:bg-primary/90 hover:text-white border-primary text-white px-8 py-6 text-base"
+            >
+              Explorar Paquetes
+            </Button>
+          </Link>
+          <Link href="/#contacto">
+            <Button
+              size="lg"
+              className="border-white text-white hover:bg-white/10 hover:text-white bg-transparent px-8 py-6 text-base"
+            >
+              Armar mi viaje
+            </Button>
+          </Link>
         </div>
       </div>
     </section>

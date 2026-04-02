@@ -6,6 +6,7 @@ import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 import type { ActionState } from "@/app/dashboard/paquetes/actions"
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
 import type { Moneda } from "@/types/shared/enums"
 
@@ -164,7 +165,12 @@ export async function createExperiencia(
       .single()
 
     if (error || !experiencia) {
-      return { error: error?.message ?? "Error al crear la experiencia" }
+      return {
+        error: getUserFacingErrorMessage(
+          error,
+          "Error al crear la experiencia.",
+        ),
+      }
     }
 
     await syncExperienceGallery(experiencia.id, input.gallery)
@@ -177,8 +183,7 @@ export async function createExperiencia(
     }
 
     return {
-      error:
-        error instanceof Error ? error.message : "Error al crear la experiencia",
+      error: getUserFacingErrorMessage(error, "Error al crear la experiencia."),
     }
   }
 }
@@ -238,7 +243,12 @@ export async function updateExperiencia(
       .eq("id", id)
 
     if (error) {
-      return { error: error.message }
+      return {
+        error: getUserFacingErrorMessage(
+          error,
+          "Error al actualizar la experiencia.",
+        ),
+      }
     }
 
     await syncExperienceGallery(id, input.gallery)
@@ -248,10 +258,10 @@ export async function updateExperiencia(
     return {}
   } catch (error) {
     return {
-      error:
-        error instanceof Error
-          ? error.message
-          : "Error al actualizar la experiencia",
+      error: getUserFacingErrorMessage(
+        error,
+        "Error al actualizar la experiencia.",
+      ),
     }
   }
 }

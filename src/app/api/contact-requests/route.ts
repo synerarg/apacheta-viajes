@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
 import { createClient } from "@/lib/supabase/server"
 import { createSolicitudesContactoRepository } from "@/repositories/solicitudes-contacto/solicitudes-contacto.repository"
@@ -85,9 +86,7 @@ export async function POST(request: Request) {
         error:
           error instanceof z.ZodError
             ? "Datos inválidos."
-            : error instanceof Error
-              ? error.message
-              : "No se pudo crear la solicitud.",
+            : getUserFacingErrorMessage(error, "No se pudo crear la solicitud."),
       },
       { status: 400 },
     )

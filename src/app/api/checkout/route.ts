@@ -7,6 +7,7 @@ import {
   CheckoutServiceException,
   CheckoutValidationException,
 } from "@/exceptions/checkout/checkout.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 const cartItemSchema = z.object({
@@ -54,7 +55,7 @@ const checkoutSubmitSchema = z.object({
 
 function getErrorMessage(error: unknown): string {
   if (error instanceof z.ZodError) {
-    return "Invalid checkout payload"
+    return "Los datos del checkout no son validos."
   }
 
   if (error instanceof Error) {
@@ -62,10 +63,10 @@ function getErrorMessage(error: unknown): string {
       return getErrorMessage(error.cause)
     }
 
-    return error.message
+    return getUserFacingErrorMessage(error, "No se pudo iniciar la reserva.")
   }
 
-  return "Checkout failed"
+  return "No se pudo iniciar la reserva."
 }
 
 export async function POST(request: Request) {

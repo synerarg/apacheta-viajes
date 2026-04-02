@@ -29,7 +29,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="fixed inset-0 z-50 overflow-y-auto bg-white">
       <DashboardSidebarClient />
       <main className="lg:ml-[250px] min-h-screen pt-14 lg:pt-0 overflow-y-auto bg-white">
         {children}

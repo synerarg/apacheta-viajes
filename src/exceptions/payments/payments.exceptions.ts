@@ -1,3 +1,4 @@
+import { BaseException } from "@/exceptions/base/base.exception"
 import { NotFoundException } from "@/exceptions/base/not-found.exception"
 import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
@@ -45,15 +46,15 @@ export class BankTransferConfigurationException extends ServiceException {
   }
 }
 
-export class PaymentReceiptAccessDeniedException extends ServiceException {
-  constructor(operation: string, cause?: unknown) {
-    super("payments", operation, cause)
+export class PaymentReceiptAccessDeniedException extends BaseException {
+  constructor(cause?: unknown) {
+    super("No tenes permiso para acceder a este comprobante.", { cause })
   }
 }
 
-export class PaymentReceiptUnavailableException extends NotFoundException {
-  constructor(criteria: string) {
-    super("payments", criteria)
+export class PaymentReceiptUnavailableException extends BaseException {
+  constructor() {
+    super("El comprobante todavia no esta disponible.")
   }
 }
 

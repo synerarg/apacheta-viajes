@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server"
 
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
 
@@ -93,7 +94,12 @@ export async function POST(request: Request) {
 
     if (error || !data) {
       return NextResponse.json(
-        { error: error?.message ?? "No se pudo firmar la subida" },
+        {
+          error: getUserFacingErrorMessage(
+            error,
+            "No se pudo preparar la subida de la imagen.",
+          ),
+        },
         { status: 500 },
       )
     }
@@ -109,8 +115,10 @@ export async function POST(request: Request) {
       url: publicUrl,
     })
   } catch (error) {
-    const message =
-      error instanceof Error ? error.message : "No se pudo autorizar la subida"
+    const message = getUserFacingErrorMessage(
+      error,
+      "No se pudo autorizar la subida.",
+    )
     const status =
       message === "No autenticado" ? 401 : message === "No autorizado" ? 403 : 400
 

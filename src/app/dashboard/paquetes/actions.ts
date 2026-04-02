@@ -5,6 +5,7 @@ import { redirect } from "next/navigation"
 import { isRedirectError } from "next/dist/client/components/redirect-error"
 
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
 import type { Moneda } from "@/types/shared/enums"
 
@@ -388,7 +389,12 @@ export async function createPaquete(
       .single()
 
     if (error || !paquete) {
-      return { error: error?.message ?? "Error al crear el paquete" }
+      return {
+        error: getUserFacingErrorMessage(
+          error,
+          "Error al crear el paquete.",
+        ),
+      }
     }
 
     await Promise.all([
@@ -406,7 +412,7 @@ export async function createPaquete(
     }
 
     return {
-      error: error instanceof Error ? error.message : "Error al crear el paquete",
+      error: getUserFacingErrorMessage(error, "Error al crear el paquete."),
     }
   }
 }
@@ -467,7 +473,9 @@ export async function updatePaquete(
       .eq("id", id)
 
     if (error) {
-      return { error: error.message }
+      return {
+        error: getUserFacingErrorMessage(error, "Error al actualizar el paquete."),
+      }
     }
 
     await Promise.all([
@@ -482,8 +490,7 @@ export async function updatePaquete(
     return {}
   } catch (error) {
     return {
-      error:
-        error instanceof Error ? error.message : "Error al actualizar el paquete",
+      error: getUserFacingErrorMessage(error, "Error al actualizar el paquete."),
     }
   }
 }

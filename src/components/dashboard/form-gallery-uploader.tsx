@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useRef, useState } from "react"
 import { Plus, Spinner, Trash } from "@phosphor-icons/react"
 
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/client"
 
 const MAX_IMAGES = 15
@@ -39,7 +40,7 @@ export function FormGalleryUploader({
       }),
     })
     const json = await res.json()
-    if (!res.ok) throw new Error(json.error ?? "Error al subir imagen")
+    if (!res.ok) throw new Error(json.error ?? "No se pudo subir la imagen.")
     const { error } = await supabase.storage
       .from(json.bucket as string)
       .uploadToSignedUrl(json.path as string, json.token as string, file, {
@@ -47,7 +48,7 @@ export function FormGalleryUploader({
       })
 
     if (error) {
-      throw new Error(error.message)
+      throw new Error("No se pudo subir la imagen.")
     }
 
     return json.url as string
@@ -63,7 +64,7 @@ export function FormGalleryUploader({
       const uploaded = await Promise.all(toUpload.map(uploadFile))
       setUrls((prev) => [...prev, ...uploaded])
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al subir imagen")
+      setError(getUserFacingErrorMessage(e, "No se pudo subir la imagen."))
     } finally {
       setUploading(false)
     }

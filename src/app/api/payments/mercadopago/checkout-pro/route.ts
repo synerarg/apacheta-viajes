@@ -4,6 +4,7 @@ import { z } from "zod"
 import { createServerCheckoutController } from "@/controllers/checkout/checkout.controller"
 import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
 import { CheckoutAuthenticationException, CheckoutValidationException } from "@/exceptions/checkout/checkout.exceptions"
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
 const createMercadoPagoCheckoutProSchema = z.object({
@@ -59,7 +60,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : "Checkout Pro failed",
+        error: getUserFacingErrorMessage(
+          error,
+          "No se pudo iniciar el pago con Mercado Pago.",
+        ),
       },
       { status: 400 },
     )

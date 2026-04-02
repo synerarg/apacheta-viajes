@@ -71,7 +71,7 @@ async function resolveReceiptSignedUrl(
   }
 
   if (!signedUrl.data?.signedUrl) {
-    throw new Error("Supabase did not return a signed receipt URL")
+    throw new Error("No se pudo generar el acceso al comprobante.")
   }
 
   return signedUrl.data.signedUrl
@@ -388,7 +388,7 @@ export class PaymentsRepository {
       }
 
       if (!signedUpload.data?.token) {
-        throw new Error("Supabase did not return a signed upload token")
+        throw new Error("No se pudo preparar la carga del comprobante.")
       }
 
       return {
@@ -416,7 +416,7 @@ export class PaymentsRepository {
       }
 
       if (!objectInfo.data) {
-        throw new Error("Supabase did not return the uploaded receipt object")
+        throw new Error("No se pudo validar el comprobante cargado.")
       }
     } catch (error) {
       throw new PaymentsRepositoryException("assertReceiptObjectExists", error)

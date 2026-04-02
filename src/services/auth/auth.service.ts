@@ -38,7 +38,7 @@ export class AuthService {
     if (!email) {
       throw new AuthServiceException(
         "buildUsuariosPayload",
-        new Error("Authenticated user email is required"),
+        new Error("No pudimos recuperar el correo de la cuenta autenticada."),
       )
     }
 

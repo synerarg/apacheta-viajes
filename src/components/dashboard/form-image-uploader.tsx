@@ -4,6 +4,7 @@ import Image from "next/image"
 import { useRef, useState } from "react"
 import { ImageSquare, Spinner, X } from "@phosphor-icons/react"
 
+import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/client"
 
 interface FormImageUploaderProps {
@@ -43,7 +44,7 @@ export function FormImageUploader({
         }),
       })
       const json = await res.json()
-      if (!res.ok) throw new Error(json.error ?? "Error al subir imagen")
+      if (!res.ok) throw new Error(json.error ?? "No se pudo subir la imagen.")
       const { error: uploadError } = await supabase.storage
         .from(json.bucket as string)
         .uploadToSignedUrl(json.path as string, json.token as string, file, {
@@ -51,12 +52,12 @@ export function FormImageUploader({
         })
 
       if (uploadError) {
-        throw new Error(uploadError.message)
+        throw new Error("No se pudo subir la imagen.")
       }
 
       setPreview(json.url)
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Error al subir imagen")
+      setError(getUserFacingErrorMessage(e, "No se pudo subir la imagen."))
     } finally {
       setUploading(false)
     }
@@ -88,7 +89,7 @@ export function FormImageUploader({
 
       {preview ? (
         <div className="relative h-52 w-full overflow-hidden border border-neutral-200 bg-neutral-50">
-          <Image src={preview} alt="Preview" fill className="object-cover" sizes="600px" />
+          <Image src={preview} alt="Vista previa" fill className="object-cover" sizes="600px" />
           <button
             type="button"
             onClick={() => setPreview(null)}

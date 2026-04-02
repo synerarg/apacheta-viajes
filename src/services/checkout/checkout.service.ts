@@ -100,7 +100,9 @@ function mapCheckoutPaymentMethod(method: CheckoutSubmitInput["paymentMethod"]):
     return "bank_transfer"
   }
 
-  throw new CheckoutValidationException("Unsupported checkout payment method")
+  throw new CheckoutValidationException(
+    "El medio de pago seleccionado no esta disponible.",
+  )
 }
 
 function assertCheckoutPaymentConfigured(
@@ -224,7 +226,7 @@ export class CheckoutService {
       }
 
       if (normalizedInput.items.length === 0) {
-        throw new CheckoutValidationException("Cart is empty")
+        throw new CheckoutValidationException("Tu carrito esta vacio.")
       }
 
       assertCheckoutPaymentConfigured(normalizedInput.paymentMethod)
@@ -361,7 +363,9 @@ export class CheckoutService {
         }
       }
 
-      throw new CheckoutValidationException("Unsupported checkout payment method")
+      throw new CheckoutValidationException(
+        "El medio de pago seleccionado no esta disponible.",
+      )
     } catch (error) {
       if (
         error instanceof CheckoutAuthenticationException ||
@@ -383,7 +387,9 @@ export class CheckoutService {
       const order = await this.ordenesService.getById(orderId)
 
       if (order.usuario_id !== user.id) {
-        throw new CheckoutValidationException("Order not found")
+        throw new CheckoutValidationException(
+          "No encontramos la orden solicitada.",
+        )
       }
 
       const summary = await this.paymentsService.getCheckoutOrderSummary(orderId)
@@ -466,7 +472,7 @@ export class CheckoutService {
     if (item.kind === "paquete") {
       if (!item.paqueteFechaId) {
         throw new CheckoutValidationException(
-          "Package checkout items require paqueteFechaId",
+          "El paquete seleccionado no tiene una salida valida.",
         )
       }
 
@@ -475,12 +481,14 @@ export class CheckoutService {
       )
 
       if (paqueteFecha.activo === false) {
-        throw new CheckoutValidationException("Selected package date is inactive")
+        throw new CheckoutValidationException(
+          "La salida seleccionada ya no esta disponible.",
+        )
       }
 
       if (item.quantity > paqueteFecha.cupo_disponible) {
         throw new CheckoutValidationException(
-          "Selected passenger count exceeds the available capacity",
+          "La cantidad de pasajeros supera la disponibilidad actual.",
         )
       }
 
@@ -498,19 +506,21 @@ export class CheckoutService {
     } else {
       if (!item.experienciaId) {
         throw new CheckoutValidationException(
-          "Experience checkout items require experienciaId",
+          "La experiencia seleccionada no es valida.",
         )
       }
 
       const experiencia = await this.experienciasService.getById(item.experienciaId)
 
       if (experiencia.activo === false) {
-        throw new CheckoutValidationException("Selected experience is inactive")
+        throw new CheckoutValidationException(
+          "La experiencia seleccionada ya no esta disponible.",
+        )
       }
 
       if (!experiencia.precio) {
         throw new CheckoutValidationException(
-          "Selected experience does not have a valid price",
+          "La experiencia seleccionada no tiene un precio valido.",
         )
       }
 
