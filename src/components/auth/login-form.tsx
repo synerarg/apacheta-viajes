@@ -285,7 +285,7 @@ export function LoginForm() {
                       fill="#EA4335"
                     />
                   </svg>
-                  <span className="text-primary group-hover/button:text-white text-base">
+                  <span className="text-primary text-base">
                     {pendingAction === "google"
                       ? "Continuando..."
                       : "Continuar con Google"}
@@ -294,7 +294,10 @@ export function LoginForm() {
               </div>
             </form>
           ) : (
-            <form onSubmit={handleVerifyCode} className="space-y-7 sm:space-y-8">
+            <form
+              onSubmit={handleVerifyCode}
+              className="space-y-7 sm:space-y-8"
+            >
               <div className="space-y-2 text-center flex flex-col items-center justify-center">
                 <h1 className="font-serif italic text-3xl sm:text-4xl md:text-5xl text-foreground leading-tight">
                   Ingresa el código
