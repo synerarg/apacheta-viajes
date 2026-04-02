@@ -1,5 +1,6 @@
 import {
   Body,
+  Button,
   Column,
   Container,
   Head,
@@ -11,10 +12,12 @@ import {
   Preview,
   Row,
   Section,
+  Tailwind,
   Text,
+  pixelBasedPreset,
 } from "@react-email/components"
 
-interface TransactionalNotificationEmailProps {
+export interface TransactionalNotificationEmailProps {
   previewText: string
   eyebrow: string
   title: string
@@ -30,17 +33,7 @@ interface TransactionalNotificationEmailProps {
   supportEmail?: string | null
 }
 
-const BRAND = {
-  primary: "#8B1A1A",
-  dark: "#2E2726",
-  text: "#1E1E1E",
-  textMuted: "#6B7280",
-  bg: "#F5F5F5",
-  white: "#FFFFFF",
-  cardBg: "#FAFAFA",
-  border: "#E5E7EB",
-  borderAccent: "#8B1A1A",
-}
+const SITE_URL = "https://apacheta-viajes.vercel.app"
 
 export function TransactionalNotificationEmail({
   previewText,
@@ -58,303 +51,216 @@ export function TransactionalNotificationEmail({
   supportEmail,
 }: TransactionalNotificationEmailProps) {
   return (
-    <Html>
-      <Head />
-      <Preview>{previewText}</Preview>
-      <Body style={body}>
-        <Container style={container}>
-          {/* Header with logo */}
-          <Section style={header}>
-            <Img
-              src="https://apacheta-viajes.com/logo.png"
-              width="180"
-              height="auto"
-              alt="Apacheta Viajes"
-              style={logo}
-            />
-          </Section>
-
-          {/* Accent line */}
-          <div style={accentLine} />
-
-          {/* Content */}
-          <Section style={content}>
-            <Text style={eyebrowStyle}>{eyebrow}</Text>
-            <Heading style={titleStyle}>{title}</Heading>
-            <Text style={greetingStyle}>{greeting}</Text>
-            <Text style={introStyle}>{intro}</Text>
-
-            {/* Order summary */}
-            <Section style={summaryCard}>
-              <Row style={summaryRow}>
-                <Column style={summaryLabel}>Reserva</Column>
-                <Column style={summaryValue}>{orderReference}</Column>
-              </Row>
-              <Hr style={summaryDivider} />
-              <Row style={summaryRow}>
-                <Column style={summaryLabel}>Total</Column>
-                <Column style={summaryValue}>{total}</Column>
-              </Row>
-              <Hr style={summaryDivider} />
-              <Row style={summaryRow}>
-                <Column style={summaryLabel}>Método de pago</Column>
-                <Column style={summaryValue}>{paymentMethod}</Column>
-              </Row>
-              <Hr style={summaryDivider} />
-              <Row style={summaryRow}>
-                <Column style={summaryLabel}>Estado del pago</Column>
-                <Column style={summaryValueHighlight}>{paymentStatus}</Column>
-              </Row>
+    <Html lang="es">
+      <Tailwind
+        config={{
+          presets: [pixelBasedPreset],
+          theme: {
+            extend: {
+              colors: {
+                brand: "#8B1A1A",
+                dark: "#2E2726",
+                muted: "#6B7280",
+                card: "#FAFAFA",
+              },
+            },
+          },
+        }}
+      >
+        <Head />
+        <Preview>{previewText}</Preview>
+        <Body className="bg-[#F5F5F5] font-sans m-0 py-10 px-4">
+          <Container className="bg-white mx-auto max-w-[600px] rounded-lg overflow-hidden border-solid border border-[#E5E7EB]">
+            {/* Header */}
+            <Section className="bg-dark py-7 px-8 text-center">
+              <Img
+                src={`${SITE_URL}/branding/Artboard%207.png`}
+                width="160"
+                height="60"
+                alt="Apacheta Viajes"
+                className="mx-auto"
+              />
             </Section>
 
-            {/* Steps */}
-            <Section style={stepsSection}>
-              <Text style={stepsTitle}>Próximos pasos</Text>
-              {steps.map((step, index) => (
-                <Section key={index} style={stepItem}>
-                  <Row>
-                    <Column style={stepNumber}>
-                      <Text style={stepNumberText}>{index + 1}</Text>
+            {/* Accent line */}
+            <Section className="bg-brand h-[3px] w-full" />
+
+            {/* Content */}
+            <Section className="pt-9 px-8 pb-6">
+              <Text className="text-brand text-[11px] font-bold tracking-widest uppercase m-0 mb-2">
+                {eyebrow}
+              </Text>
+              <Heading
+                as="h1"
+                className="text-[#1E1E1E] font-serif text-[26px] font-normal leading-tight m-0 mb-6"
+              >
+                {title}
+              </Heading>
+              <Text className="text-[#1E1E1E] text-base font-semibold leading-normal m-0 mb-2">
+                {greeting}
+              </Text>
+              <Text className="text-muted text-[15px] leading-relaxed m-0 mb-7">
+                {intro}
+              </Text>
+
+              {/* Order summary card */}
+              <Section
+                className="bg-card rounded-md mb-7"
+                style={{
+                  border: "1px solid #E5E7EB",
+                  borderLeft: "3px solid #8B1A1A",
+                }}
+              >
+                <Row className="px-6 pt-5">
+                  <Column className="w-[45%]">
+                    <Text className="text-muted text-[13px] font-medium m-0 py-1">
+                      Reserva
+                    </Text>
+                  </Column>
+                  <Column className="text-right">
+                    <Text className="text-[#1E1E1E] text-sm font-semibold m-0 py-1">
+                      {orderReference}
+                    </Text>
+                  </Column>
+                </Row>
+                <Hr className="border-none border-solid border-t border-[#E5E7EB] mx-6 my-0" />
+                <Row className="px-6">
+                  <Column className="w-[45%]">
+                    <Text className="text-muted text-[13px] font-medium m-0 py-1">
+                      Total
+                    </Text>
+                  </Column>
+                  <Column className="text-right">
+                    <Text className="text-[#1E1E1E] text-sm font-semibold m-0 py-1">
+                      {total}
+                    </Text>
+                  </Column>
+                </Row>
+                <Hr className="border-none border-solid border-t border-[#E5E7EB] mx-6 my-0" />
+                <Row className="px-6">
+                  <Column className="w-[45%]">
+                    <Text className="text-muted text-[13px] font-medium m-0 py-1">
+                      Método de pago
+                    </Text>
+                  </Column>
+                  <Column className="text-right">
+                    <Text className="text-[#1E1E1E] text-sm font-semibold m-0 py-1">
+                      {paymentMethod}
+                    </Text>
+                  </Column>
+                </Row>
+                <Hr className="border-none border-solid border-t border-[#E5E7EB] mx-6 my-0" />
+                <Row className="px-6 pb-5">
+                  <Column className="w-[45%]">
+                    <Text className="text-muted text-[13px] font-medium m-0 py-1">
+                      Estado del pago
+                    </Text>
+                  </Column>
+                  <Column className="text-right">
+                    <Text className="text-brand text-sm font-semibold m-0 py-1">
+                      {paymentStatus}
+                    </Text>
+                  </Column>
+                </Row>
+              </Section>
+
+              {/* Steps */}
+              <Section className="mb-7">
+                <Text className="text-[#1E1E1E] text-[15px] font-bold m-0 mb-4">
+                  Próximos pasos
+                </Text>
+                {steps.map((step, index) => (
+                  <Row key={index} className="mb-3">
+                    <Column className="w-[28px] align-top">
+                      <Text
+                        className="bg-brand text-white text-xs font-bold text-center m-0 mt-[2px] leading-[22px]"
+                        style={{
+                          width: "22px",
+                          height: "22px",
+                          borderRadius: "50%",
+                          display: "inline-block",
+                        }}
+                      >
+                        {index + 1}
+                      </Text>
                     </Column>
-                    <Column style={stepContent}>
-                      <Text style={stepText}>{step}</Text>
+                    <Column className="align-top pl-2">
+                      <Text className="text-muted text-sm leading-relaxed m-0">
+                        {step}
+                      </Text>
                     </Column>
                   </Row>
+                ))}
+              </Section>
+
+              {/* CTA */}
+              {actionLabel && actionUrl ? (
+                <Section className="text-center mt-1">
+                  <Button
+                    href={actionUrl}
+                    className="bg-brand text-white text-sm font-bold py-3.5 px-8 rounded-md no-underline box-border"
+                  >
+                    {actionLabel}
+                  </Button>
                 </Section>
-              ))}
+              ) : null}
             </Section>
 
-            {/* CTA */}
-            {actionLabel && actionUrl ? (
-              <Section style={ctaSection}>
-                <Link href={actionUrl} style={ctaButton}>
-                  {actionLabel}
-                </Link>
-              </Section>
-            ) : null}
-          </Section>
-
-          {/* Footer */}
-          <Section style={footer}>
-            <Text style={footerBrand}>Apacheta Viajes</Text>
-            <Text style={footerText}>
-              {supportEmail
-                ? `¿Necesitás ayuda? Escribinos a ${supportEmail}`
-                : "¿Necesitás ayuda? Respondé este email."}
-            </Text>
-            <Text style={footerCopy}>
-              © {new Date().getFullYear()} Apacheta Travel Agency. Todos los
-              derechos reservados.
-            </Text>
-          </Section>
-        </Container>
-      </Body>
+            {/* Footer */}
+            <Section className="bg-card border-none border-solid border-t border-[#E5E7EB] py-6 px-8 text-center">
+              <Img
+                src={`${SITE_URL}/branding/Artboard%206.png`}
+                width="100"
+                height="40"
+                alt="Apacheta Viajes"
+                className="mx-auto mb-3"
+              />
+              <Text className="text-muted text-[13px] leading-normal m-0 mb-2">
+                {supportEmail ? (
+                  <>
+                    ¿Necesitás ayuda? Escribinos a{" "}
+                    <Link
+                      href={`mailto:${supportEmail}`}
+                      className="text-brand underline"
+                    >
+                      {supportEmail}
+                    </Link>
+                  </>
+                ) : (
+                  "¿Necesitás ayuda? Respondé este email."
+                )}
+              </Text>
+              <Text className="text-[#9CA3AF] text-[11px] leading-normal m-0">
+                © {new Date().getFullYear()} Apacheta Viajes. Todos los derechos
+                reservados.
+              </Text>
+            </Section>
+          </Container>
+        </Body>
+      </Tailwind>
     </Html>
   )
 }
 
-/* ── Styles ────────────────────────────────────────────── */
+TransactionalNotificationEmail.PreviewProps = {
+  previewText: "Recibimos tu reserva #AV-2024-001",
+  eyebrow: "Reserva recibida",
+  title: "Tu reserva ya fue registrada",
+  greeting: "Hola Valentín,",
+  intro:
+    "Ya recibimos tu solicitud y dejamos el pedido cargado en Apacheta. A partir de ahora podés seguir el estado del pago y de tu orden desde tu cuenta.",
+  orderReference: "#AV-2024-001",
+  total: "ARS 150.000",
+  paymentMethod: "Transferencia bancaria",
+  paymentStatus: "Pendiente",
+  steps: [
+    "Ingresá a tu detalle de orden para ver los datos bancarios.",
+    "Transferí el monto exacto y subí el comprobante.",
+    "Te avisaremos apenas validemos la acreditación.",
+  ],
+  actionLabel: "Ver mis reservas",
+  actionUrl: "https://apacheta-viajes.vercel.app/mis-reservas",
+  supportEmail: "info@apachetaviajes.tur.ar",
+} satisfies TransactionalNotificationEmailProps
 
-const body: React.CSSProperties = {
-  backgroundColor: BRAND.bg,
-  fontFamily:
-    "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif",
-  margin: 0,
-  padding: "40px 16px",
-}
-
-const container: React.CSSProperties = {
-  backgroundColor: BRAND.white,
-  margin: "0 auto",
-  maxWidth: "600px",
-  borderRadius: "8px",
-  overflow: "hidden",
-  border: `1px solid ${BRAND.border}`,
-}
-
-const header: React.CSSProperties = {
-  backgroundColor: BRAND.dark,
-  padding: "28px 32px",
-  textAlign: "center" as const,
-}
-
-const logo: React.CSSProperties = {
-  margin: "0 auto",
-}
-
-const accentLine: React.CSSProperties = {
-  height: "3px",
-  backgroundColor: BRAND.primary,
-  width: "100%",
-}
-
-const content: React.CSSProperties = {
-  padding: "36px 32px 24px",
-}
-
-const eyebrowStyle: React.CSSProperties = {
-  color: BRAND.primary,
-  fontSize: "11px",
-  fontWeight: 700,
-  letterSpacing: "0.12em",
-  margin: "0 0 8px",
-  textTransform: "uppercase" as const,
-}
-
-const titleStyle: React.CSSProperties = {
-  color: BRAND.text,
-  fontFamily: "Georgia, 'Times New Roman', serif",
-  fontSize: "26px",
-  fontWeight: 400,
-  lineHeight: "1.3",
-  margin: "0 0 24px",
-}
-
-const greetingStyle: React.CSSProperties = {
-  color: BRAND.text,
-  fontSize: "16px",
-  fontWeight: 600,
-  lineHeight: "1.5",
-  margin: "0 0 8px",
-}
-
-const introStyle: React.CSSProperties = {
-  color: BRAND.textMuted,
-  fontSize: "15px",
-  lineHeight: "1.7",
-  margin: "0 0 28px",
-}
-
-const summaryCard: React.CSSProperties = {
-  backgroundColor: BRAND.cardBg,
-  border: `1px solid ${BRAND.border}`,
-  borderLeft: `3px solid ${BRAND.primary}`,
-  borderRadius: "6px",
-  padding: "20px 24px",
-  margin: "0 0 28px",
-}
-
-const summaryRow: React.CSSProperties = {
-  width: "100%",
-}
-
-const summaryDivider: React.CSSProperties = {
-  borderColor: BRAND.border,
-  margin: "10px 0",
-}
-
-const summaryLabel: React.CSSProperties = {
-  color: BRAND.textMuted,
-  fontSize: "13px",
-  fontWeight: 500,
-  width: "45%",
-  verticalAlign: "middle" as const,
-  padding: "4px 0",
-}
-
-const summaryValue: React.CSSProperties = {
-  color: BRAND.text,
-  fontSize: "14px",
-  fontWeight: 600,
-  textAlign: "right" as const,
-  verticalAlign: "middle" as const,
-  padding: "4px 0",
-}
-
-const summaryValueHighlight: React.CSSProperties = {
-  ...summaryValue,
-  color: BRAND.primary,
-}
-
-const stepsSection: React.CSSProperties = {
-  margin: "0 0 28px",
-}
-
-const stepsTitle: React.CSSProperties = {
-  color: BRAND.text,
-  fontSize: "15px",
-  fontWeight: 700,
-  margin: "0 0 16px",
-}
-
-const stepItem: React.CSSProperties = {
-  margin: "0 0 12px",
-}
-
-const stepNumber: React.CSSProperties = {
-  width: "28px",
-  verticalAlign: "top" as const,
-}
-
-const stepNumberText: React.CSSProperties = {
-  backgroundColor: BRAND.primary,
-  color: BRAND.white,
-  width: "22px",
-  height: "22px",
-  borderRadius: "50%",
-  fontSize: "12px",
-  fontWeight: 700,
-  lineHeight: "22px",
-  textAlign: "center" as const,
-  margin: "2px 0 0",
-  display: "inline-block",
-}
-
-const stepContent: React.CSSProperties = {
-  verticalAlign: "top" as const,
-  paddingLeft: "8px",
-}
-
-const stepText: React.CSSProperties = {
-  color: BRAND.textMuted,
-  fontSize: "14px",
-  lineHeight: "1.6",
-  margin: 0,
-}
-
-const ctaSection: React.CSSProperties = {
-  textAlign: "center" as const,
-  margin: "4px 0 0",
-}
-
-const ctaButton: React.CSSProperties = {
-  backgroundColor: BRAND.primary,
-  borderRadius: "6px",
-  color: BRAND.white,
-  display: "inline-block",
-  fontSize: "14px",
-  fontWeight: 700,
-  padding: "14px 32px",
-  textDecoration: "none",
-  textAlign: "center" as const,
-}
-
-const footer: React.CSSProperties = {
-  backgroundColor: BRAND.cardBg,
-  borderTop: `1px solid ${BRAND.border}`,
-  padding: "24px 32px",
-  textAlign: "center" as const,
-}
-
-const footerBrand: React.CSSProperties = {
-  color: BRAND.dark,
-  fontSize: "14px",
-  fontWeight: 700,
-  letterSpacing: "0.08em",
-  margin: "0 0 8px",
-  textTransform: "uppercase" as const,
-}
-
-const footerText: React.CSSProperties = {
-  color: BRAND.textMuted,
-  fontSize: "13px",
-  lineHeight: "1.6",
-  margin: "0 0 8px",
-}
-
-const footerCopy: React.CSSProperties = {
-  color: "#9CA3AF",
-  fontSize: "11px",
-  lineHeight: "1.5",
-  margin: 0,
-}
+export default TransactionalNotificationEmail

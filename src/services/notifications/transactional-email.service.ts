@@ -1,6 +1,10 @@
+import { render } from "@react-email/components"
 import {
   NotificationsServiceException,
 } from "@/exceptions/notifications/notifications.exceptions"
+import {
+  TransactionalNotificationEmail,
+} from "@/emails/transactional-notification.email"
 import {
   getTransactionalEmailConfig,
   isTransactionalEmailEnabled,
@@ -14,15 +18,6 @@ type ContactSnapshot = {
   firstName?: string | null
   lastName?: string | null
   email?: string | null
-}
-
-function escapeHtml(value: string) {
-  return value
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#39;")
 }
 
 function formatPrice(amount: number, currency: string) {
@@ -110,117 +105,6 @@ function buildPlainTextEmail(input: {
   ]
     .filter(Boolean)
     .join("\n")
-}
-
-function buildHtmlEmail(input: {
-  previewText: string
-  eyebrow: string
-  title: string
-  greeting: string
-  intro: string
-  orderReference: string
-  total: string
-  paymentMethod: string
-  paymentStatus: string
-  steps: string[]
-  actionLabel?: string
-  actionUrl?: string
-  supportEmail: string
-}) {
-  const stepsMarkup = input.steps
-    .map(
-      (step, i) =>
-        `<tr style="vertical-align:top;">
-          <td style="width:28px;padding:0 8px 12px 0;">
-            <div style="background:#8B1A1A;color:#ffffff;width:22px;height:22px;border-radius:50%;font-size:12px;font-weight:700;line-height:22px;text-align:center;">${i + 1}</div>
-          </td>
-          <td style="padding:0 0 12px 0;color:#6B7280;font-size:14px;line-height:1.6;">${escapeHtml(step)}</td>
-        </tr>`,
-    )
-    .join("")
-  const actionMarkup =
-    input.actionLabel && input.actionUrl
-      ? `<div style="text-align:center;margin:4px 0 0;">
-          <a href="${escapeHtml(input.actionUrl)}" style="display:inline-block;background:#8B1A1A;color:#ffffff;text-decoration:none;padding:14px 32px;font-size:14px;font-weight:700;border-radius:6px;">
-            ${escapeHtml(input.actionLabel)}
-          </a>
-        </div>`
-      : ""
-
-  const year = new Date().getFullYear()
-
-  return `<!DOCTYPE html>
-<html lang="es">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>${escapeHtml(input.title)}</title>
-  </head>
-  <body style="margin:0;padding:40px 16px;background:#F5F5F5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif;color:#1E1E1E;">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(input.previewText)}</div>
-    <div style="max-width:600px;margin:0 auto;background:#ffffff;border-radius:8px;overflow:hidden;border:1px solid #E5E7EB;">
-      <!--[if mso]><table width="600" cellpadding="0" cellspacing="0" border="0" align="center"><tr><td><![endif]-->
-
-      <!-- Header -->
-      <div style="background:#2E2726;padding:28px 32px;text-align:center;">
-        <img src="https://apacheta-viajes.com/logo.png" width="180" alt="Apacheta Viajes" style="display:block;margin:0 auto;" />
-      </div>
-
-      <!-- Accent line -->
-      <div style="height:3px;background:#8B1A1A;"></div>
-
-      <!-- Content -->
-      <div style="padding:36px 32px 24px;">
-        <p style="margin:0 0 8px 0;font-size:11px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;color:#8B1A1A;">${escapeHtml(input.eyebrow)}</p>
-        <h1 style="margin:0 0 24px 0;font-size:26px;font-weight:400;line-height:1.3;color:#1E1E1E;font-family:Georgia,'Times New Roman',serif;">${escapeHtml(input.title)}</h1>
-        <p style="margin:0 0 8px 0;font-size:16px;font-weight:600;line-height:1.5;color:#1E1E1E;">${escapeHtml(input.greeting)}</p>
-        <p style="margin:0 0 28px 0;font-size:15px;line-height:1.7;color:#6B7280;">${escapeHtml(input.intro)}</p>
-
-        <!-- Order summary -->
-        <div style="background:#FAFAFA;border:1px solid #E5E7EB;border-left:3px solid #8B1A1A;border-radius:6px;padding:20px 24px;margin:0 0 28px 0;">
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">
-            <tr>
-              <td style="color:#6B7280;font-size:13px;font-weight:500;padding:4px 0;">Reserva</td>
-              <td style="color:#1E1E1E;font-size:14px;font-weight:600;text-align:right;padding:4px 0;">${escapeHtml(input.orderReference)}</td>
-            </tr>
-            <tr><td colspan="2" style="padding:5px 0;"><hr style="border:none;border-top:1px solid #E5E7EB;margin:0;" /></td></tr>
-            <tr>
-              <td style="color:#6B7280;font-size:13px;font-weight:500;padding:4px 0;">Total</td>
-              <td style="color:#1E1E1E;font-size:14px;font-weight:600;text-align:right;padding:4px 0;">${escapeHtml(input.total)}</td>
-            </tr>
-            <tr><td colspan="2" style="padding:5px 0;"><hr style="border:none;border-top:1px solid #E5E7EB;margin:0;" /></td></tr>
-            <tr>
-              <td style="color:#6B7280;font-size:13px;font-weight:500;padding:4px 0;">Método de pago</td>
-              <td style="color:#1E1E1E;font-size:14px;font-weight:600;text-align:right;padding:4px 0;">${escapeHtml(input.paymentMethod)}</td>
-            </tr>
-            <tr><td colspan="2" style="padding:5px 0;"><hr style="border:none;border-top:1px solid #E5E7EB;margin:0;" /></td></tr>
-            <tr>
-              <td style="color:#6B7280;font-size:13px;font-weight:500;padding:4px 0;">Estado del pago</td>
-              <td style="color:#8B1A1A;font-size:14px;font-weight:600;text-align:right;padding:4px 0;">${escapeHtml(input.paymentStatus)}</td>
-            </tr>
-          </table>
-        </div>
-
-        <!-- Steps -->
-        <div style="margin:0 0 28px 0;">
-          <p style="margin:0 0 16px 0;font-size:15px;font-weight:700;color:#1E1E1E;">Próximos pasos</p>
-          <table width="100%" cellpadding="0" cellspacing="0" border="0">${stepsMarkup}</table>
-        </div>
-
-        ${actionMarkup}
-      </div>
-
-      <!-- Footer -->
-      <div style="background:#FAFAFA;border-top:1px solid #E5E7EB;padding:24px 32px;text-align:center;">
-        <p style="margin:0 0 8px 0;font-size:14px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:#2E2726;">Apacheta Viajes</p>
-        <p style="margin:0 0 8px 0;font-size:13px;line-height:1.6;color:#6B7280;">¿Necesitás ayuda? Escribinos a ${escapeHtml(input.supportEmail)}</p>
-        <p style="margin:0;font-size:11px;line-height:1.5;color:#9CA3AF;">© ${year} Apacheta Travel Agency. Todos los derechos reservados.</p>
-      </div>
-
-      <!--[if mso]></td></tr></table><![endif]-->
-    </div>
-  </body>
-</html>`
 }
 
 export class TransactionalEmailService {
@@ -429,7 +313,7 @@ export class TransactionalEmailService {
       input.context.latestPayment?.estado ?? input.context.order.estado_pago,
     )
     const greetingName = resolveGreetingName(contact)
-    const html = buildHtmlEmail({
+    const emailProps = {
       previewText: `${input.subject} - ${orderReference}`,
       eyebrow: input.eyebrow,
       title: input.title,
@@ -443,7 +327,8 @@ export class TransactionalEmailService {
       actionLabel: input.actionLabel,
       actionUrl: input.actionUrl,
       supportEmail: config.supportEmail ?? config.from ?? "soporte@apacheta-viajes.com",
-    })
+    }
+    const html = await render(TransactionalNotificationEmail(emailProps))
     const text = buildPlainTextEmail({
       title: input.title,
       intro: input.intro,

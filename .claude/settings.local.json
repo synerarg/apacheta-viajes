@@ -15,7 +15,9 @@
       "Bash(find /c/Users/tomas/OneDrive/Documentos/synera/apacheta -type f -name *admin*)",
       "Bash(xargs ls:*)",
       "Bash(xargs grep:*)",
-      "Bash(node -e \"const c = require\\(''@react-email/components''\\); console.log\\(''render:'', typeof c.render\\); console.log\\(''pixelBasedPreset:'', typeof c.pixelBasedPreset\\); console.log\\(''Tailwind:'', typeof c.Tailwind\\)\")"
+      "Bash(node -e \"const c = require\\(''@react-email/components''\\); console.log\\(''render:'', typeof c.render\\); console.log\\(''pixelBasedPreset:'', typeof c.pixelBasedPreset\\); console.log\\(''Tailwind:'', typeof c.Tailwind\\)\")",
+      "Bash(node -e \":*)",
+      "Bash(grep -v \"^$\")"
     ]
   }
 }
