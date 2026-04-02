@@ -47,14 +47,14 @@ export function PackagesSection({ packages }: PackagesSectionProps) {
                 <p className="mt-1 text-sm font-medium text-primary">
                   Desde {pkg.currency} ${pkg.price.toLocaleString("es-AR")}
                 </p>
-                <Button
-                  asChild
-                  variant="outline"
-                  size="sm"
-                  className="mt-3 w-fit border-primary text-primary hover:bg-primary hover:text-primary-foreground"
-                >
-                  <Link href={`/paquetes/${pkg.slug}`}>Ver Detalle</Link>
-                </Button>
+                <Link href={`/paquetes/${pkg.slug}`}>
+                  <Button
+                    size="sm"
+                    className="mt-3 w-fit border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                  >
+                    Ver Detalle
+                  </Button>
+                </Link>
               </div>
             </div>
           ))}
