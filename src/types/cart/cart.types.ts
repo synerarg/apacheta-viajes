@@ -14,6 +14,8 @@ export interface CartItem {
   moneda: Moneda
   paqueteFechaId: string | null
   experienciaId: string | null
+  incluyeAlojamiento?: boolean
+  incluyeTraslado?: boolean
 }
 
 export interface CartSnapshot {

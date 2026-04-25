@@ -1,16 +1,19 @@
 "use client"
 
 import { useState } from "react"
-import { HotelCard } from "@/components/hoteleria/hotel-card"
-import { hotelesMock } from "@/lib/mock-data/hoteles"
+import { HotelCard, type HotelCardItem } from "@/components/hoteleria/hotel-card"
 
 const ITEMS_PER_PAGE = 6
 
-export function CatalogoHoteleria() {
+interface CatalogoHoteleriaProps {
+  hoteles: HotelCardItem[]
+}
+
+export function CatalogoHoteleria({ hoteles }: CatalogoHoteleriaProps) {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
-  const visible = hotelesMock.slice(0, visibleCount)
-  const hasMore = visibleCount < hotelesMock.length
+  const visible = hoteles.slice(0, visibleCount)
+  const hasMore = visibleCount < hoteles.length
 
   return (
     <main className="min-h-screen bg-off-white pt-36 pb-20">

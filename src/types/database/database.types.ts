@@ -56,6 +56,17 @@ import type {
   HotelesImagenesUpdate,
 } from "@/types/hoteles-imagenes/hoteles-imagenes.types"
 import type {
+  HyperGuestBookingIntentsInsert,
+  HyperGuestBookingIntentsRow,
+  HyperGuestBookingIntentsUpdate,
+  HyperGuestEventsInsert,
+  HyperGuestEventsRow,
+  HyperGuestEventsUpdate,
+  HyperGuestHotelMappingsInsert,
+  HyperGuestHotelMappingsRow,
+  HyperGuestHotelMappingsUpdate,
+} from "@/types/hyperguest/hyperguest.types"
+import type {
   OrdenesInsert,
   OrdenesRow,
   OrdenesUpdate,
@@ -251,6 +262,55 @@ export interface Database {
             foreignKeyName: "hoteles_imagenes_hotel_id_fkey"
             columns: ["hotel_id"]
             isOneToOne: false
+            referencedRelation: "hoteles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hyperguest_booking_intents: {
+        Row: HyperGuestBookingIntentsRow
+        Insert: HyperGuestBookingIntentsInsert
+        Update: HyperGuestBookingIntentsUpdate
+        Relationships: [
+          {
+            foreignKeyName: "hyperguest_booking_intents_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: false
+            referencedRelation: "hoteles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "hyperguest_booking_intents_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hyperguest_events: {
+        Row: HyperGuestEventsRow
+        Insert: HyperGuestEventsInsert
+        Update: HyperGuestEventsUpdate
+        Relationships: [
+          {
+            foreignKeyName: "hyperguest_events_booking_intent_id_fkey"
+            columns: ["booking_intent_id"]
+            isOneToOne: false
+            referencedRelation: "hyperguest_booking_intents"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      hyperguest_hotel_mappings: {
+        Row: HyperGuestHotelMappingsRow
+        Insert: HyperGuestHotelMappingsInsert
+        Update: HyperGuestHotelMappingsUpdate
+        Relationships: [
+          {
+            foreignKeyName: "hyperguest_hotel_mappings_hotel_id_fkey"
+            columns: ["hotel_id"]
+            isOneToOne: true
             referencedRelation: "hoteles"
             referencedColumns: ["id"]
           },

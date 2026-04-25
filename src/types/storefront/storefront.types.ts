@@ -34,7 +34,7 @@ export interface StorefrontHotelItem {
   id: string
   name: string
   location: string
-  image: string
+  image: string | null
   stars: number
   href: string
 }

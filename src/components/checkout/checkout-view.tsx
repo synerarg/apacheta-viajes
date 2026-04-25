@@ -43,6 +43,12 @@ const EMPTY_PASSENGER = {
   specialRequirements: "",
 }
 
+const EMPTY_TRAVEL_DETAILS = {
+  pickupAddress: "",
+  flightNumber: "",
+  airline: "",
+}
+
 function isBrowser() {
   return typeof window !== "undefined"
 }
@@ -51,6 +57,7 @@ function parseCheckoutFormState(rawValue: string | null): {
   paymentMethod: CheckoutPaymentMethod
   contact: typeof EMPTY_CONTACT
   passenger: typeof EMPTY_PASSENGER
+  travelDetails: typeof EMPTY_TRAVEL_DETAILS
 } | null {
   if (!rawValue) return null
   try {
@@ -58,6 +65,7 @@ function parseCheckoutFormState(rawValue: string | null): {
       paymentMethod?: CheckoutPaymentMethod
       contact?: typeof EMPTY_CONTACT
       passenger?: typeof EMPTY_PASSENGER
+      travelDetails?: typeof EMPTY_TRAVEL_DETAILS
     }
     return {
       paymentMethod:
@@ -67,6 +75,10 @@ function parseCheckoutFormState(rawValue: string | null): {
           : "mercadopago",
       contact: { ...EMPTY_CONTACT, ...parsed.contact },
       passenger: { ...EMPTY_PASSENGER, ...parsed.passenger },
+      travelDetails: {
+        ...EMPTY_TRAVEL_DETAILS,
+        ...parsed.travelDetails,
+      },
     }
   } catch {
     return null
@@ -84,6 +96,7 @@ function saveCheckoutDraftState(input: {
   paymentMethod: CheckoutPaymentMethod
   contact: typeof EMPTY_CONTACT
   passenger: typeof EMPTY_PASSENGER
+  travelDetails: typeof EMPTY_TRAVEL_DETAILS
 }) {
   if (!isBrowser()) return
   window.localStorage.setItem(
@@ -103,6 +116,23 @@ function normalizeOptionalText(value: string) {
   return normalized.length > 0 ? normalized : undefined
 }
 
+function includesTransferText(value: string) {
+  return /traslad|transfer/i.test(value)
+}
+
+function cartRequiresPickupAddress(items: ReturnType<typeof useCart>["items"]) {
+  return items.length > 0 && items.every((item) => item.kind === "experiencia")
+}
+
+function cartRequiresFlightDetails(items: ReturnType<typeof useCart>["items"]) {
+  return items.some(
+    (item) =>
+      item.incluyeTraslado === true ||
+      includesTransferText(item.category) ||
+      includesTransferText(item.name),
+  )
+}
+
 function splitFullName(fullName: string) {
   const parts = fullName.trim().split(/\s+/).filter(Boolean)
 
@@ -118,6 +148,7 @@ function buildCheckoutSubmitPayload(input: {
   saveProfile: boolean
   contact: typeof EMPTY_CONTACT
   passenger: typeof EMPTY_PASSENGER
+  travelDetails: typeof EMPTY_TRAVEL_DETAILS
 }): CheckoutSubmitInput {
   const normalizedFullName = input.passenger.fullName.trim()
   const derivedName = splitFullName(normalizedFullName)
@@ -128,6 +159,9 @@ function buildCheckoutSubmitPayload(input: {
   const specialRequirements = normalizeOptionalText(
     input.passenger.specialRequirements,
   )
+  const pickupAddress = normalizeOptionalText(input.travelDetails.pickupAddress)
+  const flightNumber = normalizeOptionalText(input.travelDetails.flightNumber)
+  const airline = normalizeOptionalText(input.travelDetails.airline)
 
   return {
     items: input.items,
@@ -146,6 +180,17 @@ function buildCheckoutSubmitPayload(input: {
       ...(nationality ? { nationality } : {}),
       ...(specialRequirements ? { specialRequirements } : {}),
     },
+    ...(
+      pickupAddress || flightNumber || airline
+        ? {
+            travelDetails: {
+              ...(pickupAddress ? { pickupAddress } : {}),
+              ...(flightNumber ? { flightNumber } : {}),
+              ...(airline ? { airline } : {}),
+            },
+          }
+        : {}
+    ),
   }
 }
 
@@ -365,6 +410,9 @@ export function CheckoutView() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [contact, setContact] = useState(EMPTY_CONTACT)
   const [passenger, setPassenger] = useState(EMPTY_PASSENGER)
+  const [travelDetails, setTravelDetails] = useState(EMPTY_TRAVEL_DETAILS)
+  const requiresPickupAddress = cartRequiresPickupAddress(items)
+  const requiresFlightDetails = cartRequiresFlightDetails(items)
 
   useEffect(() => {
     const persisted = loadCheckoutDraftState()
@@ -372,6 +420,7 @@ export function CheckoutView() {
     setPaymentMethod(persisted.paymentMethod)
     setContact(persisted.contact)
     setPassenger(persisted.passenger)
+    setTravelDetails(persisted.travelDetails)
   }, [])
 
   useEffect(() => {
@@ -424,12 +473,60 @@ export function CheckoutView() {
   }, [])
 
   useEffect(() => {
-    saveCheckoutDraftState({ paymentMethod, contact, passenger })
-  }, [contact, passenger, paymentMethod])
+    saveCheckoutDraftState({
+      paymentMethod,
+      contact,
+      passenger,
+      travelDetails,
+    })
+  }, [contact, passenger, paymentMethod, travelDetails])
+
+  const validateDataStep = () => {
+    if (!passenger.fullName.trim()) {
+      toast.error("Ingresa el nombre completo para continuar.")
+      return false
+    }
+
+    if (!passenger.documentNumber.trim()) {
+      toast.error("Ingresa el DNI o pasaporte para continuar.")
+      return false
+    }
+
+    if (!contact.phone.trim()) {
+      toast.error("Ingresa un teléfono de contacto para continuar.")
+      return false
+    }
+
+    if (!contact.email.trim()) {
+      toast.error("Ingresa un correo electrónico para continuar.")
+      return false
+    }
+
+    if (requiresPickupAddress && !travelDetails.pickupAddress.trim()) {
+      toast.error("Ingresa la dirección de retiro o encuentro para continuar.")
+      return false
+    }
+
+    if (requiresFlightDetails && !travelDetails.flightNumber.trim()) {
+      toast.error("Ingresa el número de vuelo para coordinar el traslado.")
+      return false
+    }
+
+    if (requiresFlightDetails && !travelDetails.airline.trim()) {
+      toast.error("Ingresa la línea aérea para coordinar el traslado.")
+      return false
+    }
+
+    return true
+  }
 
   const handleCheckoutSubmit = async () => {
     if (isEmpty) {
       toast.error("Tu carrito está vacío.")
+      return
+    }
+    if (!validateDataStep()) {
+      setStep("datos")
       return
     }
     setIsSubmitting(true)
@@ -440,6 +537,7 @@ export function CheckoutView() {
         saveProfile: rememberDetails,
         contact,
         passenger,
+        travelDetails,
       })
       const response = await fetch("/api/checkout", {
         method: "POST",
@@ -479,6 +577,7 @@ export function CheckoutView() {
       clearCheckoutDraftState()
       setContact(EMPTY_CONTACT)
       setPassenger(EMPTY_PASSENGER)
+      setTravelDetails(EMPTY_TRAVEL_DETAILS)
       setPaymentMethod("mercadopago")
       clearCart()
       if (result.redirectUrl?.startsWith("http")) {
@@ -624,11 +723,65 @@ export function CheckoutView() {
               />
             </UnderlineField>
 
+            {requiresPickupAddress && (
+              <UnderlineField label="Dirección de Retiro o Encuentro">
+                <input
+                  type="text"
+                  placeholder=""
+                  value={travelDetails.pickupAddress}
+                  onChange={(e) =>
+                    setTravelDetails((details) => ({
+                      ...details,
+                      pickupAddress: e.target.value,
+                    }))
+                  }
+                  className={fieldClass}
+                />
+              </UnderlineField>
+            )}
+
+            {requiresFlightDetails && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6">
+                <UnderlineField label="Número de Vuelo">
+                  <input
+                    type="text"
+                    placeholder=""
+                    value={travelDetails.flightNumber}
+                    onChange={(e) =>
+                      setTravelDetails((details) => ({
+                        ...details,
+                        flightNumber: e.target.value,
+                      }))
+                    }
+                    className={fieldClass}
+                  />
+                </UnderlineField>
+                <UnderlineField label="Línea Aérea">
+                  <input
+                    type="text"
+                    placeholder=""
+                    value={travelDetails.airline}
+                    onChange={(e) =>
+                      setTravelDetails((details) => ({
+                        ...details,
+                        airline: e.target.value,
+                      }))
+                    }
+                    className={fieldClass}
+                  />
+                </UnderlineField>
+              </div>
+            )}
+
             {/* CTA */}
             <div className="pt-2">
               <button
                 type="button"
-                onClick={() => setStep("pago")}
+                onClick={() => {
+                  if (validateDataStep()) {
+                    setStep("pago")
+                  }
+                }}
                 disabled={isEmpty}
                 className="w-full bg-primary hover:bg-primary/85 text-off-white font-sans font-bold text-sm sm:text-base py-4 text-center transition-colors flex items-center justify-center gap-2 disabled:opacity-50 cursor-pointer"
               >

@@ -4,6 +4,14 @@ interface MetricsSectionProps {
   metrics: StorefrontMetricItem[]
 }
 
+function formatMetricLabel(label: string) {
+  if (/viajer/i.test(label) && !/ano|año/i.test(label)) {
+    return `${label} POR AÑO`
+  }
+
+  return label
+}
+
 export function MetricsSection({ metrics }: MetricsSectionProps) {
 
   return (
@@ -20,7 +28,7 @@ export function MetricsSection({ metrics }: MetricsSectionProps) {
                   {metric.value}
                 </span>
                 <span className="mt-2 text-xs tracking-widest text-white/80">
-                  {metric.label}
+                  {formatMetricLabel(metric.label)}
                 </span>
               </div>
               {index < metrics.length - 1 && (

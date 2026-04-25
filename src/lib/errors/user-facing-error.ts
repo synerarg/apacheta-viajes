@@ -51,6 +51,10 @@ const CONTAINS_MESSAGE_MAP: Array<[string, string]> = [
     "El codigo o los datos ingresados no son validos.",
   ],
   [
+    "HyperGuest API error",
+    "El proveedor de hoteleria no pudo completar la operacion.",
+  ],
+  [
     "Missing environment variable:",
     "Falta una variable de entorno requerida para completar la operacion.",
   ],

@@ -206,6 +206,8 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
                         moneda: paquete.moneda,
                         paqueteFechaId: paquete.paqueteFechaId,
                         experienciaId: null,
+                        incluyeAlojamiento: paquete.incluye_alojamiento,
+                        incluyeTraslado: paquete.incluye_traslado,
                       }
                     : null
                 }

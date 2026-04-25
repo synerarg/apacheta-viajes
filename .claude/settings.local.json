@@ -17,7 +17,10 @@
       "Bash(xargs grep:*)",
       "Bash(node -e \"const c = require\\(''@react-email/components''\\); console.log\\(''render:'', typeof c.render\\); console.log\\(''pixelBasedPreset:'', typeof c.pixelBasedPreset\\); console.log\\(''Tailwind:'', typeof c.Tailwind\\)\")",
       "Bash(node -e \":*)",
-      "Bash(grep -v \"^$\")"
+      "Bash(grep -v \"^$\")",
+      "WebFetch(domain:api-docs.hyperguest.com)",
+      "Bash(curl -s -u \"developer:HyperDocs\" \"https://api-docs.hyperguest.com/docs/booking-v2/\" -o /tmp/hyperguest-docs.html -w \"HTTP_STATUS=%{http_code}\\\\nSIZE=%{size_download}\\\\n\")",
+      "Read(//tmp/**)"
     ]
   }
 }

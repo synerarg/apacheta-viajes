@@ -8,6 +8,18 @@ const nextConfig: NextConfig = {
         hostname: "*.supabase.co",
         pathname: "/storage/v1/object/public/**",
       },
+      {
+        protocol: "https",
+        hostname: "hg-static.hyperguest.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.hyperguest.com",
+      },
+      {
+        protocol: "https",
+        hostname: "*.hyperguest.io",
+      },
     ],
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1440, 1920, 2560, 3840],

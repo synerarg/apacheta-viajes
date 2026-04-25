@@ -223,10 +223,13 @@ export async function getFeaturedHotelsData(limit = 3): Promise<StorefrontHotelI
     .map((hotel) => ({
       id: hotel.id,
       name: hotel.nombre,
-      location: [hotel.ciudad, hotel.provincia].filter(Boolean).join(", "),
-      image: withFallbackImage(hotel.imagen_url, "/landing/placeholder-2.png"),
+      location:
+        [hotel.ciudad, hotel.provincia].filter(Boolean).join(", ") ||
+        hotel.direccion ||
+        "Ubicacion a confirmar",
+      image: hotel.imagen_url?.trim() || null,
       stars: hotel.estrellas ?? 0,
-      href: "/#contacto",
+      href: `/hoteleria/${hotel.slug}`,
     }))
 }
 

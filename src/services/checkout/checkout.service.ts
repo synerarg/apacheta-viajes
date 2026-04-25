@@ -15,12 +15,14 @@ import { createExperienciasRepository } from "@/repositories/experiencias/experi
 import { createCheckoutProfilesRepository } from "@/repositories/checkout-profiles/checkout-profiles.repository"
 import { createOrdenesItemsRepository } from "@/repositories/ordenes-items/ordenes-items.repository"
 import { createOrdenesRepository } from "@/repositories/ordenes/ordenes.repository"
+import { createPaquetesRepository } from "@/repositories/paquetes/paquetes.repository"
 import { createPaquetesFechasRepository } from "@/repositories/paquetes-fechas/paquetes-fechas.repository"
 import { createReservasRepository } from "@/repositories/reservas/reservas.repository"
 import { createExperienciasService } from "@/services/experiencias/experiencias.service"
 import { createCheckoutProfilesService } from "@/services/checkout-profiles/checkout-profiles.service"
 import { createOrdenesItemsService } from "@/services/ordenes-items/ordenes-items.service"
 import { createOrdenesService } from "@/services/ordenes/ordenes.service"
+import { createPaquetesService } from "@/services/paquetes/paquetes.service"
 import { createPaquetesFechasService } from "@/services/paquetes-fechas/paquetes-fechas.service"
 import { createPaymentsService } from "@/services/payments/payments.service"
 import { createReservasService } from "@/services/reservas/reservas.service"
@@ -47,9 +49,9 @@ function buildReservationNotes(
     .join(" ")
 
   return [
-    `Order reference: ${orderReference}`,
-    `Checkout item: ${item.kind}`,
-    `Checkout label: ${item.name}`,
+    `Referencia de orden: ${orderReference}`,
+    `Tipo de item: ${item.kind}`,
+    `Item: ${item.name}`,
     `Usuario autenticado: ${user.id}`,
     `Contacto: ${contactName || input.passenger.fullName}`,
     `Email contacto: ${input.contact.email}`,
@@ -62,6 +64,15 @@ function buildReservationNotes(
       : null,
     input.passenger.specialRequirements
       ? `Observaciones: ${input.passenger.specialRequirements}`
+      : null,
+    input.travelDetails?.pickupAddress
+      ? `Direccion de retiro o encuentro: ${input.travelDetails.pickupAddress}`
+      : null,
+    input.travelDetails?.flightNumber
+      ? `Numero de vuelo: ${input.travelDetails.flightNumber}`
+      : null,
+    input.travelDetails?.airline
+      ? `Linea aerea: ${input.travelDetails.airline}`
       : null,
     `Metodo de pago seleccionado: ${input.paymentMethod}`,
   ]
@@ -81,6 +92,23 @@ function normalizeOptionalText(value?: string | null) {
   const normalized = value?.trim()
 
   return normalized ? normalized : undefined
+}
+
+function includesTransferText(value: string) {
+  return /traslad|transfer/i.test(value)
+}
+
+function checkoutRequiresPickupAddress(input: CheckoutSubmitInput) {
+  return input.items.length > 0 && input.items.every((item) => item.kind === "experiencia")
+}
+
+function checkoutRequiresFlightDetails(input: CheckoutSubmitInput) {
+  return input.items.some(
+    (item) =>
+      item.incluyeTraslado === true ||
+      includesTransferText(item.category) ||
+      includesTransferText(item.name),
+  )
 }
 
 function buildPaymentPayer(input: CheckoutSubmitInput) {
@@ -140,6 +168,7 @@ function assertCheckoutPaymentConfigured(
 export class CheckoutService {
   private readonly checkoutProfilesService
   private readonly reservasService
+  private readonly paquetesService
   private readonly paquetesFechasService
   private readonly experienciasService
   private readonly ordenesService
@@ -155,6 +184,7 @@ export class CheckoutService {
     this.paquetesFechasService = createPaquetesFechasService(
       createPaquetesFechasRepository(supabase),
     )
+    this.paquetesService = createPaquetesService(createPaquetesRepository(supabase))
     this.experienciasService = createExperienciasService(
       createExperienciasRepository(supabase),
     )
@@ -219,6 +249,11 @@ export class CheckoutService {
             input.passenger.specialRequirements,
           ),
         },
+        travelDetails: {
+          pickupAddress: normalizeOptionalText(input.travelDetails?.pickupAddress),
+          flightNumber: normalizeOptionalText(input.travelDetails?.flightNumber),
+          airline: normalizeOptionalText(input.travelDetails?.airline),
+        },
       }
 
       if (!user) {
@@ -227,6 +262,33 @@ export class CheckoutService {
 
       if (normalizedInput.items.length === 0) {
         throw new CheckoutValidationException("Tu carrito esta vacio.")
+      }
+
+      if (
+        checkoutRequiresPickupAddress(normalizedInput) &&
+        !normalizedInput.travelDetails?.pickupAddress
+      ) {
+        throw new CheckoutValidationException(
+          "Ingresa la direccion de retiro o encuentro para continuar.",
+        )
+      }
+
+      if (
+        checkoutRequiresFlightDetails(normalizedInput) &&
+        !normalizedInput.travelDetails?.flightNumber
+      ) {
+        throw new CheckoutValidationException(
+          "Ingresa el numero de vuelo para coordinar el traslado.",
+        )
+      }
+
+      if (
+        checkoutRequiresFlightDetails(normalizedInput) &&
+        !normalizedInput.travelDetails?.airline
+      ) {
+        throw new CheckoutValidationException(
+          "Ingresa la linea aerea para coordinar el traslado.",
+        )
       }
 
       assertCheckoutPaymentConfigured(normalizedInput.paymentMethod)
@@ -257,8 +319,24 @@ export class CheckoutService {
           nationality: normalizedInput.passenger.nationality ?? null,
           specialRequirements:
             normalizedInput.passenger.specialRequirements ?? null,
+          pickupAddress: normalizedInput.travelDetails?.pickupAddress ?? null,
+          flightNumber: normalizedInput.travelDetails?.flightNumber ?? null,
+          airline: normalizedInput.travelDetails?.airline ?? null,
         },
-        notas: `Checkout iniciado ${new Date().toISOString()}`,
+        notas: [
+          `Checkout iniciado ${new Date().toISOString()}`,
+          normalizedInput.travelDetails?.pickupAddress
+            ? `Direccion de retiro o encuentro: ${normalizedInput.travelDetails.pickupAddress}`
+            : null,
+          normalizedInput.travelDetails?.flightNumber
+            ? `Numero de vuelo: ${normalizedInput.travelDetails.flightNumber}`
+            : null,
+          normalizedInput.travelDetails?.airline
+            ? `Linea aerea: ${normalizedInput.travelDetails.airline}`
+            : null,
+        ]
+          .filter(Boolean)
+          .join("\n"),
       })
 
       const reservations = []
@@ -479,6 +557,7 @@ export class CheckoutService {
       const paqueteFecha = await this.paquetesFechasService.getById(
         item.paqueteFechaId,
       )
+      const paquete = await this.paquetesService.getById(paqueteFecha.paquete_id)
 
       if (paqueteFecha.activo === false) {
         throw new CheckoutValidationException(
@@ -501,7 +580,18 @@ export class CheckoutService {
         precio_unitario: paqueteFecha.precio_por_persona,
         precio_total: paqueteFecha.precio_por_persona * item.quantity,
         moneda: paqueteFecha.moneda ?? item.moneda,
-        notas: buildReservationNotes(item, input, user, orderReference),
+        notas: buildReservationNotes(
+          {
+            ...item,
+            incluyeAlojamiento:
+              item.incluyeAlojamiento ?? paquete.incluye_alojamiento ?? undefined,
+            incluyeTraslado:
+              item.incluyeTraslado ?? paquete.incluye_traslado ?? undefined,
+          },
+          input,
+          user,
+          orderReference,
+        ),
       }
     } else {
       if (!item.experienciaId) {

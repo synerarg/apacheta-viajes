@@ -1,10 +1,24 @@
 import Image from "next/image"
 import Link from "next/link"
 import { MapPin, Star } from "lucide-react"
-import type { HotelMock } from "@/lib/mock-data/hoteles"
+
+export interface HotelCardItem {
+  id: string | number
+  nombre: string
+  slug: string
+  ubicacion: string
+  descripcion_corta: string | null
+  estrellas: number
+  precio_desde: number | null
+  moneda: string
+  imagen_url: string | null
+  categoria: string
+  activo: boolean | null
+  orden: number | null
+}
 
 interface HotelCardProps {
-  hotel: HotelMock
+  hotel: HotelCardItem
 }
 
 function StarRating({ rating }: { rating: number }) {
@@ -28,13 +42,17 @@ export function HotelCard({ hotel }: HotelCardProps) {
       <article>
         {/* Image */}
         <div className="relative aspect-[3/2] overflow-hidden bg-muted mb-4">
-          {hotel.imagen_url && (
+          {hotel.imagen_url ? (
             <Image
               src={hotel.imagen_url}
               alt={hotel.nombre}
               fill
               className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
+          ) : (
+            <div className="flex h-full items-center justify-center px-6 text-center font-sans text-sm text-subtle">
+              Imagen en actualización
+            </div>
           )}
           {/* Category tag */}
           <div className="absolute top-4 left-4">
@@ -54,12 +72,20 @@ export function HotelCard({ hotel }: HotelCardProps) {
             <MapPin className="w-3.5 h-3.5 text-primary flex-shrink-0" />
             <p className="text-sm text-subtle font-sans">{hotel.ubicacion}</p>
           </div>
-          <p className="text-xs text-subtle font-sans pt-0.5">
-            Desde{" "}
-            <span className="font-bold text-primary">
-              ARS ${hotel.precio_desde.toLocaleString("es-AR")}
-            </span>
-          </p>
+          {hotel.precio_desde ? (
+            <p className="text-xs text-subtle font-sans pt-0.5">
+              Desde{" "}
+              <span className="font-bold text-primary">
+                {hotel.moneda} ${hotel.precio_desde.toLocaleString("es-AR")}
+              </span>
+            </p>
+          ) : (
+            <p className="text-xs text-subtle font-sans pt-0.5">
+              <span className="font-bold text-primary">
+                Consultar disponibilidad
+              </span>
+            </p>
+          )}
         </div>
       </article>
     </Link>

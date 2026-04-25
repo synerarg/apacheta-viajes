@@ -22,6 +22,8 @@ const cartItemSchema = z.object({
   moneda: z.enum(["ARS", "USD", "EUR", "BRL", "MXN", "CLP", "COP", "PEN", "UYU"]),
   paqueteFechaId: z.string().uuid().nullable(),
   experienciaId: z.string().uuid().nullable(),
+  incluyeAlojamiento: z.boolean().optional(),
+  incluyeTraslado: z.boolean().optional(),
 })
 
 const optionalNonEmptyString = z.preprocess((value) => {
@@ -51,6 +53,13 @@ const checkoutSubmitSchema = z.object({
     nationality: optionalNonEmptyString,
     specialRequirements: optionalNonEmptyString,
   }),
+  travelDetails: z
+    .object({
+      pickupAddress: optionalNonEmptyString,
+      flightNumber: optionalNonEmptyString,
+      airline: optionalNonEmptyString,
+    })
+    .optional(),
 })
 
 function getErrorMessage(error: unknown): string {

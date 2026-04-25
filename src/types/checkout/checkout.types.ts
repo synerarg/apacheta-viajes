@@ -22,12 +22,19 @@ export interface CheckoutPassengerInput {
   specialRequirements?: string
 }
 
+export interface CheckoutTravelDetailsInput {
+  pickupAddress?: string
+  flightNumber?: string
+  airline?: string
+}
+
 export interface CheckoutSubmitInput {
   items: CartItem[]
   paymentMethod: CheckoutPaymentMethod
   saveProfile: boolean
   contact: CheckoutContactInput
   passenger: CheckoutPassengerInput
+  travelDetails?: CheckoutTravelDetailsInput
 }
 
 export interface CheckoutUserContext {
