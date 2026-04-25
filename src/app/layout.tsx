@@ -1,7 +1,6 @@
 import type { Metadata } from "next"
 import { Playfair_Display, Lato } from "next/font/google"
 import { Toaster } from "sonner"
-
 import { AuthSessionSync } from "@/components/auth/auth-session-sync"
 import { Footer } from "@/components/layout/footer"
 import { Navbar } from "@/components/layout/navbar"
