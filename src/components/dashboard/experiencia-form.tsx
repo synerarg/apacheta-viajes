@@ -32,6 +32,7 @@ interface ExperienciaFormProps {
     destacado?: boolean | null
     imagen_url?: string | null
     ubicacion?: string | null
+    origen?: string | null
     categoria_id?: string | null
     destino_id?: string | null
     duracion_horas?: number | null
@@ -221,9 +222,26 @@ export function ExperienciaForm({
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <Label htmlFor="ubicacion">Ubicación</Label>
-            <Input id="ubicacion" name="ubicacion" defaultValue={initialData?.ubicacion ?? ""} />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="ubicacion">Ubicación</Label>
+              <Input
+                id="ubicacion"
+                name="ubicacion"
+                defaultValue={initialData?.ubicacion ?? ""}
+                placeholder="Lugar donde se desarrolla la experiencia"
+              />
+            </div>
+
+            <div className="space-y-1.5">
+              <Label htmlFor="origen">Origen</Label>
+              <Input
+                id="origen"
+                name="origen"
+                defaultValue={initialData?.origen ?? ""}
+                placeholder="Punto de partida (Ej: Salta capital)"
+              />
+            </div>
           </div>
 
           <div className="space-y-1.5">

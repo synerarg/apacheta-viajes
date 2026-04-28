@@ -7,7 +7,29 @@ import { isRedirectError } from "next/dist/client/components/redirect-error"
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
-import type { Moneda } from "@/types/shared/enums"
+import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+
+const REGIMEN_VALUES: RegimenAlimentario[] = [
+  "desayuno",
+  "media_pension",
+  "pension_completa",
+  "all_inclusive",
+]
+
+function parseRegimen(value: FormDataEntryValue | null): RegimenAlimentario | null {
+  if (typeof value !== "string") return null
+  const trimmed = value.trim()
+  if (trimmed.length === 0) return null
+  return REGIMEN_VALUES.includes(trimmed as RegimenAlimentario)
+    ? (trimmed as RegimenAlimentario)
+    : null
+}
+
+function parseNullableNumberValue(value: unknown): number | null {
+  if (value === null || value === undefined || value === "") return null
+  const parsed = Number(value)
+  return Number.isFinite(parsed) ? parsed : null
+}
 
 export interface ActionState {
   error?: string
@@ -19,6 +41,9 @@ interface PackageDateDraft {
   fecha_inicio: string
   fecha_fin: string
   precio_por_persona: number
+  precio_hab_single: number | null
+  precio_hab_doble: number | null
+  precio_hab_triple: number | null
   moneda: Moneda
   cupo_total: number
   cupo_disponible: number
@@ -81,6 +106,9 @@ function normalizePackageDates(rawDates: PackageDateDraft[]) {
       fecha_inicio: String(date.fecha_inicio ?? "").trim(),
       fecha_fin: String(date.fecha_fin ?? "").trim(),
       precio_por_persona: Number(date.precio_por_persona ?? 0),
+      precio_hab_single: parseNullableNumberValue(date.precio_hab_single),
+      precio_hab_doble: parseNullableNumberValue(date.precio_hab_doble),
+      precio_hab_triple: parseNullableNumberValue(date.precio_hab_triple),
       moneda: (date.moneda ?? "ARS") as Moneda,
       cupo_total: Number(date.cupo_total ?? 0),
       cupo_disponible: Number(date.cupo_disponible ?? 0),
@@ -226,6 +254,9 @@ async function syncPackageDates(
       fecha_inicio: date.fecha_inicio,
       fecha_fin: date.fecha_fin,
       precio_por_persona: date.precio_por_persona,
+      precio_hab_single: date.precio_hab_single,
+      precio_hab_doble: date.precio_hab_doble,
+      precio_hab_triple: date.precio_hab_triple,
       moneda: date.moneda,
       cupo_total: date.cupo_total,
       cupo_disponible: date.cupo_disponible,
@@ -278,6 +309,16 @@ function validatePackageInput(input: {
       return { error: "El precio por persona no puede ser negativo." }
     }
 
+    for (const roomPrice of [
+      date.precio_hab_single,
+      date.precio_hab_doble,
+      date.precio_hab_triple,
+    ]) {
+      if (roomPrice !== null && roomPrice < 0) {
+        return { error: "Los precios de habitación no pueden ser negativos." }
+      }
+    }
+
     if (date.cupo_total < 1) {
       return { error: "Cada salida debe tener al menos 1 lugar disponible." }
     }
@@ -301,6 +342,8 @@ function buildPackagePayload(formData: FormData) {
   const precio_desde = Math.max(0, Number(formData.get("precio_desde") ?? 0))
   const moneda = (parseNullableString(formData.get("moneda")) ?? "ARS") as Moneda
   const destino_id = parseNullableString(formData.get("destino_id"))
+  const lugar_inicio = parseNullableString(formData.get("lugar_inicio"))
+  const regimen = parseRegimen(formData.get("regimen"))
   const orden = parseNullableNumber(formData.get("orden"))
   const gallery = parseJsonField<string[]>(formData.get("gallery"), []).filter(Boolean)
   const categoriaIds = [
@@ -326,10 +369,12 @@ function buildPackagePayload(formData: FormData) {
     precio_desde,
     moneda,
     destino_id,
+    lugar_inicio,
+    regimen,
     orden,
     incluye_alojamiento: parseBoolean(formData.get("incluye_alojamiento")),
     incluye_traslado: parseBoolean(formData.get("incluye_traslado")),
-    incluye_comidas: parseBoolean(formData.get("incluye_comidas")),
+    incluye_comidas: regimen !== null,
     incluye_guia: parseBoolean(formData.get("incluye_guia")),
     incluye_entradas: parseBoolean(formData.get("incluye_entradas")),
     gallery,
@@ -378,6 +423,8 @@ export async function createPaquete(
         precio_desde: input.precio_desde,
         moneda: input.moneda,
         destino_id: input.destino_id,
+        lugar_inicio: input.lugar_inicio,
+        regimen: input.regimen,
         orden: input.orden,
         incluye_alojamiento: input.incluye_alojamiento,
         incluye_traslado: input.incluye_traslado,
@@ -463,6 +510,8 @@ export async function updatePaquete(
         precio_desde: input.precio_desde,
         moneda: input.moneda,
         destino_id: input.destino_id,
+        lugar_inicio: input.lugar_inicio,
+        regimen: input.regimen,
         orden: input.orden,
         incluye_alojamiento: input.incluye_alojamiento,
         incluye_traslado: input.incluye_traslado,

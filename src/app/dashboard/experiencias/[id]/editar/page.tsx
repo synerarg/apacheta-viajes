@@ -107,6 +107,7 @@ export default async function EditarExperienciaPage({ params }: EditarExperienci
             destacado: experiencia.destacado,
             imagen_url: experiencia.imagen_url,
             ubicacion: experiencia.ubicacion,
+            origen: experiencia.origen,
             categoria_id: experiencia.categoria_id,
             destino_id: experiencia.destino_id,
             duracion_horas: experiencia.duracion_horas,

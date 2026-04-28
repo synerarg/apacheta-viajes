@@ -20,7 +20,15 @@ import {
 import { Textarea } from "@/components/ui/textarea"
 import type { CategoriasExperienciaRow } from "@/types/categorias-experiencia/categorias-experiencia.types"
 import type { DestinosRow } from "@/types/destinos/destinos.types"
-import type { Moneda } from "@/types/shared/enums"
+import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+
+const REGIMEN_NONE = "__none__"
+const REGIMEN_OPTIONS: Array<{ value: RegimenAlimentario; label: string }> = [
+  { value: "desayuno", label: "Desayuno" },
+  { value: "media_pension", label: "Media pensión" },
+  { value: "pension_completa", label: "Pensión completa" },
+  { value: "all_inclusive", label: "All inclusive" },
+]
 
 interface PackageDateDraft {
   id?: string
@@ -28,6 +36,9 @@ interface PackageDateDraft {
   fecha_inicio: string
   fecha_fin: string
   precio_por_persona: number
+  precio_hab_single: number | null
+  precio_hab_doble: number | null
+  precio_hab_triple: number | null
   moneda: Moneda
   cupo_total: number
   cupo_disponible: number
@@ -55,10 +66,11 @@ interface PaqueteFormProps {
     precio_desde?: number
     moneda?: Moneda | null
     destino_id?: string | null
+    lugar_inicio?: string | null
     orden?: number | null
     incluye_alojamiento?: boolean | null
     incluye_traslado?: boolean | null
-    incluye_comidas?: boolean | null
+    regimen?: RegimenAlimentario | null
     incluye_guia?: boolean | null
     incluye_entradas?: boolean | null
     categoria_ids?: string[]
@@ -67,6 +79,9 @@ interface PaqueteFormProps {
       fecha_inicio: string
       fecha_fin: string
       precio_por_persona: number
+      precio_hab_single?: number | null
+      precio_hab_doble?: number | null
+      precio_hab_triple?: number | null
       moneda?: Moneda | null
       cupo_total: number
       cupo_disponible: number
@@ -99,6 +114,9 @@ function createEmptyDate(moneda: Moneda): PackageDateDraft {
     fecha_inicio: "",
     fecha_fin: "",
     precio_por_persona: 0,
+    precio_hab_single: null,
+    precio_hab_doble: null,
+    precio_hab_triple: null,
     moneda,
     cupo_total: 1,
     cupo_disponible: 1,
@@ -121,6 +139,9 @@ function serializeDateDraft(date: PackageDateDraft) {
     fecha_inicio: date.fecha_inicio,
     fecha_fin: date.fecha_fin,
     precio_por_persona: date.precio_por_persona,
+    precio_hab_single: date.precio_hab_single,
+    precio_hab_doble: date.precio_hab_doble,
+    precio_hab_triple: date.precio_hab_triple,
     moneda: date.moneda,
     cupo_total: date.cupo_total,
     cupo_disponible: date.cupo_disponible,
@@ -162,10 +183,12 @@ export function PaqueteForm({
   const [includes, setIncludes] = useState({
     alojamiento: initialData?.incluye_alojamiento ?? false,
     traslado: initialData?.incluye_traslado ?? false,
-    comidas: initialData?.incluye_comidas ?? false,
     guia: initialData?.incluye_guia ?? false,
     entradas: initialData?.incluye_entradas ?? false,
   })
+  const [regimen, setRegimen] = useState<string>(
+    initialData?.regimen ?? REGIMEN_NONE,
+  )
   const [fechas, setFechas] = useState<PackageDateDraft[]>(
     (initialData?.fechas ?? []).map((date) => ({
       id: date.id,
@@ -173,6 +196,9 @@ export function PaqueteForm({
       fecha_inicio: date.fecha_inicio,
       fecha_fin: date.fecha_fin,
       precio_por_persona: date.precio_por_persona,
+      precio_hab_single: date.precio_hab_single ?? null,
+      precio_hab_doble: date.precio_hab_doble ?? null,
+      precio_hab_triple: date.precio_hab_triple ?? null,
       moneda: date.moneda ?? initialData?.moneda ?? "ARS",
       cupo_total: date.cupo_total,
       cupo_disponible: date.cupo_disponible,
@@ -230,7 +256,7 @@ export function PaqueteForm({
   function updateDate(
     clientId: string,
     field: keyof PackageDateDraft,
-    value: string | number | boolean,
+    value: string | number | boolean | null,
   ) {
     setFechas((currentDates) =>
       currentDates.map((date) =>
@@ -407,6 +433,16 @@ export function PaqueteForm({
           </div>
 
           <div className="space-y-1.5">
+            <Label htmlFor="lugar_inicio">Lugar de inicio</Label>
+            <Input
+              id="lugar_inicio"
+              name="lugar_inicio"
+              defaultValue={initialData?.lugar_inicio ?? ""}
+              placeholder="Ej: Salta capital, terminal de ómnibus"
+            />
+          </div>
+
+          <div className="space-y-1.5">
             <Label>Imagen Principal</Label>
             <FormImageUploader
               name="imagen_url"
@@ -465,44 +501,70 @@ export function PaqueteForm({
       </FormSection>
 
       <FormSection title="Incluye">
-        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
-          {[
-            { key: "alojamiento", label: "Alojamiento", field: "incluye_alojamiento" },
-            { key: "traslado", label: "Traslados", field: "incluye_traslado" },
-            { key: "comidas", label: "Comidas", field: "incluye_comidas" },
-            { key: "guia", label: "Guía", field: "incluye_guia" },
-            { key: "entradas", label: "Entradas", field: "incluye_entradas" },
-          ].map((item) => (
-            <div
-              key={item.key}
-              className="flex items-center justify-between border border-neutral-200 px-4 py-3"
-            >
-              <span className="text-sm text-neutral-700">{item.label}</span>
-              <button
-                type="button"
-                onClick={() =>
-                  setIncludes((currentValue) => ({
-                    ...currentValue,
-                    [item.key]: !currentValue[item.key as keyof typeof currentValue],
-                  }))
-                }
-                className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors cursor-pointer ${
-                  includes[item.key as keyof typeof includes] ? "bg-primary" : "bg-neutral-200"
-                }`}
+        <div className="space-y-4">
+          <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {[
+              { key: "alojamiento", label: "Alojamiento", field: "incluye_alojamiento" },
+              { key: "traslado", label: "Traslados", field: "incluye_traslado" },
+              { key: "guia", label: "Guía", field: "incluye_guia" },
+              { key: "entradas", label: "Entradas", field: "incluye_entradas" },
+            ].map((item) => (
+              <div
+                key={item.key}
+                className="flex items-center justify-between border border-neutral-200 px-4 py-3"
               >
-                <span
-                  className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
-                    includes[item.key as keyof typeof includes] ? "translate-x-5" : "translate-x-0"
+                <span className="text-sm text-neutral-700">{item.label}</span>
+                <button
+                  type="button"
+                  onClick={() =>
+                    setIncludes((currentValue) => ({
+                      ...currentValue,
+                      [item.key]: !currentValue[item.key as keyof typeof currentValue],
+                    }))
+                  }
+                  className={`relative inline-flex h-6 w-11 shrink-0 rounded-full border-2 border-transparent transition-colors cursor-pointer ${
+                    includes[item.key as keyof typeof includes] ? "bg-primary" : "bg-neutral-200"
                   }`}
+                >
+                  <span
+                    className={`inline-block h-5 w-5 transform rounded-full bg-white shadow transition-transform ${
+                      includes[item.key as keyof typeof includes] ? "translate-x-5" : "translate-x-0"
+                    }`}
+                  />
+                </button>
+                <input
+                  type="hidden"
+                  name={item.field}
+                  value={includes[item.key as keyof typeof includes] ? "true" : "false"}
                 />
-              </button>
-              <input
-                type="hidden"
-                name={item.field}
-                value={includes[item.key as keyof typeof includes] ? "true" : "false"}
-              />
-            </div>
-          ))}
+              </div>
+            ))}
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Régimen</Label>
+            <input
+              type="hidden"
+              name="regimen"
+              value={regimen === REGIMEN_NONE ? "" : regimen}
+            />
+            <Select value={regimen} onValueChange={setRegimen}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Sin régimen" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={REGIMEN_NONE}>Sin régimen</SelectItem>
+                {REGIMEN_OPTIONS.map((option) => (
+                  <SelectItem key={option.value} value={option.value}>
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-neutral-500">
+              Define qué comidas están incluidas (desayuno, media pensión, pensión completa, all inclusive).
+            </p>
+          </div>
         </div>
       </FormSection>
 
@@ -590,6 +652,44 @@ export function PaqueteForm({
                   </Select>
                 </div>
               </div>
+
+              {includes.alojamiento ? (
+                <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+                  {(
+                    [
+                      { field: "precio_hab_single", label: "Precio hab. single" },
+                      { field: "precio_hab_doble", label: "Precio hab. doble (p/persona)" },
+                      { field: "precio_hab_triple", label: "Precio hab. triple (p/persona)" },
+                    ] as const
+                  ).map((roomField) => {
+                    const value = date[roomField.field]
+                    return (
+                      <div key={roomField.field} className="space-y-1.5">
+                        <Label>{roomField.label}</Label>
+                        <div className="flex items-center gap-2">
+                          <span className="shrink-0 text-xs font-medium text-neutral-500">
+                            {date.moneda}
+                          </span>
+                          <Input
+                            type="number"
+                            min={0}
+                            value={value === null ? "" : value}
+                            placeholder="—"
+                            onChange={(event) => {
+                              const raw = event.target.value
+                              updateDate(
+                                date.clientId,
+                                roomField.field,
+                                raw === "" ? null : Number(raw),
+                              )
+                            }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })}
+                </div>
+              ) : null}
 
               <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
                 <div className="space-y-1.5">

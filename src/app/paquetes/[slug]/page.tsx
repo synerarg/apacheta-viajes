@@ -102,11 +102,17 @@ async function getPaqueteViewData(slug: string): Promise<PaqueteViewData | null>
     precio_desde: fechaPrincipal?.precio_por_persona ?? paquete.precio_desde,
     moneda: fechaPrincipal?.moneda ?? paquete.moneda ?? "ARS",
     imagen_url: paquete.imagen_url ?? galeria[0] ?? "",
+    lugar_inicio: paquete.lugar_inicio ?? null,
     incluye_alojamiento: paquete.incluye_alojamiento ?? false,
     incluye_traslado: paquete.incluye_traslado ?? false,
-    incluye_comidas: paquete.incluye_comidas ?? false,
+    regimen: paquete.regimen ?? null,
     incluye_guia: paquete.incluye_guia ?? false,
     incluye_entradas: paquete.incluye_entradas ?? false,
+    habitaciones: {
+      single: fechaPrincipal?.precio_hab_single ?? null,
+      doble: fechaPrincipal?.precio_hab_doble ?? null,
+      triple: fechaPrincipal?.precio_hab_triple ?? null,
+    },
     categoria,
     fecha_salida: fechaPrincipal
       ? formatDateRange(fechaPrincipal.fecha_inicio, fechaPrincipal.fecha_fin)
