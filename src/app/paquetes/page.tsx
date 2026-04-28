@@ -3,7 +3,7 @@ import { CatalogoPaquetes } from "@/components/paquetes/catalogo-paquetes"
 import { getPackagesCatalogData } from "@/lib/storefront/storefront.server"
 
 export const metadata: Metadata = {
-  title: "Paquetes | Apacheta Viajes",
+  title: "Paquetes nacionales | Apacheta Viajes",
   description:
     "Circuitos y paquetes turísticos por el Norte Argentino. Valles Calchaquíes, Puna, Quebrada de Humahuaca y más.",
 }

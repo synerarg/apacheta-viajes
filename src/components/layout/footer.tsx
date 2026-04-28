@@ -5,10 +5,10 @@ const footerColumns = [
   {
     title: "EXPLORAR",
     links: [
-      { label: "Paquetes NOA", href: "/paquetes" },
+      { label: "Paquetes nacionales", href: "/paquetes" },
       { label: "Experiencias", href: "/experiencias" },
       { label: "Hotelería", href: "/hoteleria" },
-      { label: "Emisivo", href: "/emisivo" },
+      { label: "Paquetes internacionales", href: "/emisivo" },
     ],
   },
   {

@@ -29,7 +29,8 @@ const navLinks = [
   { href: "/experiencias", label: "Experiencias" },
   { href: "/hoteleria", label: "Hotelería" },
   { href: "/para-agencias", label: "Para Agencias" },
-  { href: "/emisivo", label: "Emisivo" },
+  { href: "/paquetes", label: "Paquetes nacionales" },
+  { href: "/emisivo", label: "Paquetes internacionales" },
   { href: "/contacto", label: "Viaje a medida" },
 ]
 
@@ -97,7 +98,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
               variant="default"
               className="h-10 text-sm text-primary hover:text-primary bg-white hover:bg-white/90 cursor-pointer"
             >
-              <Link href="/paquetes">Explorar Paquetes</Link>
+              <Link href="/paquetes">Explorar paquetes nacionales</Link>
             </Button>
 
             <div className="flex items-center gap-1 text-white/90">
@@ -280,7 +281,7 @@ export function NavbarClient({ user }: NavbarClientProps) {
             onClick={() => setIsOpen(false)}
             className="block w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3.5 mb-2 transition-colors hover:bg-white/90 cursor-pointer"
           >
-            Explorar Paquetes
+            Explorar paquetes nacionales
           </Link>
 
           {/* Links secundarios — uno por fila */}
