@@ -40,9 +40,17 @@ export function CatalogoHoteleria({ hoteles }: CatalogoHoteleriaProps) {
             ))}
           </div>
         ) : (
-          <div className="py-20 text-center">
-            <p className="text-subtle font-sans">
-              No hay hoteles en esta categoría.
+          <div className="mt-12 border border-dark-brown/15 bg-white/40 backdrop-blur-sm px-8 py-20 text-center">
+            <span className="text-xs uppercase tracking-[0.22em] text-subtle font-sans block mb-4">
+              Próximamente
+            </span>
+            <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-normal italic text-dark-brown mb-5 leading-tight">
+              Estamos preparando una selección a tu altura
+            </h2>
+            <p className="text-base md:text-lg text-subtle font-sans max-w-xl mx-auto leading-relaxed">
+              Trabajamos junto a nuestros aliados para sumar refugios, lodges y
+              fincas del norte argentino. Volvé pronto: las primeras propiedades
+              estarán disponibles muy pronto.
             </p>
           </div>
         )}
