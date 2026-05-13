@@ -18,10 +18,10 @@ const TIPO_VIAJE_AGENCIAS = [
 ]
 
 const TIPO_VIAJE_CONTACTO = [
-  { value: "paquete-noa", label: "Paquete NOA" },
+  { value: "paquete-noa", label: "Paquete nacional" },
   { value: "experiencia", label: "Experiencia" },
   { value: "hoteleria", label: "Hotelería" },
-  { value: "emisivo", label: "Emisivo" },
+  { value: "emisivo", label: "Paquete internacional" },
 ]
 
 // ─── Configuración por fuente ─────────────────────────────────────────────────

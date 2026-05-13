@@ -6,6 +6,9 @@ export interface PaquetesFechasRow {
   fecha_inicio: string
   fecha_fin: string
   precio_por_persona: number
+  precio_hab_single: number | null
+  precio_hab_doble: number | null
+  precio_hab_triple: number | null
   moneda: Moneda | null
   cupo_total: number
   cupo_disponible: number
@@ -20,6 +23,9 @@ export interface PaquetesFechasInsert {
   fecha_inicio: string
   fecha_fin: string
   precio_por_persona: number
+  precio_hab_single?: number | null
+  precio_hab_doble?: number | null
+  precio_hab_triple?: number | null
   moneda?: Moneda | null
   cupo_total: number
   cupo_disponible: number
@@ -34,6 +40,9 @@ export interface PaquetesFechasUpdate {
   fecha_inicio?: string
   fecha_fin?: string
   precio_por_persona?: number
+  precio_hab_single?: number | null
+  precio_hab_doble?: number | null
+  precio_hab_triple?: number | null
   moneda?: Moneda | null
   cupo_total?: number
   cupo_disponible?: number

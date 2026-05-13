@@ -1,9 +1,15 @@
 import Image from "next/image"
-import { BedDouble, Car, Utensils, User, Ticket, MapPin } from "lucide-react"
+import { BedDouble, Car, UtensilsCrossed, User, Ticket, MapPin } from "lucide-react"
 import { ImageGallery } from "@/components/product/image-gallery"
 import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
 import { UbicacionMap } from "@/components/product/ubicacion-map"
-import type { Moneda } from "@/types/shared/enums"
+import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+
+export interface PaqueteRoomPricing {
+  single: number | null
+  doble: number | null
+  triple: number | null
+}
 
 export interface PaqueteViewData {
   id: string
@@ -13,11 +19,13 @@ export interface PaqueteViewData {
   precio_desde: number
   moneda: Moneda
   imagen_url: string
+  lugar_inicio: string | null
   incluye_alojamiento: boolean
   incluye_traslado: boolean
-  incluye_comidas: boolean
+  regimen: RegimenAlimentario | null
   incluye_guia: boolean
   incluye_entradas: boolean
+  habitaciones: PaqueteRoomPricing
   categoria: string
   fecha_salida?: string
   itinerario: Array<{
@@ -36,36 +44,63 @@ interface PaqueteViewProps {
   paquete: PaqueteViewData
 }
 
-const incluyeItems = (paquete: PaqueteViewData) => [
-  {
-    icon: <BedDouble className="w-5 h-5 text-primary" />,
-    label: "Alojamiento",
-    incluye: paquete.incluye_alojamiento,
-  },
-  {
-    icon: <Car className="w-5 h-5 text-primary" />,
-    label: "Traslados",
-    incluye: paquete.incluye_traslado,
-  },
-  {
-    icon: <Utensils className="w-5 h-5 text-primary" />,
-    label: "Comidas",
-    incluye: paquete.incluye_comidas,
-  },
-  {
-    icon: <User className="w-5 h-5 text-primary" />,
-    label: "Guía",
-    incluye: paquete.incluye_guia,
-  },
-  {
-    icon: <Ticket className="w-5 h-5 text-primary" />,
-    label: "Entradas",
-    incluye: paquete.incluye_entradas,
-  },
-]
+const REGIMEN_LABEL: Record<RegimenAlimentario, string> = {
+  desayuno: "Desayuno",
+  media_pension: "Media pensión",
+  pension_completa: "Pensión completa",
+  all_inclusive: "All inclusive",
+}
+
+const incluyeItems = (paquete: PaqueteViewData) => {
+  const items: Array<{ icon: React.ReactNode; label: string; incluye: boolean }> = [
+    {
+      icon: <BedDouble className="w-5 h-5 text-primary" />,
+      label: "Alojamiento",
+      incluye: paquete.incluye_alojamiento,
+    },
+    {
+      icon: <Car className="w-5 h-5 text-primary" />,
+      label: "Traslados",
+      incluye: paquete.incluye_traslado,
+    },
+    {
+      icon: <UtensilsCrossed className="w-5 h-5 text-primary" />,
+      label: paquete.regimen ? REGIMEN_LABEL[paquete.regimen] : "Régimen",
+      incluye: paquete.regimen !== null,
+    },
+    {
+      icon: <User className="w-5 h-5 text-primary" />,
+      label: "Guía",
+      incluye: paquete.incluye_guia,
+    },
+    {
+      icon: <Ticket className="w-5 h-5 text-primary" />,
+      label: "Entradas",
+      incluye: paquete.incluye_entradas,
+    },
+  ]
+  return items
+}
+
+function formatRoomPrice(price: number | null, moneda: Moneda) {
+  if (price === null) return null
+  return new Intl.NumberFormat("es-AR", {
+    style: "currency",
+    currency: moneda,
+    maximumFractionDigits: 0,
+  }).format(price)
+}
 
 export function PaqueteView({ paquete }: PaqueteViewProps) {
   const duracion = `${paquete.duracion_dias} ${paquete.duracion_dias === 1 ? "día" : "días"}`
+
+  const roomPricingRows: Array<{ label: string; price: number | null }> = paquete.incluye_alojamiento
+    ? [
+        { label: "Habitación single", price: paquete.habitaciones.single },
+        { label: "Habitación doble (p/persona)", price: paquete.habitaciones.doble },
+        { label: "Habitación triple (p/persona)", price: paquete.habitaciones.triple },
+      ].filter((row) => row.price !== null)
+    : []
 
   return (
     <main className="min-h-screen bg-off-white">
@@ -102,6 +137,19 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
         <div className="flex flex-col lg:flex-row gap-10 lg:gap-16">
           {/* Left Column */}
           <div className="flex-1 min-w-0">
+            {/* Datos clave */}
+            {paquete.lugar_inicio ? (
+              <section className="mb-10 flex flex-wrap items-center gap-x-6 gap-y-3 border-y border-primary/15 py-4">
+                <div className="flex items-center gap-2">
+                  <MapPin className="w-4 h-4 text-primary" />
+                  <span className="font-sans text-sm text-dark-brown">
+                    <span className="font-medium">Salida desde: </span>
+                    {paquete.lugar_inicio}
+                  </span>
+                </div>
+              </section>
+            ) : null}
+
             {/* Itinerario */}
             <section className="mb-14">
               <h2 className="font-serif text-3xl md:text-4xl font-medium text-dark-brown mb-8">
@@ -152,6 +200,34 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
                   ))}
               </div>
             </section>
+
+            {/* Precios por habitación */}
+            {roomPricingRows.length > 0 ? (
+              <section className="mb-14">
+                <h2 className="font-serif text-3xl md:text-4xl font-medium text-dark-brown mb-8">
+                  Precios por habitación
+                </h2>
+                <div className="border border-primary/15 bg-primary/5">
+                  {roomPricingRows.map((row, index) => (
+                    <div
+                      key={row.label}
+                      className={`flex items-center justify-between px-5 py-4 ${
+                        index !== roomPricingRows.length - 1
+                          ? "border-b border-primary/15"
+                          : ""
+                      }`}
+                    >
+                      <span className="font-sans text-sm text-dark-brown">
+                        {row.label}
+                      </span>
+                      <span className="font-sans text-base font-semibold text-primary">
+                        {formatRoomPrice(row.price, paquete.moneda)}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
 
             {/* Galería */}
             <section className="mb-14">

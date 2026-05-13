@@ -15,6 +15,7 @@ export interface ExperienciaViewData {
   moneda: Moneda
   imagen_url: string
   ubicacion: string
+  origen: string | null
   latitud: number
   longitud: number
   categoria: string
@@ -48,11 +49,23 @@ export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
           <h1 className="font-serif text-4xl md:text-[64px] font-normal italic text-dark-brown leading-none mb-4">
             {experiencia.nombre}
           </h1>
-          <div className="flex items-center gap-2">
-            <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-            <span className="font-sans text-base md:text-xl text-subtle">
-              {experiencia.ubicacion}
-            </span>
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
+            <div className="flex items-center gap-2">
+              <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+              <span className="font-sans text-base md:text-xl text-subtle">
+                {experiencia.ubicacion}
+              </span>
+            </div>
+            {experiencia.origen ? (
+              <div className="flex items-center gap-2">
+                <span className="text-xs uppercase tracking-[0.18em] text-primary font-sans">
+                  Origen
+                </span>
+                <span className="font-sans text-sm md:text-base text-dark-brown">
+                  {experiencia.origen}
+                </span>
+              </div>
+            ) : null}
           </div>
         </div>
 

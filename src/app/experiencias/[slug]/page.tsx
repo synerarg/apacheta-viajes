@@ -70,6 +70,7 @@ async function getExperienciaViewData(
     ubicacion:
       experiencia.ubicacion ??
       [destino?.nombre, destino?.provincia].filter(Boolean).join(", "),
+    origen: experiencia.origen ?? null,
     latitud: Number(experiencia.latitud ?? destino?.latitud ?? -24.7859),
     longitud: Number(experiencia.longitud ?? destino?.longitud ?? -65.4117),
     categoria: categoria?.nombre ?? "Experiencia",

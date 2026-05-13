@@ -15,10 +15,10 @@ export function PackagesSection({ packages }: PackagesSectionProps) {
         {/* Header */}
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-medium uppercase tracking-widest text-muted-foreground">
-            Paquetes NOA
+            Paquetes nacionales
           </p>
           <h2 className="font-serif text-3xl italic text-foreground md:text-4xl lg:text-5xl">
-            Paquetes Destacados
+            Paquetes nacionales destacados
           </h2>
         </div>
 
@@ -68,7 +68,7 @@ export function PackagesSection({ packages }: PackagesSectionProps) {
             size="lg"
             className="text-base h-12 px-4 hover:bg-primary/90 cursor-pointer"
           >
-            <Link href="/paquetes">Ver Todos Los Paquetes</Link>
+            <Link href="/paquetes">Ver todos los paquetes nacionales</Link>
           </Button>
         </div>
       </div>

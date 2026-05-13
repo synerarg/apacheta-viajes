@@ -46,7 +46,7 @@ export function HeroSection() {
               size="lg"
               className="bg-primary hover:bg-primary/90 hover:text-white border-primary text-white px-8 py-6 text-base"
             >
-              Explorar Paquetes
+              Explorar paquetes nacionales
             </Button>
           </Link>
           <Link href="/#contacto">

@@ -1,4 +1,4 @@
-import type { Moneda } from "@/types/shared/enums"
+import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
 
 export interface PaquetesRow {
   id: string
@@ -11,9 +11,11 @@ export interface PaquetesRow {
   moneda: Moneda | null
   imagen_url: string | null
   destino_id: string | null
+  lugar_inicio: string | null
   incluye_alojamiento: boolean | null
   incluye_traslado: boolean | null
   incluye_comidas: boolean | null
+  regimen: RegimenAlimentario | null
   incluye_guia: boolean | null
   incluye_entradas: boolean | null
   destacado: boolean | null
@@ -34,9 +36,11 @@ export interface PaquetesInsert {
   moneda?: Moneda | null
   imagen_url?: string | null
   destino_id?: string | null
+  lugar_inicio?: string | null
   incluye_alojamiento?: boolean | null
   incluye_traslado?: boolean | null
   incluye_comidas?: boolean | null
+  regimen?: RegimenAlimentario | null
   incluye_guia?: boolean | null
   incluye_entradas?: boolean | null
   destacado?: boolean | null
@@ -57,9 +61,11 @@ export interface PaquetesUpdate {
   moneda?: Moneda | null
   imagen_url?: string | null
   destino_id?: string | null
+  lugar_inicio?: string | null
   incluye_alojamiento?: boolean | null
   incluye_traslado?: boolean | null
   incluye_comidas?: boolean | null
+  regimen?: RegimenAlimentario | null
   incluye_guia?: boolean | null
   incluye_entradas?: boolean | null
   destacado?: boolean | null

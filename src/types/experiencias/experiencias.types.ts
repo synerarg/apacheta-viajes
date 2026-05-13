@@ -11,6 +11,7 @@ export interface ExperienciasRow {
   moneda: Moneda | null
   imagen_url: string | null
   ubicacion: string | null
+  origen: string | null
   latitud: number | null
   longitud: number | null
   destino_id: string | null
@@ -33,6 +34,7 @@ export interface ExperienciasInsert {
   moneda?: Moneda | null
   imagen_url?: string | null
   ubicacion?: string | null
+  origen?: string | null
   latitud?: number | null
   longitud?: number | null
   destino_id?: string | null
@@ -55,6 +57,7 @@ export interface ExperienciasUpdate {
   moneda?: Moneda | null
   imagen_url?: string | null
   ubicacion?: string | null
+  origen?: string | null
   latitud?: number | null
   longitud?: number | null
   destino_id?: string | null

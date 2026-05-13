@@ -42,10 +42,10 @@ export function PartnersSection({ destinations }: PartnersSectionProps) {
           </div>
         </div>
 
-        {/* Emisivo - Viajes al Exterior */}
+        {/* Paquetes internacionales */}
         <div className="text-center mb-12">
           <span className="text-xs font-medium tracking-[0.2em] uppercase text-neutral-400 mb-4 block">
-            Emisivo - Viajes al Exterior
+            Paquetes internacionales
           </span>
           <h2 className="font-serif italic text-3xl md:text-4xl lg:text-5xl text-white mb-6 text-balance">
             Descubrí el mundo con Apacheta
@@ -83,7 +83,7 @@ export function PartnersSection({ destinations }: PartnersSectionProps) {
             href="/emisivo"
             className="inline-flex items-center justify-center bg-[#8B1A1A] hover:bg-[#7a1616] text-white text-base h-12 px-8 transition-colors cursor-pointer"
           >
-            Consultar Viajes al Exterior
+            Consultar paquetes internacionales
           </Link>
         </div>
       </div>

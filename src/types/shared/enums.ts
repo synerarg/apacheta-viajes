@@ -38,6 +38,12 @@ export type ReservaEstado =
 
 export type SolicitudEstado = "nuevo" | "en_proceso" | "respondido" | "cerrado"
 
+export type RegimenAlimentario =
+  | "desayuno"
+  | "media_pension"
+  | "pension_completa"
+  | "all_inclusive"
+
 export type Moneda =
   | "ARS"
   | "USD"

@@ -38,10 +38,10 @@ export function CatalogoPaquetes({
         {/* Header */}
         <div className="mb-12">
           <span className="text-xs uppercase tracking-[0.22em] text-subtle font-sans block mb-4">
-            Paquetes NOA
+            Paquetes nacionales
           </span>
           <h1 className="font-serif text-3xl sm:text-4xl md:text-5xl lg:text-[64px] font-normal italic text-dark-brown mb-5 leading-none">
-            Paquetes Destacados
+            Paquetes nacionales destacados
           </h1>
           <p className="text-base md:text-xl text-subtle font-sans max-w-2xl leading-relaxed">
             Circuitos cuidadosamente diseñados para mostrar lo mejor del Norte
