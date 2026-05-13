@@ -39,6 +39,7 @@ export interface HyperGuestConfig {
   acceptEncoding: string | null
   defaultCurrency: string
   defaultNationality: string
+  publishCertProperty: boolean
 }
 
 export function getHyperGuestConfig(): HyperGuestConfig {
@@ -80,6 +81,12 @@ export function getHyperGuestConfig(): HyperGuestConfig {
       getEnvironmentVariable("HYPERGUEST_DEFAULT_CURRENCY") ?? "ARS",
     defaultNationality:
       getEnvironmentVariable("HYPERGUEST_DEFAULT_NATIONALITY") ?? "AR",
+    // Set HYPERGUEST_PUBLISH_CERT_PROPERTY=true to publish the certification
+    // property (19912) even in production. Useful while HG hasn't issued the
+    // LIVE token; flip back to false once real properties are onboarded.
+    publishCertProperty:
+      getEnvironmentVariable("HYPERGUEST_PUBLISH_CERT_PROPERTY")
+        ?.toLowerCase() === "true",
   }
 }
 
