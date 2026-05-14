@@ -1,10 +1,11 @@
 "use client"
 
-import { useState, useTransition } from "react"
+import { useEffect, useRef, useState, useTransition } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
+  CaretDownIcon,
   ShoppingCartIcon,
   SquaresFourIcon,
   UserIcon,
@@ -24,14 +25,31 @@ import type { AuthenticatedNavbarUser } from "@/types/auth/auth.types"
 
 const supabase = createClient()
 
-const navLinks = [
-  { href: "/", label: "Inicio" },
-  { href: "/experiencias", label: "Experiencias" },
-  { href: "/hoteleria", label: "Hotelería" },
-  { href: "/para-agencias", label: "Para Agencias" },
-  { href: "/paquetes", label: "Paquetes nacionales" },
-  { href: "/emisivo", label: "Paquetes internacionales" },
-  { href: "/contacto", label: "Viaje a medida" },
+type NavItem =
+  | { kind: "link"; href: string; label: string }
+  | { kind: "group"; label: string; items: { href: string; label: string }[] }
+
+const navItems: NavItem[] = [
+  { kind: "link", href: "/", label: "Inicio" },
+  {
+    kind: "group",
+    label: "Paquetes",
+    items: [
+      { href: "/paquetes", label: "Nacionales" },
+      { href: "/emisivo", label: "Internacionales" },
+      { href: "/contacto", label: "Viaje a medida" },
+    ],
+  },
+  {
+    kind: "group",
+    label: "Servicios",
+    items: [
+      { href: "/experiencias", label: "Experiencias" },
+      { href: "/hoteleria", label: "Hotelería" },
+      { href: "/traslados", label: "Traslados" },
+    ],
+  },
+  { kind: "link", href: "/para-agencias", label: "Para Agencias" },
 ]
 
 interface NavbarClientProps {
@@ -44,15 +62,148 @@ function resolveDisplayName(user: AuthenticatedNavbarUser | null) {
   return fullName || user.email || "Mi cuenta"
 }
 
+interface DesktopDropdownProps {
+  label: string
+  items: { href: string; label: string }[]
+}
+
+function DesktopDropdown({ label, items }: DesktopDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  function openImmediate() {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+    setIsOpen(true)
+  }
+
+  function closeWithDelay() {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => setIsOpen(false), 120)
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [isOpen])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative"
+      onMouseEnter={openImmediate}
+      onMouseLeave={closeWithDelay}
+    >
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex items-center gap-1 whitespace-nowrap text-[13px] text-white/90 transition-colors hover:text-white cursor-pointer"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+      >
+        <span>{label}</span>
+        <CaretDownIcon
+          className={`h-3 w-3 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+          weight="bold"
+        />
+      </button>
+
+      <div
+        className={`absolute left-1/2 top-full -translate-x-1/2 pt-3 transition-opacity duration-150 ${
+          isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        role="menu"
+      >
+        <div className="min-w-[200px] bg-primary border border-white/15 shadow-lg py-1.5">
+          {items.map((item) => (
+            <Link
+              key={item.href}
+              href={item.href}
+              onClick={() => setIsOpen(false)}
+              className="block px-4 py-2.5 text-[13px] text-white/90 transition-colors hover:bg-white/10 hover:text-white"
+              role="menuitem"
+            >
+              {item.label}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+interface MobileDropdownProps {
+  label: string
+  items: { href: string; label: string }[]
+  onItemClick: () => void
+}
+
+function MobileDropdown({ label, items, onItemClick }: MobileDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false)
+
+  return (
+    <div className="border-b border-white/10 last:border-0">
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex w-full items-center justify-between py-3.5 text-base text-white/85 transition-colors hover:text-white cursor-pointer"
+        aria-expanded={isOpen}
+      >
+        <span>{label}</span>
+        <CaretDownIcon
+          className={`h-4 w-4 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+          weight="bold"
+        />
+      </button>
+      <div
+        className={`grid transition-all duration-200 ${
+          isOpen ? "grid-rows-[1fr] opacity-100" : "grid-rows-[0fr] opacity-0"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <ul className="flex flex-col pl-3 pb-2">
+            {items.map((item) => (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  onClick={onItemClick}
+                  className="block py-2.5 text-sm text-white/75 transition-colors hover:text-white"
+                >
+                  {item.label}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export function NavbarClient({ user }: NavbarClientProps) {
   const [isOpen, setIsOpen] = useState(false)
   const [isSigningOut, startSigningOut] = useTransition()
   const { totalItems } = useCart()
   const router = useRouter()
   const displayName = resolveDisplayName(user)
-  const resolvedNavLinks = user
-    ? [...navLinks]
-    : navLinks
 
   function handleSignOut() {
     startSigningOut(async () => {
@@ -60,6 +211,10 @@ export function NavbarClient({ user }: NavbarClientProps) {
       router.replace("/")
       router.refresh()
     })
+  }
+
+  function closeMobile() {
+    setIsOpen(false)
   }
 
   return (
@@ -80,15 +235,23 @@ export function NavbarClient({ user }: NavbarClientProps) {
 
           {/* Desktop — nav links */}
           <div className="hidden items-center gap-6 lg:flex xl:gap-8">
-            {resolvedNavLinks.map((link) => (
-              <Link
-                key={link.label}
-                href={link.href}
-                className="whitespace-nowrap text-[13px] text-white/90 transition-colors hover:text-white"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {navItems.map((item) =>
+              item.kind === "link" ? (
+                <Link
+                  key={item.label}
+                  href={item.href}
+                  className="whitespace-nowrap text-[13px] text-white/90 transition-colors hover:text-white"
+                >
+                  {item.label}
+                </Link>
+              ) : (
+                <DesktopDropdown
+                  key={item.label}
+                  label={item.label}
+                  items={item.items}
+                />
+              ),
+            )}
           </div>
 
           {/* Desktop — actions */}
@@ -258,17 +421,25 @@ export function NavbarClient({ user }: NavbarClientProps) {
         </div>
 
         {/* Links */}
-        <nav className="flex-1 overflow-y-auto px-6 py-4">
+        <nav className="flex-1 overflow-y-auto px-6 py-2">
           <ul className="flex flex-col">
-            {resolvedNavLinks.map((link) => (
-              <li key={link.label}>
-                <Link
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  className="flex items-center py-3.5 text-base text-white/85 border-b border-white/10 transition-colors hover:text-white last:border-0"
-                >
-                  {link.label}
-                </Link>
+            {navItems.map((item) => (
+              <li key={item.label}>
+                {item.kind === "link" ? (
+                  <Link
+                    href={item.href}
+                    onClick={closeMobile}
+                    className="flex items-center py-3.5 text-base text-white/85 border-b border-white/10 transition-colors hover:text-white last:border-0"
+                  >
+                    {item.label}
+                  </Link>
+                ) : (
+                  <MobileDropdown
+                    label={item.label}
+                    items={item.items}
+                    onItemClick={closeMobile}
+                  />
+                )}
               </li>
             ))}
           </ul>
