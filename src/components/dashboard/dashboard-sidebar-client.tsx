@@ -9,6 +9,7 @@ import {
   SquaresFour,
   Suitcase,
   Star,
+  Van,
   Globe,
   SignOut,
   List,
@@ -31,6 +32,12 @@ const navItems = [
     href: "/dashboard/experiencias",
     label: "Experiencias",
     icon: Star,
+    exact: false,
+  },
+  {
+    href: "/dashboard/traslados",
+    label: "Traslados",
+    icon: Van,
     exact: false,
   },
 ]

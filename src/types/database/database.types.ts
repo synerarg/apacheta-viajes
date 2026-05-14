@@ -122,6 +122,21 @@ import type {
   SolicitudesContactoUpdate,
 } from "@/types/solicitudes-contacto/solicitudes-contacto.types"
 import type {
+  TrasladosInsert,
+  TrasladosRow,
+  TrasladosUpdate,
+} from "@/types/traslados/traslados.types"
+import type {
+  TrasladosImagenesInsert,
+  TrasladosImagenesRow,
+  TrasladosImagenesUpdate,
+} from "@/types/traslados-imagenes/traslados-imagenes.types"
+import type {
+  TrasladosTarifasInsert,
+  TrasladosTarifasRow,
+  TrasladosTarifasUpdate,
+} from "@/types/traslados-tarifas/traslados-tarifas.types"
+import type {
   UsuariosInsert,
   UsuariosRow,
   UsuariosUpdate,
@@ -489,6 +504,48 @@ export interface Database {
         Insert: SolicitudesContactoInsert
         Update: SolicitudesContactoUpdate
         Relationships: []
+      }
+      traslados: {
+        Row: TrasladosRow
+        Insert: TrasladosInsert
+        Update: TrasladosUpdate
+        Relationships: [
+          {
+            foreignKeyName: "traslados_destino_id_fkey"
+            columns: ["destino_id"]
+            isOneToOne: false
+            referencedRelation: "destinos"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traslados_imagenes: {
+        Row: TrasladosImagenesRow
+        Insert: TrasladosImagenesInsert
+        Update: TrasladosImagenesUpdate
+        Relationships: [
+          {
+            foreignKeyName: "traslados_imagenes_traslado_id_fkey"
+            columns: ["traslado_id"]
+            isOneToOne: false
+            referencedRelation: "traslados"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      traslados_tarifas: {
+        Row: TrasladosTarifasRow
+        Insert: TrasladosTarifasInsert
+        Update: TrasladosTarifasUpdate
+        Relationships: [
+          {
+            foreignKeyName: "traslados_tarifas_traslado_id_fkey"
+            columns: ["traslado_id"]
+            isOneToOne: false
+            referencedRelation: "traslados"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       usuarios: {
         Row: UsuariosRow
