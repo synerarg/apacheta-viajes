@@ -19,18 +19,6 @@ export interface ActionState {
   fieldErrors?: Record<string, string>
 }
 
-export interface TarifaFormItem {
-  id?: string
-  vigencia_label: string | null
-  vigencia_desde: string | null
-  vigencia_hasta: string | null
-  precio_adulto: number | null
-  precio_nino: number | null
-  moneda: Moneda
-  comision_pct: number | null
-  notas: string | null
-}
-
 const TIPO_SERVICIO_VALUES: TrasladoTipoServicio[] = ["regular", "privado"]
 const MODALIDAD_VALUES: TrasladoModalidad[] = [
   "ida",
@@ -161,33 +149,6 @@ async function syncGallery(trasladoId: string, gallery: string[]) {
   )
 }
 
-async function syncTarifas(
-  trasladoId: string,
-  tarifas: TarifaFormItem[],
-) {
-  await adminClient
-    .from("traslados_tarifas")
-    .delete()
-    .eq("traslado_id", trasladoId)
-
-  if (tarifas.length === 0) return
-
-  await adminClient.from("traslados_tarifas").insert(
-    tarifas.map((tarifa, index) => ({
-      traslado_id: trasladoId,
-      vigencia_label: tarifa.vigencia_label,
-      vigencia_desde: tarifa.vigencia_desde,
-      vigencia_hasta: tarifa.vigencia_hasta,
-      precio_adulto: tarifa.precio_adulto,
-      precio_nino: tarifa.precio_nino,
-      moneda: tarifa.moneda,
-      comision_pct: tarifa.comision_pct,
-      notas: tarifa.notas,
-      orden: index,
-    })),
-  )
-}
-
 function buildTrasladoPayload(formData: FormData) {
   return {
     nombre: parseNullableString(formData.get("nombre")),
@@ -217,7 +178,6 @@ function buildTrasladoPayload(formData: FormData) {
     gallery: parseJsonField<string[]>(formData.get("gallery"), []).filter(
       Boolean,
     ),
-    tarifas: parseJsonField<TarifaFormItem[]>(formData.get("tarifas"), []),
   }
 }
 
@@ -278,7 +238,6 @@ export async function createTraslado(
     }
 
     await syncGallery(traslado.id, input.gallery)
-    await syncTarifas(traslado.id, input.tarifas)
 
     revalidatePath("/dashboard/traslados")
     revalidatePath("/traslados")
@@ -351,7 +310,6 @@ export async function updateTraslado(
     }
 
     await syncGallery(id, input.gallery)
-    await syncTarifas(id, input.tarifas)
 
     revalidatePath("/dashboard/traslados")
     revalidatePath(`/dashboard/traslados/${id}/editar`)

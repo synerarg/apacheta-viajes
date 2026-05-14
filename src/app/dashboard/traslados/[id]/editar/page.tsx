@@ -5,32 +5,21 @@ import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 import {
   deleteTraslado,
   updateTraslado,
-  type TarifaFormItem,
 } from "@/app/dashboard/traslados/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
 import { TrasladoForm } from "@/components/dashboard/traslado-form"
 import { adminClient } from "@/lib/supabase/admin-client"
-import type { Moneda } from "@/types/shared/enums"
 
 interface EditarTrasladoPageProps {
   params: Promise<{ id: string }>
 }
 
 async function getTrasladoData(id: string) {
-  const [
-    { data: traslado },
-    { data: imagenes },
-    { data: tarifas },
-  ] = await Promise.all([
+  const [{ data: traslado }, { data: imagenes }] = await Promise.all([
     adminClient.from("traslados").select("*").eq("id", id).single(),
     adminClient
       .from("traslados_imagenes")
       .select("url")
-      .eq("traslado_id", id)
-      .order("orden"),
-    adminClient
-      .from("traslados_tarifas")
-      .select("*")
       .eq("traslado_id", id)
       .order("orden"),
   ])
@@ -38,17 +27,6 @@ async function getTrasladoData(id: string) {
   return {
     traslado,
     gallery: imagenes?.map((image) => image.url) ?? [],
-    tarifas: (tarifas ?? []) as Array<{
-      id: string
-      vigencia_label: string | null
-      vigencia_desde: string | null
-      vigencia_hasta: string | null
-      precio_adulto: number | null
-      precio_nino: number | null
-      moneda: Moneda | null
-      comision_pct: number | null
-      notas: string | null
-    }>,
   }
 }
 
@@ -66,7 +44,7 @@ export default async function EditarTrasladoPage({
   params,
 }: EditarTrasladoPageProps) {
   const { id } = await params
-  const [{ traslado, gallery, tarifas }, destinos] = await Promise.all([
+  const [{ traslado, gallery }, destinos] = await Promise.all([
     getTrasladoData(id),
     getDestinos(),
   ])
@@ -75,18 +53,6 @@ export default async function EditarTrasladoPage({
 
   const updateAction = updateTraslado.bind(null, id)
   const deleteAction = deleteTraslado.bind(null, id)
-
-  const tarifasIniciales: TarifaFormItem[] = tarifas.map((tarifa) => ({
-    id: tarifa.id,
-    vigencia_label: tarifa.vigencia_label,
-    vigencia_desde: tarifa.vigencia_desde,
-    vigencia_hasta: tarifa.vigencia_hasta,
-    precio_adulto: tarifa.precio_adulto,
-    precio_nino: tarifa.precio_nino,
-    moneda: (tarifa.moneda ?? "ARS") as Moneda,
-    comision_pct: tarifa.comision_pct,
-    notas: tarifa.notas,
-  }))
 
   return (
     <div className="min-h-full bg-neutral-50 pb-16">
@@ -140,7 +106,6 @@ export default async function EditarTrasladoPage({
             gallery,
           }}
           destinos={destinos}
-          tarifasIniciales={tarifasIniciales}
           isEdit
         />
       </div>

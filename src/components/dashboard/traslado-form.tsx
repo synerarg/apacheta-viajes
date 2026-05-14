@@ -1,13 +1,10 @@
 "use client"
 
-import { useActionState, useEffect, useMemo, useRef, useState } from "react"
-import { FloppyDisk, Plus, Trash } from "@phosphor-icons/react"
+import { useActionState, useEffect, useRef, useState } from "react"
+import { FloppyDisk } from "@phosphor-icons/react"
 import { toast } from "sonner"
 
-import type {
-  ActionState,
-  TarifaFormItem,
-} from "@/app/dashboard/traslados/actions"
+import type { ActionState } from "@/app/dashboard/traslados/actions"
 import { FormGalleryUploader } from "@/components/dashboard/form-gallery-uploader"
 import { FormImageUploader } from "@/components/dashboard/form-image-uploader"
 import { FormSection } from "@/components/dashboard/form-section"
@@ -56,7 +53,6 @@ interface TrasladoFormProps {
     gallery?: string[]
   }
   destinos: DestinosRow[]
-  tarifasIniciales?: TarifaFormItem[]
   isEdit?: boolean
 }
 
@@ -101,24 +97,10 @@ const SUGERENCIAS_LUGARES = [
   "Cafayate",
 ]
 
-function emptyTarifa(): TarifaFormItem {
-  return {
-    vigencia_label: "",
-    vigencia_desde: null,
-    vigencia_hasta: null,
-    precio_adulto: null,
-    precio_nino: null,
-    moneda: "ARS",
-    comision_pct: null,
-    notas: null,
-  }
-}
-
 export function TrasladoForm({
   action,
   initialData,
   destinos,
-  tarifasIniciales = [],
   isEdit = false,
 }: TrasladoFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState)
@@ -150,7 +132,6 @@ export function TrasladoForm({
     initialData?.incluye_iva ?? false,
   )
 
-  const [tarifas, setTarifas] = useState<TarifaFormItem[]>(tarifasIniciales)
   const hasSubmitted = useRef(false)
 
   useEffect(() => {
@@ -165,22 +146,6 @@ export function TrasladoForm({
       toast.error(state.error)
     }
   }, [state, isPending, isEdit])
-
-  const tarifasJson = useMemo(() => JSON.stringify(tarifas), [tarifas])
-
-  function updateTarifa(index: number, patch: Partial<TarifaFormItem>) {
-    setTarifas((current) =>
-      current.map((item, idx) => (idx === index ? { ...item, ...patch } : item)),
-    )
-  }
-
-  function removeTarifa(index: number) {
-    setTarifas((current) => current.filter((_, idx) => idx !== index))
-  }
-
-  function addTarifa() {
-    setTarifas((current) => [...current, emptyTarifa()])
-  }
 
   return (
     <form action={formAction} className="space-y-4">
@@ -595,178 +560,6 @@ export function TrasladoForm({
             </Select>
           </div>
         </div>
-      </FormSection>
-
-      <FormSection
-        title="Tarifas por vigencia (temporada)"
-        right={
-          <button
-            type="button"
-            onClick={addTarifa}
-            className="inline-flex cursor-pointer items-center gap-1.5 bg-primary px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-primary/90"
-          >
-            <Plus className="h-3.5 w-3.5" />
-            Agregar tarifa
-          </button>
-        }
-      >
-        <input type="hidden" name="tarifas" value={tarifasJson} />
-
-        {tarifas.length === 0 ? (
-          <p className="py-6 text-center text-sm text-neutral-500">
-            No hay tarifas cargadas. Agregá una temporada con su vigencia y
-            precios.
-          </p>
-        ) : (
-          <div className="space-y-4">
-            {tarifas.map((tarifa, index) => (
-              <div
-                key={index}
-                className="space-y-3 border border-neutral-200 bg-neutral-50 p-3 sm:p-4"
-              >
-                <div className="flex items-center justify-between gap-2">
-                  <span className="text-xs font-semibold text-neutral-600">
-                    Tarifa #{index + 1}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeTarifa(index)}
-                    className="inline-flex cursor-pointer items-center gap-1 text-xs text-red-600 transition-colors hover:text-red-700"
-                  >
-                    <Trash className="h-3.5 w-3.5" />
-                    Eliminar
-                  </button>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-3">
-                  <div className="space-y-1.5 md:col-span-1">
-                    <Label>Etiqueta de vigencia</Label>
-                    <Input
-                      value={tarifa.vigencia_label ?? ""}
-                      onChange={(event) =>
-                        updateTarifa(index, {
-                          vigencia_label: event.target.value || null,
-                        })
-                      }
-                      placeholder="Ej: Oct 2025 - Mar 2026"
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Desde</Label>
-                    <Input
-                      type="date"
-                      value={tarifa.vigencia_desde ?? ""}
-                      onChange={(event) =>
-                        updateTarifa(index, {
-                          vigencia_desde: event.target.value || null,
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Hasta</Label>
-                    <Input
-                      type="date"
-                      value={tarifa.vigencia_hasta ?? ""}
-                      onChange={(event) =>
-                        updateTarifa(index, {
-                          vigencia_hasta: event.target.value || null,
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-1 gap-3 md:grid-cols-4">
-                  <div className="space-y-1.5">
-                    <Label>Precio adulto</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      value={tarifa.precio_adulto ?? ""}
-                      onChange={(event) =>
-                        updateTarifa(index, {
-                          precio_adulto:
-                            event.target.value === ""
-                              ? null
-                              : Number(event.target.value),
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Precio niño</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      value={tarifa.precio_nino ?? ""}
-                      onChange={(event) =>
-                        updateTarifa(index, {
-                          precio_nino:
-                            event.target.value === ""
-                              ? null
-                              : Number(event.target.value),
-                        })
-                      }
-                    />
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Moneda</Label>
-                    <Select
-                      value={tarifa.moneda}
-                      onValueChange={(value) =>
-                        updateTarifa(index, { moneda: value as Moneda })
-                      }
-                    >
-                      <SelectTrigger className="w-full">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {MONEDAS.map((currency) => (
-                          <SelectItem key={currency} value={currency}>
-                            {currency}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div className="space-y-1.5">
-                    <Label>Comisión (%)</Label>
-                    <Input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      value={tarifa.comision_pct ?? ""}
-                      onChange={(event) =>
-                        updateTarifa(index, {
-                          comision_pct:
-                            event.target.value === ""
-                              ? null
-                              : Number(event.target.value),
-                        })
-                      }
-                    />
-                  </div>
-                </div>
-
-                <div className="space-y-1.5">
-                  <Label>Notas</Label>
-                  <Textarea
-                    rows={2}
-                    value={tarifa.notas ?? ""}
-                    onChange={(event) =>
-                      updateTarifa(index, {
-                        notas: event.target.value || null,
-                      })
-                    }
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
       </FormSection>
 
       <FormGalleryUploader
