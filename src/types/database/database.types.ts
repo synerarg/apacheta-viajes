@@ -1,10 +1,10 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 import type {
-  AgenciasInsert,
-  AgenciasRow,
-  AgenciasUpdate,
-} from "@/types/agencias/agencias.types"
+  OperadoresInsert,
+  OperadoresRow,
+  OperadoresUpdate,
+} from "@/types/operadores/operadores.types"
 import type {
   CategoriasExperienciaInsert,
   CategoriasExperienciaRow,
@@ -122,6 +122,36 @@ import type {
   SolicitudesContactoUpdate,
 } from "@/types/solicitudes-contacto/solicitudes-contacto.types"
 import type {
+  SolicitudesOperadorInsert,
+  SolicitudesOperadorRow,
+  SolicitudesOperadorUpdate,
+} from "@/types/solicitudes-operador/solicitudes-operador.types"
+import type {
+  CotizadorCategoriasInsert,
+  CotizadorCategoriasRow,
+  CotizadorCategoriasUpdate,
+} from "@/types/cotizador-categorias/cotizador-categorias.types"
+import type {
+  CotizadorServiciosInsert,
+  CotizadorServiciosRow,
+  CotizadorServiciosUpdate,
+} from "@/types/cotizador-servicios/cotizador-servicios.types"
+import type {
+  CotizadorPreciosInsert,
+  CotizadorPreciosRow,
+  CotizadorPreciosUpdate,
+} from "@/types/cotizador-precios/cotizador-precios.types"
+import type {
+  CotizacionesInsert,
+  CotizacionesRow,
+  CotizacionesUpdate,
+} from "@/types/cotizaciones/cotizaciones.types"
+import type {
+  CotizacionesItemsInsert,
+  CotizacionesItemsRow,
+  CotizacionesItemsUpdate,
+} from "@/types/cotizaciones-items/cotizaciones-items.types"
+import type {
   TrasladosInsert,
   TrasladosRow,
   TrasladosUpdate,
@@ -153,13 +183,13 @@ export type Json =
 export interface Database {
   public: {
     Tables: {
-      agencias: {
-        Row: AgenciasRow
-        Insert: AgenciasInsert
-        Update: AgenciasUpdate
+      operadores: {
+        Row: OperadoresRow
+        Insert: OperadoresInsert
+        Update: OperadoresUpdate
         Relationships: [
           {
-            foreignKeyName: "agencias_usuario_id_fkey"
+            foreignKeyName: "operadores_usuario_id_fkey"
             columns: ["usuario_id"]
             isOneToOne: false
             referencedRelation: "usuarios"
@@ -504,6 +534,96 @@ export interface Database {
         Insert: SolicitudesContactoInsert
         Update: SolicitudesContactoUpdate
         Relationships: []
+      }
+      solicitudes_operador: {
+        Row: SolicitudesOperadorRow
+        Insert: SolicitudesOperadorInsert
+        Update: SolicitudesOperadorUpdate
+        Relationships: [
+          {
+            foreignKeyName: "solicitudes_operador_usuario_id_fkey"
+            columns: ["usuario_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "solicitudes_operador_revisado_por_fkey"
+            columns: ["revisado_por"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotizador_categorias: {
+        Row: CotizadorCategoriasRow
+        Insert: CotizadorCategoriasInsert
+        Update: CotizadorCategoriasUpdate
+        Relationships: []
+      }
+      cotizador_servicios: {
+        Row: CotizadorServiciosRow
+        Insert: CotizadorServiciosInsert
+        Update: CotizadorServiciosUpdate
+        Relationships: [
+          {
+            foreignKeyName: "cotizador_servicios_categoria_id_fkey"
+            columns: ["categoria_id"]
+            isOneToOne: false
+            referencedRelation: "cotizador_categorias"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotizador_servicio_precios: {
+        Row: CotizadorPreciosRow
+        Insert: CotizadorPreciosInsert
+        Update: CotizadorPreciosUpdate
+        Relationships: [
+          {
+            foreignKeyName: "cotizador_servicio_precios_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "cotizador_servicios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotizaciones: {
+        Row: CotizacionesRow
+        Insert: CotizacionesInsert
+        Update: CotizacionesUpdate
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_operador_id_fkey"
+            columns: ["operador_id"]
+            isOneToOne: false
+            referencedRelation: "usuarios"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cotizaciones_items: {
+        Row: CotizacionesItemsRow
+        Insert: CotizacionesItemsInsert
+        Update: CotizacionesItemsUpdate
+        Relationships: [
+          {
+            foreignKeyName: "cotizaciones_items_cotizacion_id_fkey"
+            columns: ["cotizacion_id"]
+            isOneToOne: false
+            referencedRelation: "cotizaciones"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cotizaciones_items_servicio_id_fkey"
+            columns: ["servicio_id"]
+            isOneToOne: false
+            referencedRelation: "cotizador_servicios"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       traslados: {
         Row: TrasladosRow

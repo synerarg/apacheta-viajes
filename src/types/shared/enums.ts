@@ -1,6 +1,6 @@
 // Enums compartidos — espejo de los tipos de base de datos de PostgreSQL
 
-export type UsuarioTipo = "cliente" | "agencia" | "admin"
+export type UsuarioTipo = "cliente" | "operador" | "admin"
 
 export type OrdenEstado =
   | "pendiente"
@@ -37,6 +37,13 @@ export type ReservaEstado =
   | "cancelada"
 
 export type SolicitudEstado = "nuevo" | "en_proceso" | "respondido" | "cerrado"
+
+export type SolicitudOperadorEstado =
+  | "pendiente"
+  | "en_revision"
+  | "aprobada"
+  | "rechazada"
+  | "cancelada"
 
 export type RegimenAlimentario =
   | "desayuno"

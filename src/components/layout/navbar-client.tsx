@@ -5,9 +5,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
+  BriefcaseIcon,
   CaretDownIcon,
   ShoppingCartIcon,
-  SquaresFourIcon,
+  TicketIcon,
   UserIcon,
   XIcon,
 } from "@phosphor-icons/react"
@@ -148,6 +149,204 @@ function DesktopDropdown({ label, items }: DesktopDropdownProps) {
   )
 }
 
+interface UserMenuItem {
+  href?: string
+  label: string
+  description?: string
+  icon: React.ComponentType<{ className?: string; weight?: "regular" | "fill" | "bold" }>
+  highlight?: boolean
+  onClick?: () => void
+}
+
+interface UserMenuDropdownProps {
+  user: AuthenticatedNavbarUser
+  displayName: string
+  items: UserMenuItem[]
+  onSignOut: () => void
+  isSigningOut: boolean
+}
+
+function UserMenuDropdown({
+  user,
+  displayName,
+  items,
+  onSignOut,
+  isSigningOut,
+}: UserMenuDropdownProps) {
+  const [isOpen, setIsOpen] = useState(false)
+  const containerRef = useRef<HTMLDivElement>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const initials = (() => {
+    const source = [user.nombre, user.apellido].filter(Boolean).join(" ").trim()
+    if (source) {
+      return source
+        .split(/\s+/)
+        .slice(0, 2)
+        .map((s) => s[0]?.toUpperCase() ?? "")
+        .join("")
+    }
+    return (user.email?.[0] ?? "U").toUpperCase()
+  })()
+
+  function openImmediate() {
+    if (closeTimerRef.current) {
+      clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+    setIsOpen(true)
+  }
+
+  function closeWithDelay() {
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+    closeTimerRef.current = setTimeout(() => setIsOpen(false), 140)
+  }
+
+  useEffect(() => {
+    if (!isOpen) return
+    function handleClickOutside(event: MouseEvent) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [isOpen])
+
+  return (
+    <div
+      ref={containerRef}
+      className="relative"
+      onMouseEnter={openImmediate}
+      onMouseLeave={closeWithDelay}
+    >
+      <button
+        type="button"
+        onClick={() => setIsOpen((value) => !value)}
+        className="flex items-center gap-2 rounded-full pl-1 pr-3 py-1 text-[13px] text-white/90 transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
+        aria-haspopup="menu"
+        aria-expanded={isOpen}
+        aria-label="Menú de cuenta"
+      >
+        <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-[11px] font-bold text-primary">
+          {initials}
+        </span>
+        <span className="hidden xl:inline max-w-[120px] truncate">{displayName}</span>
+        <CaretDownIcon
+          className={`h-3 w-3 transition-transform duration-200 ${
+            isOpen ? "rotate-180" : "rotate-0"
+          }`}
+          weight="bold"
+        />
+      </button>
+
+      <div
+        className={`absolute right-0 top-full pt-3 transition-opacity duration-150 ${
+          isOpen
+            ? "opacity-100 pointer-events-auto"
+            : "opacity-0 pointer-events-none"
+        }`}
+        role="menu"
+      >
+        <div className="w-[300px] bg-white border border-neutral-200 shadow-xl">
+          <div className="px-4 py-3 border-b border-neutral-100">
+            <p className="text-xs uppercase tracking-wider text-neutral-400">
+              Sesión iniciada como
+            </p>
+            <p className="text-sm font-semibold text-neutral-900 truncate mt-0.5">
+              {displayName}
+            </p>
+            {user.email ? (
+              <p className="text-xs text-neutral-500 truncate">{user.email}</p>
+            ) : null}
+          </div>
+
+          <div className="py-1">
+            {items.map((item, idx) => {
+              const Icon = item.icon
+              const content = (
+                <div
+                  className={`flex items-start gap-3 px-4 py-2.5 transition-colors cursor-pointer ${
+                    item.highlight
+                      ? "bg-primary/5 hover:bg-primary/10"
+                      : "hover:bg-neutral-50"
+                  }`}
+                >
+                  <span
+                    className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full ${
+                      item.highlight
+                        ? "bg-primary text-white"
+                        : "bg-neutral-100 text-neutral-700"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4" weight={item.highlight ? "fill" : "regular"} />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <p
+                      className={`text-sm font-medium ${
+                        item.highlight ? "text-primary" : "text-neutral-900"
+                      }`}
+                    >
+                      {item.label}
+                    </p>
+                    {item.description ? (
+                      <p className="text-xs text-neutral-500 mt-0.5 leading-snug">
+                        {item.description}
+                      </p>
+                    ) : null}
+                  </div>
+                </div>
+              )
+              if (item.href) {
+                return (
+                  <Link
+                    key={idx}
+                    href={item.href}
+                    onClick={() => setIsOpen(false)}
+                    role="menuitem"
+                  >
+                    {content}
+                  </Link>
+                )
+              }
+              return (
+                <button
+                  key={idx}
+                  type="button"
+                  className="w-full text-left"
+                  onClick={() => {
+                    setIsOpen(false)
+                    item.onClick?.()
+                  }}
+                  role="menuitem"
+                >
+                  {content}
+                </button>
+              )
+            })}
+          </div>
+
+          <div className="border-t border-neutral-100 py-1">
+            <button
+              type="button"
+              onClick={onSignOut}
+              disabled={isSigningOut}
+              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm text-neutral-700 transition-colors hover:bg-neutral-50 disabled:opacity-50 cursor-pointer"
+              role="menuitem"
+            >
+              <LogOutIcon className="h-4 w-4" />
+              {isSigningOut ? "Saliendo..." : "Cerrar sesión"}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 interface MobileDropdownProps {
   label: string
   items: { href: string; label: string }[]
@@ -217,6 +416,27 @@ export function NavbarClient({ user }: NavbarClientProps) {
     setIsOpen(false)
   }
 
+  const primaryCta = (() => {
+    if (user?.tipo === "admin") {
+      return { href: "/dashboard", label: "Ir al dashboard" }
+    }
+    if (user?.tipo === "operador") {
+      return { href: "/operador", label: "Ir al panel de operador" }
+    }
+    return { href: "/account/operador", label: "Convertirme en operador" }
+  })()
+
+  const userMenuItems: UserMenuItem[] = user
+    ? [
+        {
+          href: "/mis-reservas",
+          label: "Mis reservas",
+          description: "Tus compras y vouchers",
+          icon: TicketIcon,
+        },
+      ]
+    : []
+
   return (
     <>
       <header className="fixed left-1/2 top-4 z-50 w-[calc(100%-1rem)] max-w-[1440px] -translate-x-1/2">
@@ -255,33 +475,20 @@ export function NavbarClient({ user }: NavbarClientProps) {
           </div>
 
           {/* Desktop — actions */}
-          <div className="hidden items-center gap-4 lg:flex">
+          <div className="hidden items-center gap-3 lg:flex">
             <Button
               asChild
               variant="default"
               className="h-10 text-sm text-primary hover:text-primary bg-white hover:bg-white/90 cursor-pointer"
             >
-              <Link href="/paquetes">Explorar paquetes nacionales</Link>
+              <Link href={primaryCta.href}>
+                <BriefcaseIcon className="h-4 w-4" weight="fill" />
+                {primaryCta.label}
+              </Link>
             </Button>
 
             <div className="flex items-center gap-1 text-white/90">
-              {/* Dashboard (solo admin) */}
-              {user?.tipo === "admin" && (
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/dashboard"
-                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                      aria-label="Dashboard"
-                    >
-                      <SquaresFourIcon className="h-5 w-5" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom"><p>Dashboard</p></TooltipContent>
-                </Tooltip>
-              )}
-
-              {/* Carrito */}
+              {/* Carrito (siempre visible) */}
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
@@ -303,53 +510,22 @@ export function NavbarClient({ user }: NavbarClientProps) {
               </Tooltip>
 
               {user ? (
-                <>
-                  {/* Mis reservas */}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Link
-                        href="/mis-reservas"
-                        className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                        aria-label="Mis reservas"
-                      >
-                        <UserIcon className="h-5 w-5" />
-                      </Link>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom"><p>{displayName}</p></TooltipContent>
-                  </Tooltip>
-
-                  {/* Cerrar sesión */}
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <button
-                        type="button"
-                        onClick={handleSignOut}
-                        disabled={isSigningOut}
-                        className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white cursor-pointer"
-                        aria-label="Cerrar sesión"
-                      >
-                        <LogOutIcon className="h-5 w-5" />
-                      </button>
-                    </TooltipTrigger>
-                    <TooltipContent side="bottom">
-                      <p>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </>
+                <UserMenuDropdown
+                  user={user}
+                  displayName={displayName}
+                  items={userMenuItems}
+                  onSignOut={handleSignOut}
+                  isSigningOut={isSigningOut}
+                />
               ) : (
-                /* Ingresar (solo cuando no hay usuario) */
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <Link
-                      href="/login"
-                      className="flex h-10 w-10 items-center justify-center transition-colors hover:bg-white/10 hover:text-white"
-                      aria-label="Ingresar"
-                    >
-                      <UserIcon className="h-5 w-5" />
-                    </Link>
-                  </TooltipTrigger>
-                  <TooltipContent side="bottom"><p>Ingresar</p></TooltipContent>
-                </Tooltip>
+                <Link
+                  href="/login"
+                  className="flex items-center gap-2 px-3 h-10 transition-colors hover:bg-white/10 hover:text-white text-[13px]"
+                  aria-label="Ingresar"
+                >
+                  <UserIcon className="h-5 w-5" />
+                  <span>Ingresar</span>
+                </Link>
               )}
             </div>
           </div>
@@ -448,48 +624,68 @@ export function NavbarClient({ user }: NavbarClientProps) {
         {/* Footer del panel */}
         <div className="px-6 pb-safe-or-8 pb-8 pt-4 border-t border-white/15 flex flex-col gap-1">
           <Link
-            href="/paquetes"
+            href={primaryCta.href}
             onClick={() => setIsOpen(false)}
-            className="block w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3.5 mb-2 transition-colors hover:bg-white/90 cursor-pointer"
+            className="flex items-center justify-center gap-2 w-full text-center bg-white text-primary font-sans font-semibold text-sm py-3.5 mb-3 transition-colors hover:bg-white/90 cursor-pointer"
           >
-            Explorar paquetes nacionales
+            <BriefcaseIcon className="h-4 w-4" weight="fill" />
+            {primaryCta.label}
           </Link>
-
-          {/* Links secundarios — uno por fila */}
-          <Link
-            href="/carrito"
-            onClick={() => setIsOpen(false)}
-            className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm border-b border-white/10"
-          >
-            <ShoppingCartIcon className="h-4 w-4 shrink-0" />
-            <span>Carrito{totalItems > 0 ? ` (${totalItems})` : ""}</span>
-          </Link>
-
-          {user?.tipo === "admin" && (
-            <Link
-              href="/dashboard"
-              onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm border-b border-white/10"
-              aria-label="Dashboard"
-            >
-              <SquaresFourIcon className="h-4 w-4 shrink-0" />
-              <span>Dashboard</span>
-            </Link>
-          )}
 
           {user ? (
-            <button
-              type="button"
-              className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm w-full cursor-pointer"
-              onClick={() => {
-                setIsOpen(false)
-                handleSignOut()
-              }}
-              disabled={isSigningOut}
-            >
-              <LogOutIcon className="h-4 w-4 shrink-0" />
-              <span>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</span>
-            </button>
+            <>
+              {/* User card */}
+              <div className="mb-2 flex items-center gap-3 rounded-md bg-white/10 px-3 py-2.5">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-white text-xs font-bold text-primary">
+                  {(displayName?.[0] ?? "U").toUpperCase()}
+                </span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold text-white truncate">
+                    {displayName}
+                  </p>
+                  {user.email ? (
+                    <p className="text-[11px] text-white/60 truncate">{user.email}</p>
+                  ) : null}
+                </div>
+              </div>
+
+              {userMenuItems.map((item, idx) => {
+                const Icon = item.icon
+                return (
+                  <Link
+                    key={idx}
+                    href={item.href ?? "#"}
+                    onClick={() => setIsOpen(false)}
+                    className={`flex items-center gap-3 py-3 text-sm transition-colors border-b border-white/10 ${
+                      item.highlight
+                        ? "text-white font-semibold"
+                        : "text-white/80 hover:text-white"
+                    }`}
+                  >
+                    <Icon className="h-4 w-4 shrink-0" weight={item.highlight ? "fill" : "regular"} />
+                    <span>{item.label}</span>
+                    {item.highlight ? (
+                      <span className="ml-auto inline-flex items-center rounded-full bg-white/20 px-2 py-0.5 text-[10px] uppercase tracking-wider">
+                        Nuevo
+                      </span>
+                    ) : null}
+                  </Link>
+                )
+              })}
+
+              <button
+                type="button"
+                className="flex items-center gap-3 py-3 text-white/80 hover:text-white transition-colors text-sm w-full cursor-pointer"
+                onClick={() => {
+                  setIsOpen(false)
+                  handleSignOut()
+                }}
+                disabled={isSigningOut}
+              >
+                <LogOutIcon className="h-4 w-4 shrink-0" />
+                <span>{isSigningOut ? "Saliendo..." : "Cerrar sesión"}</span>
+              </button>
+            </>
           ) : (
             <Link
               href="/login"

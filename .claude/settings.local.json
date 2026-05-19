@@ -24,7 +24,12 @@
       "Bash(curl *)",
       "Bash(node -e \"const fs=require\\('fs'\\);for\\(const f of ['tmp_hg_booking.html','tmp_hg_search.html','tmp_hg_static.html']\\){const h=fs.readFileSync\\(f,'utf8'\\);const t=h.replace\\(/<script[\\\\s\\\\S]*?<\\\\/script>/g,''\\).replace\\(/<style[\\\\s\\\\S]*?<\\\\/style>/g,''\\).replace\\(/<[^>]+>/g,' '\\).replace\\(/&nbsp;/g,' '\\).replace\\(/&amp;/g,'&'\\).replace\\(/&lt;/g,'<'\\).replace\\(/&gt;/g,'>'\\).replace\\(/&quot;/g,'\\\\\"'\\).replace\\(/&#x27;/g,\\\\\"'\\\\\"\\).replace\\(/\\\\s+/g,' '\\).trim\\(\\);fs.writeFileSync\\(f.replace\\('.html','.txt'\\),t\\);console.log\\(f,'->',t.length,'chars'\\);}\")",
       "Bash(node *)",
-      "Bash(echo \"EXIT:$?\")"
+      "Bash(echo \"EXIT:$?\")",
+      "Bash(cmd.exe /c \"dir supabase\\\\migrations\")",
+      "PowerShell(pnpm exec *)"
     ]
-  }
+  },
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }

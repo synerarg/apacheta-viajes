@@ -44,11 +44,13 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(new URL("/login", request.url))
   }
 
-  // Rutas que requieren rol admin (páginas y API) — sin sesión no se permite entrar
   const adminRoutes = ["/dashboard", "/api/dashboard"]
   const needsAdmin = adminRoutes.some((route) => pathname.startsWith(route))
 
-  if (needsAdmin) {
+  const operadorRoutes = ["/operador", "/api/operador"]
+  const needsOperador = operadorRoutes.some((route) => pathname.startsWith(route))
+
+  if (needsAdmin || needsOperador) {
     if (!user) {
       if (isApiRoute) {
         return NextResponse.json({ error: "No autenticado" }, { status: 401 })
@@ -62,11 +64,18 @@ export async function updateSession(request: NextRequest) {
       .eq("id", user.id)
       .maybeSingle()
 
-    if (profile?.tipo !== "admin") {
+    if (needsAdmin && profile?.tipo !== "admin") {
       if (isApiRoute) {
         return NextResponse.json({ error: "No autorizado" }, { status: 403 })
       }
       return NextResponse.redirect(new URL("/", request.url))
+    }
+
+    if (needsOperador && profile?.tipo !== "operador" && profile?.tipo !== "admin") {
+      if (isApiRoute) {
+        return NextResponse.json({ error: "No autorizado" }, { status: 403 })
+      }
+      return NextResponse.redirect(new URL("/account/operador", request.url))
     }
   }
 
