@@ -360,6 +360,11 @@ function normalizeAvailabilityOffers(response: unknown): HyperGuestNormalizedOff
                 amount,
                 currency,
               },
+          // propertyRemarks / propertyInfo are duplicated on every offer so the
+          // UI can render property-level context without holding the full
+          // search response in client state.
+          propertyRemarks: Array.isArray(result.remarks) ? result.remarks : [],
+          propertyInfo: result.propertyInfo ?? null,
           room,
           ratePlan,
         }

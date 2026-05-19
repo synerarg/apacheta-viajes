@@ -50,7 +50,7 @@ export function PackagesSection({ packages }: PackagesSectionProps) {
                 <Link href={`/paquetes/${pkg.slug}`}>
                   <Button
                     size="sm"
-                    className="mt-3 w-fit border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                    className="mt-3 w-fit bg-primary text-white border-primary hover:bg-primary/90"
                   >
                     Ver Detalle
                   </Button>

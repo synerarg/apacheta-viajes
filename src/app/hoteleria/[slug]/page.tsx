@@ -2,10 +2,15 @@ import type { Metadata } from "next"
 import Image from "next/image"
 import Link from "next/link"
 import { notFound } from "next/navigation"
-import { ArrowLeft, MapPin, Star } from "lucide-react"
+import { ArrowLeft, Check, MapPin, Star } from "lucide-react"
 
 import { HotelAvailabilityForm } from "@/components/hoteleria/hotel-availability-form"
 import { createServerHotelesController } from "@/controllers/hoteles/hoteles.controller"
+import { createServerHyperGuestController } from "@/controllers/hyperguest/hyperguest.controller"
+import {
+  extractPropertyDisplay,
+  type PropertyDisplay,
+} from "@/lib/hyperguest/offer-display"
 import type { HotelesRow } from "@/types/hoteles/hoteles.types"
 
 type HotelPageProps = {
@@ -22,6 +27,35 @@ async function getRealHotelBySlug(slug: string) {
   const controller = await createServerHotelesController()
 
   return controller.get({ slug, activo: true })
+}
+
+async function getHyperGuestPropertyDisplay(
+  hotelId: string,
+): Promise<PropertyDisplay | null> {
+  try {
+    const controller = await createServerHyperGuestController()
+    const mapping = await controller.getMappingByHotelId(hotelId)
+
+    if (!mapping?.hyperguest_payload) {
+      return null
+    }
+
+    const display = extractPropertyDisplay(mapping.hyperguest_payload)
+
+    if (
+      display.photos.length === 0 &&
+      display.facilities.length === 0 &&
+      display.remarks.length === 0 &&
+      !display.longDescription
+    ) {
+      return null
+    }
+
+    return display
+  } catch {
+    // Missing mapping or transient lookup error must not break the public page.
+    return null
+  }
 }
 
 function getHotelLocation(hotel: HotelesRow) {
@@ -63,8 +97,14 @@ export default async function HotelDetailPage({ params }: HotelPageProps) {
   const hotelLocation = getHotelLocation(hotel)
   const hotelCategory = "Hotel"
   const hotelStars = hotel.estrellas ?? 0
+  const providerDisplay = await getHyperGuestPropertyDisplay(hotel.id)
   const hotelDescription =
-    hotel.descripcion ?? "Hotel disponible para reservar con Apacheta Viajes."
+    providerDisplay?.longDescription ??
+    hotel.descripcion ??
+    "Hotel disponible para reservar con Apacheta Viajes."
+  const galleryPhotos = providerDisplay?.photos ?? []
+  const heroImage = hotel.imagen_url ?? galleryPhotos[0] ?? null
+  const additionalPhotos = galleryPhotos.filter((url) => url !== heroImage)
 
   return (
     <main className="min-h-screen bg-off-white pb-20 pt-28">
@@ -115,13 +155,14 @@ export default async function HotelDetailPage({ params }: HotelPageProps) {
 
           <div className="border border-dark-brown/15 bg-white p-5 sm:p-6 md:p-8">
             <div className="relative mb-6 aspect-[4/3] overflow-hidden bg-muted">
-              {hotel.imagen_url ? (
+              {heroImage ? (
                 <Image
-                  src={hotel.imagen_url}
+                  src={heroImage}
                   alt={hotel.nombre}
                   fill
                   className="object-cover"
                   priority
+                  unoptimized
                 />
               ) : (
                 <div className="flex h-full items-center justify-center px-6 text-center font-sans text-sm text-subtle">
@@ -155,6 +196,65 @@ export default async function HotelDetailPage({ params }: HotelPageProps) {
             <HotelAvailabilityForm hotelId={hotel.id} />
           </div>
         </div>
+
+        {additionalPhotos.length > 0 ? (
+          <section className="mb-12">
+            <h2 className="mb-4 font-serif text-2xl italic text-dark-brown">
+              Galería
+            </h2>
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+              {additionalPhotos.slice(0, 12).map((url) => (
+                <div
+                  key={url}
+                  className="relative aspect-[4/3] overflow-hidden bg-muted"
+                >
+                  <Image
+                    src={url}
+                    alt={hotel.nombre}
+                    fill
+                    sizes="(max-width: 768px) 50vw, 25vw"
+                    className="object-cover"
+                    unoptimized
+                  />
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
+
+        {providerDisplay?.facilities.length ? (
+          <section className="mb-12">
+            <h2 className="mb-4 font-serif text-2xl italic text-dark-brown">
+              Servicios e instalaciones
+            </h2>
+            <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+              {providerDisplay.facilities.map((facility) => (
+                <li
+                  key={facility}
+                  className="flex items-start gap-2 font-sans text-sm text-dark-brown"
+                >
+                  <Check className="mt-0.5 h-4 w-4 shrink-0 text-primary" />
+                  <span>{facility}</span>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
+
+        {providerDisplay?.remarks.length ? (
+          <section className="mb-4">
+            <h2 className="mb-4 font-serif text-2xl italic text-dark-brown">
+              Información importante
+            </h2>
+            <ul className="list-disc space-y-2 pl-5 font-sans text-sm text-dark-brown">
+              {providerDisplay.remarks.map((remark, index) => (
+                <li key={index} className="whitespace-pre-line">
+                  {remark}
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
       </div>
     </main>
   )

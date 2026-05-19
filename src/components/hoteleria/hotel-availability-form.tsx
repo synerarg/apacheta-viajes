@@ -2,6 +2,11 @@
 
 import { useMemo, useState, type FormEvent } from "react"
 
+import {
+  extractOfferDetails,
+  type OfferDetails,
+} from "@/lib/hyperguest/offer-display"
+
 interface HotelAvailabilityFormProps {
   hotelId: string
 }
@@ -95,6 +100,7 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
   const [guestZip, setGuestZip] = useState("C1000")
   const [guestCountry, setGuestCountry] = useState("AR")
   const [guestBirthDate, setGuestBirthDate] = useState("1990-01-01")
+  const [specialRequests, setSpecialRequests] = useState("")
 
   const offers = useMemo(
     () => availability?.offers ?? [],
@@ -106,6 +112,18 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       map.set(offerKey(offer, index), offer)
     })
     return map
+  }, [offers])
+  const offerDetailsById = useMemo(() => {
+    const map = new Map<string, OfferDetails>()
+    offers.forEach((offer, index) => {
+      map.set(offerKey(offer, index), extractOfferDetails(offer.raw))
+    })
+    return map
+  }, [offers])
+  const propertyRemarks = useMemo(() => {
+    const first = offers[0]
+    if (!first) return []
+    return extractOfferDetails(first.raw).propertyRemarks
   }, [offers])
 
   function resetAfterSearch() {
@@ -270,6 +288,11 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
     setStatusMessage(null)
 
     try {
+      const trimmedRequests = specialRequests
+        .split(/\r?\n/)
+        .map((line) => line.trim())
+        .filter((line) => line.length > 0)
+
       const response = await fetch("/api/hoteleria/hyperguest/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -292,6 +315,8 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
               zip: guestZip,
             },
           },
+          specialRequests:
+            trimmedRequests.length > 0 ? trimmedRequests : undefined,
         }),
       })
 
@@ -507,6 +532,21 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
         </button>
       </form>
 
+      {propertyRemarks.length > 0 ? (
+        <div className="border border-dark-brown/15 bg-white/60 p-4">
+          <p className="mb-2 font-sans text-xs uppercase tracking-[0.18em] text-subtle">
+            Información del establecimiento
+          </p>
+          <ul className="list-disc space-y-1 pl-5 font-sans text-sm text-dark-brown">
+            {propertyRemarks.map((remark, index) => (
+              <li key={index} className="whitespace-pre-line">
+                {remark}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
       {offers.length > 0 ? (
         <div className="space-y-4">
           {occupancy.map((_, roomIndex) => (
@@ -514,39 +554,34 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
               <p className="font-sans text-xs uppercase tracking-[0.18em] text-subtle">
                 Tarifa para habitacion {roomIndex + 1}
               </p>
-              <div className="space-y-2">
+              <div className="space-y-3">
                 {offers.map((offer, index) => {
                   const value = offerKey(offer, index)
+                  const details = offerDetailsById.get(value)
+                  const isSelected = selectedOfferIds[roomIndex] === value
 
                   return (
                     <label
                       key={value}
-                      className="flex cursor-pointer items-start gap-3 border border-dark-brown/15 p-3 font-sans text-sm text-dark-brown"
+                      className={`flex cursor-pointer items-start gap-3 border p-4 font-sans text-sm text-dark-brown transition-colors ${
+                        isSelected
+                          ? "border-primary bg-primary/5"
+                          : "border-dark-brown/15"
+                      }`}
                     >
                       <input
                         type="radio"
                         name={`hotel-offer-${roomIndex}`}
                         value={value}
-                        checked={selectedOfferIds[roomIndex] === value}
+                        checked={isSelected}
                         onChange={() => toggleSelectedOffer(roomIndex, value)}
                         className="mt-1"
                       />
-                      <span className="flex-1">
-                        <span className="block font-bold">{offer.roomName}</span>
-                        {offer.boardName ? (
-                          <span className="block text-subtle">{offer.boardName}</span>
-                        ) : null}
-                        {offer.totalAmount ? (
-                          <span className="block text-primary">
-                            {offer.currency ?? currency}{" "}
-                            {offer.totalAmount.toLocaleString("es-AR")}
-                          </span>
-                        ) : (
-                          <span className="block text-primary">
-                            Tarifa disponible
-                          </span>
-                        )}
-                      </span>
+                      <OfferCard
+                        offer={offer}
+                        details={details}
+                        fallbackCurrency={currency}
+                      />
                     </label>
                   )
                 })}
@@ -664,6 +699,19 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
               />
             </label>
           </div>
+          <label className="block font-sans text-sm text-dark-brown">
+            Pedidos especiales (uno por línea, opcional)
+            <textarea
+              value={specialRequests}
+              onChange={(event) => setSpecialRequests(event.target.value)}
+              rows={3}
+              placeholder="Ej.: late check-in, cama matrimonial, piso alto"
+              className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
+            />
+            <span className="mt-1 block font-sans text-xs text-subtle">
+              Se envían como hints a HyperGuest. No están garantizados por el hotel.
+            </span>
+          </label>
           <button
             type="button"
             disabled={isLoading || Boolean(bookResult)}
@@ -691,6 +739,203 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       ) : null}
       {errorMessage ? (
         <p className="font-sans text-sm font-bold text-primary">{errorMessage}</p>
+      ) : null}
+    </div>
+  )
+}
+
+interface OfferCardProps {
+  offer: AvailabilityOffer
+  details: OfferDetails | undefined
+  fallbackCurrency: string
+}
+
+function formatAmount(value: number | null | undefined) {
+  if (value === null || value === undefined) return null
+  return value.toLocaleString("es-AR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  })
+}
+
+function OfferCard({ offer, details, fallbackCurrency }: OfferCardProps) {
+  if (!details) {
+    return (
+      <div className="flex-1">
+        <p className="font-bold">{offer.roomName}</p>
+        {offer.totalAmount ? (
+          <p className="text-primary">
+            {offer.currency ?? fallbackCurrency}{" "}
+            {formatAmount(offer.totalAmount)}
+          </p>
+        ) : (
+          <p className="text-primary">Tarifa disponible</p>
+        )}
+      </div>
+    )
+  }
+
+  const currency = details.currency ?? offer.currency ?? fallbackCurrency
+  const totalNet = details.netAmount ?? offer.totalAmount
+  const totalSell = details.sellAmount
+  const displayTaxes = details.taxes.filter((tax) => tax.relation === "display")
+  const includedTaxes = details.taxes.filter(
+    (tax) => tax.relation === "included",
+  )
+  const displayFees = details.fees.filter((fee) => fee.relation === "display")
+  const includedFees = details.fees.filter((fee) => fee.relation === "included")
+
+  return (
+    <div className="flex-1 space-y-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-2">
+        <div>
+          <p className="font-bold">{offer.roomName}</p>
+          <p className="text-subtle">
+            {details.boardLabel}
+            {details.rateName && details.rateName !== details.boardLabel ? (
+              <> · {details.rateName}</>
+            ) : null}
+          </p>
+          {details.beddingDescription || details.roomSize ? (
+            <p className="text-xs text-subtle">
+              {[
+                details.beddingDescription,
+                details.roomSize ? `${details.roomSize} m²` : null,
+                details.maxOccupancy
+                  ? `Cap. ${details.maxOccupancy} pax`
+                  : null,
+              ]
+                .filter(Boolean)
+                .join(" · ")}
+            </p>
+          ) : null}
+        </div>
+        <div className="text-right">
+          {totalNet !== null && totalNet !== undefined ? (
+            <p className="font-bold text-primary">
+              {currency} {formatAmount(totalNet)}
+            </p>
+          ) : null}
+          {totalSell !== null &&
+          totalSell !== undefined &&
+          totalSell !== totalNet ? (
+            <p className="text-xs text-subtle">
+              Sell: {currency} {formatAmount(totalSell)}
+            </p>
+          ) : null}
+          {details.searchCurrencyAmount !== null &&
+          details.searchCurrency &&
+          details.searchCurrency !== currency ? (
+            <p className="text-xs text-subtle">
+              ≈ {details.searchCurrency}{" "}
+              {formatAmount(details.searchCurrencyAmount)}
+            </p>
+          ) : null}
+          <p
+            className={`text-xs font-bold ${
+              details.isRefundable ? "text-emerald-700" : "text-amber-700"
+            }`}
+          >
+            {details.isRefundable ? "Reembolsable" : "No reembolsable"}
+          </p>
+        </div>
+      </div>
+
+      {displayTaxes.length > 0 || displayFees.length > 0 ? (
+        <div className="border-t border-dark-brown/10 pt-2 text-xs text-subtle">
+          <p className="font-bold uppercase tracking-[0.14em]">
+            No incluido en la tarifa
+          </p>
+          <ul className="mt-1 list-disc pl-5">
+            {displayTaxes.map((tax, index) => (
+              <li key={`dtax-${index}`}>
+                {tax.description} — {tax.currency} {formatAmount(tax.amount)}
+              </li>
+            ))}
+            {displayFees.map((fee, index) => (
+              <li key={`dfee-${index}`}>
+                {fee.description} — {fee.currency} {formatAmount(fee.amount)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {includedTaxes.length > 0 || includedFees.length > 0 ? (
+        <div className="text-xs text-subtle">
+          <p className="font-bold uppercase tracking-[0.14em]">
+            Incluido en la tarifa
+          </p>
+          <ul className="mt-1 list-disc pl-5">
+            {includedTaxes.map((tax, index) => (
+              <li key={`itax-${index}`}>
+                {tax.description} — {tax.currency} {formatAmount(tax.amount)}
+              </li>
+            ))}
+            {includedFees.map((fee, index) => (
+              <li key={`ifee-${index}`}>
+                {fee.description} — {fee.currency} {formatAmount(fee.amount)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {details.cancellationPolicies.length > 0 ? (
+        <div className="border-t border-dark-brown/10 pt-2 text-xs text-subtle">
+          <p className="font-bold uppercase tracking-[0.14em]">
+            Política de cancelación
+          </p>
+          <ul className="mt-1 list-disc pl-5">
+            {details.cancellationPolicies.map((policy, index) => {
+              const window = policy.fromCheckIn
+                ? `dentro de ${policy.fromCheckIn} previos al check-in`
+                : policy.daysBefore !== null
+                  ? `dentro de los ${policy.daysBefore} días previos`
+                  : "en cualquier momento"
+              const penalty =
+                policy.amount === null
+                  ? "penalidad según política"
+                  : policy.penaltyType === "nights"
+                    ? `${policy.amount} noche(s) de penalidad`
+                    : `${policy.amount} ${policy.penaltyType ?? ""} de penalidad`
+
+              return (
+                <li key={`pol-${index}`}>
+                  {penalty} si se cancela {window}.
+                </li>
+              )
+            })}
+          </ul>
+        </div>
+      ) : null}
+
+      {details.ratePlanRemarks.length > 0 ? (
+        <div className="border-t border-dark-brown/10 pt-2 text-xs text-subtle">
+          <p className="font-bold uppercase tracking-[0.14em]">
+            Notas de la tarifa
+          </p>
+          <ul className="mt-1 list-disc whitespace-pre-line pl-5">
+            {details.ratePlanRemarks.map((remark, index) => (
+              <li key={`rem-${index}`}>{remark}</li>
+            ))}
+          </ul>
+        </div>
+      ) : null}
+
+      {details.nightlyBreakdown.length > 1 ? (
+        <div className="border-t border-dark-brown/10 pt-2 text-xs text-subtle">
+          <p className="font-bold uppercase tracking-[0.14em]">
+            Desglose por noche
+          </p>
+          <ul className="mt-1 grid grid-cols-2 gap-x-3 gap-y-1 sm:grid-cols-3">
+            {details.nightlyBreakdown.map((night, index) => (
+              <li key={`night-${index}`}>
+                {night.date}: {currency} {formatAmount(night.net ?? night.sell)}
+              </li>
+            ))}
+          </ul>
+        </div>
       ) : null}
     </div>
   )

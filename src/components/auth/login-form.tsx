@@ -409,12 +409,13 @@ export function LoginForm() {
         </div>
       </div>
 
-      <div className="hidden lg:flex flex-1 relative">
+      <div className="relative hidden lg:block lg:w-1/2">
         <Image
           src="/login/login-image.png"
           alt="Paisaje del Norte Argentino"
           fill
-          className="object-cover object-right"
+          sizes="50vw"
+          className="object-cover"
           priority
         />
       </div>

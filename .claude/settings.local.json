@@ -25,8 +25,13 @@
       "Bash(node -e \"const fs=require\\('fs'\\);for\\(const f of ['tmp_hg_booking.html','tmp_hg_search.html','tmp_hg_static.html']\\){const h=fs.readFileSync\\(f,'utf8'\\);const t=h.replace\\(/<script[\\\\s\\\\S]*?<\\\\/script>/g,''\\).replace\\(/<style[\\\\s\\\\S]*?<\\\\/style>/g,''\\).replace\\(/<[^>]+>/g,' '\\).replace\\(/&nbsp;/g,' '\\).replace\\(/&amp;/g,'&'\\).replace\\(/&lt;/g,'<'\\).replace\\(/&gt;/g,'>'\\).replace\\(/&quot;/g,'\\\\\"'\\).replace\\(/&#x27;/g,\\\\\"'\\\\\"\\).replace\\(/\\\\s+/g,' '\\).trim\\(\\);fs.writeFileSync\\(f.replace\\('.html','.txt'\\),t\\);console.log\\(f,'->',t.length,'chars'\\);}\")",
       "Bash(node *)",
       "Bash(echo \"EXIT:$?\")",
+<<<<<<< Updated upstream
       "Bash(cmd.exe /c \"dir supabase\\\\migrations\")",
       "PowerShell(pnpm exec *)"
+=======
+      "Bash(pnpm dev *)",
+      "Read(//c/Users/valen/AppData/Local/Temp/claude/D--valentin-gonzalez-dev-apacheta-viajes/a0f830df-8111-4681-b891-1415de5b98a0/tasks/**)"
+>>>>>>> Stashed changes
     ]
   },
   "enabledMcpjsonServers": [
