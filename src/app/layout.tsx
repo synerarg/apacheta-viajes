@@ -22,7 +22,7 @@ const lato = Lato({
   weight: ["100", "300", "400", "700", "900"],
 })
 
-const SITE_URL = "https://apacheta-viajes.vercel.app"
+const SITE_URL = "https://apacheta-viajes.tur.ar"
 const SITE_NAME = "Apacheta Viajes"
 const DEFAULT_TITLE =
   "Apacheta Viajes | Operador turistico boutique del Norte Argentino"
