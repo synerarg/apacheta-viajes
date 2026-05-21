@@ -393,11 +393,37 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       return
     }
 
+    const selectedForBook = getSelectedOffers()
+
+    if (selectedForBook.length < occupancy.length) {
+      setErrorMessage(
+        "Volvé a seleccionar una tarifa para cada habitación.",
+      )
+      return
+    }
+
     setIsLoading(true)
     setErrorMessage(null)
     setStatusMessage(null)
 
     try {
+      // HG invalidates the prebook session after a short TTL (BN.502 on /book
+      // when the guest spends too long on the guest/card form). Re-run prebook
+      // right before booking so the session is fresh.
+      const refreshResponse = await fetch(
+        "/api/hoteleria/hyperguest/prebook",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            bookingIntentId: availability.bookingIntent.id,
+            selectedOffers: selectedForBook.map((offer) => offer.raw),
+          }),
+        },
+      )
+
+      await readJsonResponse<PrebookResult>(refreshResponse)
+
       const trimmedRequests = specialRequests
         .split(/\r?\n/)
         .map((line) => line.trim())
