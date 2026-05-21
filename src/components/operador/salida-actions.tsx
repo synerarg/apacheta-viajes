@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { toast } from "sonner"
-import { WhatsappLogo, EnvelopeSimple, Copy, LinkSimple } from "@phosphor-icons/react"
+import { WhatsappLogo, Copy, LinkSimple } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -18,12 +18,11 @@ import {
 export function SalidaActions({
   text,
   publicUrl,
-  clienteEmail,
   clienteTelefono,
 }: {
   text: string
   publicUrl: string
-  clienteEmail: string | null
+  clienteEmail?: string | null
   clienteTelefono: string | null
 }) {
   const [waOpen, setWaOpen] = useState(false)
@@ -38,7 +37,16 @@ export function SalidaActions({
     }
   }
 
-  function openWhatsApp() {
+  function openWhatsAppDirect() {
+    const clean = (clienteTelefono ?? "").replace(/\D/g, "")
+    const encoded = encodeURIComponent(text)
+    const url = clean
+      ? `https://wa.me/${clean}?text=${encoded}`
+      : `https://wa.me/?text=${encoded}`
+    window.open(url, "_blank")
+  }
+
+  function openWhatsAppFromSheet() {
     const clean = phone.replace(/\D/g, "")
     if (!clean) {
       toast.error("Ingresá un teléfono válido")
@@ -49,16 +57,6 @@ export function SalidaActions({
     setWaOpen(false)
   }
 
-  async function openEmail() {
-    await copy(text, "Texto").catch(() => {})
-    const email = clienteEmail ?? ""
-    const subject = encodeURIComponent("Cotización Apacheta Viajes")
-    const body = encodeURIComponent(
-      "Pegá la cotización aquí (Ctrl+V) — ya quedó copiada en tu portapapeles.",
-    )
-    window.location.href = `mailto:${email}?subject=${subject}&body=${body}`
-  }
-
   return (
     <>
       <div className="flex flex-wrap gap-2">
@@ -66,16 +64,16 @@ export function SalidaActions({
           variant="default"
           size="sm"
           onClick={() => {
-            setPhone(clienteTelefono ?? phone)
-            setWaOpen(true)
+            if (clienteTelefono) {
+              openWhatsAppDirect()
+            } else {
+              setPhone("")
+              setWaOpen(true)
+            }
           }}
         >
           <WhatsappLogo />
           WhatsApp
-        </Button>
-        <Button variant="outline" size="sm" onClick={openEmail}>
-          <EnvelopeSimple />
-          Email
         </Button>
         <Button variant="outline" size="sm" onClick={() => copy(text, "Texto")}>
           <Copy />
@@ -113,7 +111,7 @@ export function SalidaActions({
               <Button variant="outline" size="sm" onClick={() => setWaOpen(false)}>
                 Cancelar
               </Button>
-              <Button size="sm" onClick={openWhatsApp}>
+              <Button size="sm" onClick={openWhatsAppFromSheet}>
                 Abrir WhatsApp
               </Button>
             </div>

@@ -1,13 +1,21 @@
 "use client"
 
-import { useEffect, useRef, useCallback } from "react"
+import { useEffect, useMemo, useRef } from "react"
+
+export type DebouncedFn<T extends (...args: never[]) => void> = ((
+  ...args: Parameters<T>
+) => void) & {
+  flush: () => void
+  cancel: () => void
+}
 
 export function useDebouncedCallback<T extends (...args: never[]) => void>(
   fn: T,
   delay: number,
-) {
-  const timeout = useRef<ReturnType<typeof setTimeout> | null>(null)
+): DebouncedFn<T> {
   const fnRef = useRef(fn)
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingRef = useRef<Parameters<T> | null>(null)
 
   useEffect(() => {
     fnRef.current = fn
@@ -15,17 +23,40 @@ export function useDebouncedCallback<T extends (...args: never[]) => void>(
 
   useEffect(() => {
     return () => {
-      if (timeout.current) clearTimeout(timeout.current)
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
     }
   }, [])
 
-  return useCallback(
-    (...args: Parameters<T>) => {
-      if (timeout.current) clearTimeout(timeout.current)
-      timeout.current = setTimeout(() => {
-        fnRef.current(...args)
+  return useMemo(() => {
+    const debounced = ((...args: Parameters<T>) => {
+      if (timeoutRef.current) clearTimeout(timeoutRef.current)
+      pendingRef.current = args
+      timeoutRef.current = setTimeout(() => {
+        timeoutRef.current = null
+        const pending = pendingRef.current
+        pendingRef.current = null
+        if (pending) fnRef.current(...pending)
       }, delay)
-    },
-    [delay],
-  )
+    }) as DebouncedFn<T>
+
+    debounced.flush = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+      const pending = pendingRef.current
+      pendingRef.current = null
+      if (pending) fnRef.current(...pending)
+    }
+
+    debounced.cancel = () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current)
+        timeoutRef.current = null
+      }
+      pendingRef.current = null
+    }
+
+    return debounced
+  }, [delay])
 }

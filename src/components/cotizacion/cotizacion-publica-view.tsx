@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { EnvelopeSimple, Phone, Lightbulb } from "@phosphor-icons/react/dist/ssr"
+import { EnvelopeSimple, Phone } from "@phosphor-icons/react/dist/ssr"
 
 import { Card, CardContent } from "@/components/ui/card"
 
@@ -27,7 +27,6 @@ export type CotizacionPublicaData = {
   total_final: number
   aplica_impuesto: boolean | null
   impuesto_pct: number
-  recomendaciones: string[] | null
   estado: "borrador" | "enviada" | "archivada"
   items: CotizacionPublicaItem[]
   operador: {
@@ -218,30 +217,6 @@ export function CotizacionPublicaView({ data }: { data: CotizacionPublicaData })
             </div>
           </CardContent>
         </Card>
-
-        {/* Recomendaciones */}
-        {data.recomendaciones && data.recomendaciones.length > 0 ? (
-          <Card>
-            <CardContent className="py-5 space-y-3">
-              <div className="flex items-center gap-2">
-                <Lightbulb className="h-4 w-4 text-amber-500" weight="fill" />
-                <h3 className="font-semibold text-sm text-neutral-900">
-                  Recomendaciones del operador
-                </h3>
-              </div>
-              <ul className="space-y-1.5">
-                {data.recomendaciones.map((rec, i) => (
-                  <li
-                    key={i}
-                    className="text-sm text-neutral-700 leading-relaxed"
-                  >
-                    {rec}
-                  </li>
-                ))}
-              </ul>
-            </CardContent>
-          </Card>
-        ) : null}
 
         {/* Operador CTA */}
         <Card>

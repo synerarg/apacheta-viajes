@@ -26,6 +26,46 @@ const AUTH_ERROR_MESSAGES: Record<string, string> = {
     "Falló la validación del login con Google. Reintenta desde el botón de acceso.",
 }
 
+// Supabase auth errors a veces vienen como AuthError, otras veces como objetos
+// "pelados" sin .message útil (típico cuando el SMTP falla). Esta función
+// extrae el mejor mensaje posible o un hint accionable según el code/status.
+function extractSupabaseAuthErrorMessage(error: unknown, fallback: string): string {
+  if (!error || typeof error !== "object") {
+    return getUserFacingErrorMessage(error, fallback)
+  }
+
+  const err = error as {
+    message?: string
+    code?: string
+    status?: number
+    name?: string
+  }
+
+  // Hints específicos para fallas comunes después de configurar SMTP custom.
+  if (err.code === "over_email_send_rate_limit") {
+    return "Esperá unos segundos antes de pedir otro código (rate limit)."
+  }
+  if (err.code === "otp_expired" || err.code === "otp_invalid") {
+    return "El código expiró o no es válido. Pedí uno nuevo."
+  }
+  if (err.code === "email_address_invalid") {
+    return "El email ingresado no es válido."
+  }
+  if (
+    err.code === "unexpected_failure" ||
+    err.status === 500 ||
+    err.status === 504
+  ) {
+    return "El servidor de email rechazó el envío. Revisá la configuración SMTP en Supabase (Authentication → Emails)."
+  }
+
+  if (typeof err.message === "string" && err.message.trim().length > 0) {
+    return getUserFacingErrorMessage(error, fallback)
+  }
+
+  return fallback
+}
+
 const RESEND_COOLDOWN_SECONDS = 30
 const PUBLIC_APP_URL =
   process.env.NEXT_PUBLIC_APP_URL?.trim() ||
@@ -117,10 +157,11 @@ export function LoginForm() {
       setResendCooldown(RESEND_COOLDOWN_SECONDS)
       toast.success("Código enviado. Revisa tu correo electrónico.")
     } catch (error) {
+      console.error("[login] signInWithOtp failed", error)
       toast.error(
-        getUserFacingErrorMessage(
+        extractSupabaseAuthErrorMessage(
           error,
-          "No pudimos enviar el codigo. Intenta nuevamente.",
+          "No pudimos enviar el codigo. Revisá la consola para más detalle.",
         ),
       )
     } finally {
@@ -152,8 +193,9 @@ export function LoginForm() {
       router.replace(next)
       router.refresh()
     } catch (error) {
+      console.error("[login] verifyOtp failed", error)
       toast.error(
-        getUserFacingErrorMessage(
+        extractSupabaseAuthErrorMessage(
           error,
           "No pudimos verificar el codigo. Intenta nuevamente.",
         ),
@@ -185,8 +227,9 @@ export function LoginForm() {
       setResendCooldown(RESEND_COOLDOWN_SECONDS)
       toast.success("Código reenviado. Revisa tu correo nuevamente.")
     } catch (error) {
+      console.error("[login] resend signInWithOtp failed", error)
       toast.error(
-        getUserFacingErrorMessage(
+        extractSupabaseAuthErrorMessage(
           error,
           "No pudimos reenviar el codigo. Intenta nuevamente.",
         ),

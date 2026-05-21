@@ -1,22 +1,26 @@
 import { NextResponse } from "next/server"
 
 import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import {
+  authorizeCotizacion,
+  ensureEditable,
+  isAuthFailure,
+} from "@/lib/cotizaciones/authorize"
 import { handleCotizadorError } from "@/lib/cotizaciones/errors"
 import { addItemRequestSchema } from "@/lib/cotizaciones/schemas"
-import { createClient } from "@/lib/supabase/server"
 
 export async function POST(
   request: Request,
   context: { params: Promise<{ id: string }> },
 ) {
   try {
-    const supabase = await createClient()
-    const {
-      data: { user },
-    } = await supabase.auth.getUser()
-    if (!user) return NextResponse.json({ error: "No autenticado" }, { status: 401 })
-
     const { id } = await context.params
+    const auth = await authorizeCotizacion(id)
+    if (isAuthFailure(auth)) return auth
+
+    const blocked = ensureEditable(auth.cotizacion)
+    if (blocked) return blocked
+
     const body = await request.json()
     const parsed = addItemRequestSchema.parse(body)
     const controller = await createServerCotizacionesController()

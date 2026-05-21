@@ -1,6 +1,6 @@
 "use client"
 
-import { useMemo, useState, type FormEvent } from "react"
+import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 
 import {
   extractOfferDetails,
@@ -51,11 +51,25 @@ interface CancelResult {
 
 const EMPTY_ROOM: RoomOccupancy = { adults: 1, childrenAges: [], infants: 0 }
 
+function formatLocalDate(date: Date) {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, "0")
+  const day = String(date.getDate()).padStart(2, "0")
+  return `${year}-${month}-${day}`
+}
+
 function getDefaultDate(offsetDays: number) {
   const date = new Date()
   date.setDate(date.getDate() + offsetDays)
+  return formatLocalDate(date)
+}
 
-  return date.toISOString().slice(0, 10)
+function getTodayDate() {
+  return formatLocalDate(new Date())
+}
+
+function isDateInPast(value: string) {
+  return value < getTodayDate()
 }
 
 async function readJsonResponse<T>(response: Response): Promise<T> {
@@ -90,17 +104,45 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
-  const [guestFirstName, setGuestFirstName] = useState("Test")
-  const [guestLastName, setGuestLastName] = useState("Apacheta")
-  const [guestEmail, setGuestEmail] = useState("test@apacheta.com")
-  const [guestPhone, setGuestPhone] = useState("+541112345678")
-  const [guestAddress, setGuestAddress] = useState("Av. Siempre Viva 123")
-  const [guestCity, setGuestCity] = useState("Buenos Aires")
-  const [guestState, setGuestState] = useState("CABA")
-  const [guestZip, setGuestZip] = useState("C1000")
+  const [guestFirstName, setGuestFirstName] = useState("")
+  const [guestLastName, setGuestLastName] = useState("")
+  const [guestEmail, setGuestEmail] = useState("")
+  const [guestPhone, setGuestPhone] = useState("")
+  const [guestAddress, setGuestAddress] = useState("")
+  const [guestCity, setGuestCity] = useState("")
+  const [guestState, setGuestState] = useState("")
+  const [guestZip, setGuestZip] = useState("")
   const [guestCountry, setGuestCountry] = useState("AR")
-  const [guestBirthDate, setGuestBirthDate] = useState("1990-01-01")
+  const [guestBirthDate, setGuestBirthDate] = useState("")
   const [specialRequests, setSpecialRequests] = useState("")
+
+  const abortRef = useRef<AbortController | null>(null)
+  const hasMountedRef = useRef(false)
+
+  useEffect(() => {
+    if (!hasMountedRef.current) {
+      hasMountedRef.current = true
+      return
+    }
+
+    abortRef.current?.abort()
+    abortRef.current = null
+
+    setAvailability((prev) => (prev ? null : prev))
+    setSelectedOfferIds((prev) => (prev.length > 0 ? [] : prev))
+    setHasPrebooked((prev) => (prev ? false : prev))
+    setBookResult((prev) => (prev ? null : prev))
+    setStatusMessage(
+      "Los criterios cambiaron. Volvé a consultar disponibilidad.",
+    )
+    setErrorMessage(null)
+  }, [checkIn, checkOut, nationality, currency, occupancy, hotelId])
+
+  useEffect(() => {
+    return () => {
+      abortRef.current?.abort()
+    }
+  }, [])
 
   const offers = useMemo(
     () => availability?.offers ?? [],
@@ -188,6 +230,36 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
+
+    if (!checkIn || !checkOut) {
+      setErrorMessage("Indicá fechas de check-in y check-out.")
+      return
+    }
+
+    if (isDateInPast(checkIn)) {
+      setErrorMessage("La fecha de check-in no puede ser anterior a hoy.")
+      return
+    }
+
+    if (checkOut <= checkIn) {
+      setErrorMessage("El check-out debe ser posterior al check-in.")
+      return
+    }
+
+    const invalidRoom = occupancy.findIndex(
+      (room) => room.adults < 1 || room.childrenAges.some((age) => age < 0 || age > 17),
+    )
+    if (invalidRoom !== -1) {
+      setErrorMessage(
+        `Revisá los datos de la habitación ${invalidRoom + 1} (mínimo 1 adulto, edades 0-17).`,
+      )
+      return
+    }
+
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     setIsLoading(true)
     setErrorMessage(null)
     setStatusMessage(null)
@@ -197,6 +269,7 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       const response = await fetch("/api/hoteleria/hyperguest/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        signal: controller.signal,
         body: JSON.stringify({
           hotelId,
           checkIn,
@@ -212,6 +285,8 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       })
       const payload = await readJsonResponse<AvailabilityResult>(response)
 
+      if (controller.signal.aborted) return
+
       setAvailability(payload)
       setSelectedOfferIds(
         Array.from({ length: occupancy.length }, () =>
@@ -221,16 +296,21 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       setStatusMessage(
         payload.offers.length > 0
           ? `Encontramos ${payload.offers.length} tarifa(s).`
-          : "No encontramos tarifas para esa configuracion.",
+          : "No encontramos tarifas para esa configuración.",
       )
     } catch (error) {
+      if (error instanceof DOMException && error.name === "AbortError") return
+      if (controller.signal.aborted) return
       setErrorMessage(
         error instanceof Error
           ? error.message
           : "No se pudo consultar la disponibilidad.",
       )
     } finally {
-      setIsLoading(false)
+      if (abortRef.current === controller) {
+        abortRef.current = null
+        setIsLoading(false)
+      }
     }
   }
 
@@ -242,11 +322,14 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
   async function handlePrebook() {
     if (!availability) return
+    if (isLoading) return
 
     const selected = getSelectedOffers()
 
-    if (selected.length === 0) {
-      setErrorMessage("Selecciona al menos una tarifa para continuar.")
+    if (selected.length < occupancy.length) {
+      setErrorMessage(
+        "Seleccioná una tarifa para cada habitación antes de continuar.",
+      )
       return
     }
 
@@ -282,6 +365,29 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
   async function handleBook() {
     if (!availability) return
+    if (isLoading) return
+
+    const missingField = (
+      [
+        ["nombre", guestFirstName],
+        ["apellido", guestLastName],
+        ["email", guestEmail],
+        ["teléfono", guestPhone],
+        ["dirección", guestAddress],
+        ["ciudad", guestCity],
+        ["país", guestCountry],
+      ] as const
+    ).find(([, value]) => value.trim().length === 0)
+
+    if (missingField) {
+      setErrorMessage(`Completá el campo "${missingField[0]}" del huésped.`)
+      return
+    }
+
+    if (!/^\S+@\S+\.\S+$/.test(guestEmail)) {
+      setErrorMessage("Ingresá un email válido.")
+      return
+    }
 
     setIsLoading(true)
     setErrorMessage(null)
@@ -377,7 +483,16 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
             <input
               type="date"
               value={checkIn}
-              onChange={(event) => setCheckIn(event.target.value)}
+              min={getTodayDate()}
+              onChange={(event) => {
+                const next = event.target.value
+                setCheckIn(next)
+                if (next && checkOut && next >= checkOut) {
+                  const nextDay = new Date(`${next}T00:00:00`)
+                  nextDay.setDate(nextDay.getDate() + 1)
+                  setCheckOut(formatLocalDate(nextDay))
+                }
+              }}
               className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
               required
             />
@@ -387,6 +502,7 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
             <input
               type="date"
               value={checkOut}
+              min={checkIn || getTodayDate()}
               onChange={(event) => setCheckOut(event.target.value)}
               className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
               required

@@ -34,9 +34,9 @@ function formatDate(iso: string | null) {
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
   if (!value) return null
   return (
-    <div className="space-y-1">
+    <div className="space-y-1 min-w-0">
       <p className="text-xs font-medium uppercase tracking-wide text-neutral-500">{label}</p>
-      <p className="text-sm text-neutral-900 whitespace-pre-line">{value}</p>
+      <p className="text-sm text-neutral-900 whitespace-pre-line break-words">{value}</p>
     </div>
   )
 }
@@ -60,8 +60,8 @@ export default async function SolicitudOperadorDetallePage({
   }
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-      <div className="flex items-center gap-3">
+    <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 lg:space-y-8">
+      <div className="flex flex-wrap items-center gap-3">
         <Button asChild variant="ghost" size="sm">
           <Link href="/dashboard/operadores/solicitudes">← Volver</Link>
         </Button>
@@ -74,8 +74,8 @@ export default async function SolicitudOperadorDetallePage({
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">{solicitud.nombre_comercial}</CardTitle>
-          <CardDescription>
+          <CardTitle className="text-xl sm:text-2xl break-words">{solicitud.nombre_comercial}</CardTitle>
+          <CardDescription className="text-sm sm:text-base">
             Solicitud enviada el {formatDate(solicitud.created_at)}
             {solicitud.revisado_at
               ? ` · Última revisión el ${formatDate(solicitud.revisado_at)}`
@@ -83,7 +83,7 @@ export default async function SolicitudOperadorDetallePage({
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-6">
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             <Field label="Email de contacto" value={solicitud.email_contacto} />
             <Field label="Teléfono" value={solicitud.telefono_contacto} />
             <Field label="Documento / CUIT" value={solicitud.documento} />

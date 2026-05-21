@@ -25,7 +25,6 @@ export interface ItineraryCotizacion {
   total_final: number
   aplica_impuesto: boolean
   impuesto_pct: number
-  recomendaciones: string[] | null
 }
 
 function formatARS(n: number | null | undefined): string {
@@ -120,14 +119,6 @@ export function generateItineraryText(
     text += `Impuestos (${Number(cotizacion.impuesto_pct).toFixed(1)}%): No aplicado\n`
   }
   text += `*TOTAL FINAL: ${formatARS(cotizacion.total_final)}*`
-
-  const recs = cotizacion.recomendaciones ?? []
-  if (recs.length > 0) {
-    text += `\n\n💡 *RECOMENDACIONES*\n`
-    for (const r of recs) {
-      text += `${r}\n`
-    }
-  }
 
   if (publicUrl) {
     text += `\n🔗 Ver online: ${publicUrl}\n`

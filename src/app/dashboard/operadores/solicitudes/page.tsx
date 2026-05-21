@@ -45,22 +45,22 @@ export default async function SolicitudesOperadorPage({
   const solicitudes = await controller.list({ estado: activeTab })
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 lg:space-y-8">
       <header className="space-y-2">
-        <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-neutral-900">
+        <h1 className="font-playfair text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900">
           Solicitudes de operador
         </h1>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm sm:text-base text-neutral-500">
           Aprobá o rechazá pedidos de alta de operadores. Una aprobación activa el rol y le da acceso al panel.
         </p>
       </header>
 
-      <nav className="flex flex-wrap gap-2 border-b border-neutral-200 pb-2">
+      <nav className="flex flex-wrap gap-2 border-b border-neutral-200 pb-2 -mx-3 sm:mx-0 px-3 sm:px-0 overflow-x-auto">
         {TABS.map((tab) => (
           <Link
             key={tab.key}
             href={`/dashboard/operadores/solicitudes?estado=${tab.key}`}
-            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+            className={`shrink-0 rounded-full px-3 sm:px-4 py-1.5 text-xs sm:text-sm font-medium transition-colors ${
               activeTab === tab.key
                 ? "bg-primary text-primary-foreground"
                 : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
@@ -86,10 +86,10 @@ export default async function SolicitudesOperadorPage({
               className="block"
             >
               <Card className="transition-shadow hover:shadow-md">
-                <CardContent className="flex flex-col gap-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-                  <div className="space-y-1">
-                    <p className="font-semibold text-neutral-900">{solicitud.nombre_comercial}</p>
-                    <p className="text-xs text-neutral-500">
+                <CardContent className="flex flex-col gap-3 py-4 sm:flex-row sm:items-center sm:justify-between">
+                  <div className="space-y-1 min-w-0">
+                    <p className="font-semibold text-neutral-900 break-words">{solicitud.nombre_comercial}</p>
+                    <p className="text-xs text-neutral-500 break-words">
                       {solicitud.email_contacto} · {solicitud.telefono_contacto}
                     </p>
                     <p className="text-xs text-neutral-400">
@@ -97,7 +97,7 @@ export default async function SolicitudesOperadorPage({
                     </p>
                   </div>
                   <span
-                    className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ${
+                    className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-medium shrink-0 ${
                       statusStyles[solicitud.estado]
                     }`}
                   >

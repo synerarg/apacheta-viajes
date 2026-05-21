@@ -5,6 +5,16 @@ import { useRouter } from "next/navigation"
 import { CheckCircle, Circle, FloppyDisk, Trash } from "@phosphor-icons/react"
 import { toast } from "sonner"
 
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import type { CotizadorPreciosRow } from "@/types/cotizador-precios/cotizador-precios.types"
@@ -80,6 +90,7 @@ export function CotizadorPreciosGrid({
   )
 
   const [rows, setRows] = useState<Record<Temporada, PrecioState>>(initialMap)
+  const [deleteTarget, setDeleteTarget] = useState<Temporada | null>(null)
 
   function updateRow(
     temporada: Temporada,
@@ -162,15 +173,19 @@ export function CotizadorPreciosGrid({
       setRows((prev) => ({ ...prev, [temporada]: emptyState() }))
       return
     }
+    setDeleteTarget(temporada)
+  }
 
-    if (
-      !confirm(
-        `¿Limpiar el precio de la temporada ${temporada}? Se eliminará la fila.`,
-      )
-    ) {
+  function confirmDelete() {
+    const temporada = deleteTarget
+    if (!temporada) return
+    const row = rows[temporada]
+    if (!row.id) {
+      setDeleteTarget(null)
       return
     }
 
+    setDeleteTarget(null)
     setSavingTemporada(temporada)
     startTransition(async () => {
       try {
@@ -198,6 +213,37 @@ export function CotizadorPreciosGrid({
   }
 
   return (
+    <>
+    <AlertDialog
+      open={deleteTarget !== null}
+      onOpenChange={(o) => {
+        if (!o) setDeleteTarget(null)
+      }}
+    >
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Eliminar precio</AlertDialogTitle>
+          <AlertDialogDescription>
+            {deleteTarget
+              ? `¿Limpiar el precio de la temporada ${deleteTarget}? Se eliminará la fila.`
+              : ""}
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPending}>Cancelar</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={(event) => {
+              event.preventDefault()
+              confirmDelete()
+            }}
+            disabled={isPending}
+            className="bg-red-600 hover:bg-red-700"
+          >
+            Eliminar
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
     <div className="overflow-x-auto border border-neutral-200 bg-white">
       <table className="w-full min-w-[1100px] text-sm">
         <thead className="bg-neutral-50 text-xs uppercase text-neutral-500">
@@ -322,7 +368,7 @@ export function CotizadorPreciosGrid({
                       className="inline-flex items-center gap-1 bg-primary px-2.5 py-1 text-xs font-medium text-white transition-colors hover:bg-primary/90 disabled:opacity-50 cursor-pointer"
                     >
                       <FloppyDisk className="h-3.5 w-3.5" />
-                      {isRowSaving ? "..." : "Guardar"}
+                      {isRowSaving ? "Guardando…" : "Guardar"}
                     </button>
                     <button
                       type="button"
@@ -341,5 +387,6 @@ export function CotizadorPreciosGrid({
         </tbody>
       </table>
     </div>
+    </>
   )
 }

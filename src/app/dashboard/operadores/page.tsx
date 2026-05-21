@@ -1,9 +1,16 @@
+import { CurrencyDollar, FileText, HandCoins, UsersThree } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 
+import { CotizacionesEnviadasRecientes } from "@/components/dashboard/cotizaciones-enviadas-recientes"
+import { KpiCard } from "@/components/dashboard/kpi-card"
+import { OperadorActivityCard } from "@/components/dashboard/operador-activity-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
 import { createServerOperadoresController } from "@/controllers/operadores/operadores.controller"
 import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
+import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
+import type { OperadoresRow } from "@/types/operadores/operadores.types"
 import type { SolicitudesOperadorRow } from "@/types/solicitudes-operador/solicitudes-operador.types"
 
 export const dynamic = "force-dynamic"
@@ -24,6 +31,22 @@ const statusLabels: Record<SolicitudesOperadorRow["estado"], string> = {
   cancelada: "Cancelada",
 }
 
+const DAY_MS = 24 * 60 * 60 * 1000
+
+function getNow(): number {
+  return new Date().getTime()
+}
+
+const currencyFormatter = new Intl.NumberFormat("es-AR", {
+  style: "currency",
+  currency: "ARS",
+  maximumFractionDigits: 0,
+})
+
+function formatCurrency(value: number) {
+  return currencyFormatter.format(Number.isFinite(value) ? value : 0)
+}
+
 function formatDate(iso: string | null) {
   if (!iso) return "—"
   return new Date(iso).toLocaleDateString("es-AR", {
@@ -33,14 +56,106 @@ function formatDate(iso: string | null) {
   })
 }
 
+function formatRelative(iso: string | null): string {
+  if (!iso) return "sin fecha"
+  const date = new Date(iso)
+  const diffMs = Date.now() - date.getTime()
+  if (Number.isNaN(diffMs)) return "sin fecha"
+
+  const days = Math.floor(diffMs / DAY_MS)
+  if (days <= 0) return "hoy"
+  if (days === 1) return "ayer"
+  if (days < 7) return `hace ${days} días`
+  if (days < 30) {
+    const weeks = Math.floor(days / 7)
+    return `hace ${weeks} ${weeks === 1 ? "semana" : "semanas"}`
+  }
+  if (days < 365) {
+    const months = Math.floor(days / 30)
+    return `hace ${months} ${months === 1 ? "mes" : "meses"}`
+  }
+  const years = Math.floor(days / 365)
+  return `hace ${years} ${years === 1 ? "año" : "años"}`
+}
+
+function computeTrend(current: number, previous: number) {
+  if (previous === 0) {
+    if (current === 0) {
+      return { label: "Sin datos previos", direction: "flat" as const }
+    }
+    return { label: "Nuevo este período", direction: "up" as const }
+  }
+  const diff = current - previous
+  const pct = Math.round((diff / previous) * 100)
+  if (pct === 0) return { label: "Sin cambios", direction: "flat" as const }
+  return {
+    label: `${Math.abs(pct)}% vs período anterior`,
+    direction: pct > 0 ? ("up" as const) : ("down" as const),
+  }
+}
+
+type OperadorAggregate = {
+  operador: OperadoresRow
+  enviadas: number
+  borradores: number
+  totalVenta: number
+  lastActivityIso: string | null
+}
+
+// `cotizaciones.operador_id` referencia `usuarios.id` (auth user id), NO
+// `operadores.id`. Por eso hay que indexar agregados por `usuario_id` y
+// hacer un fallback al `id` por si algún operador no tiene `usuario_id`.
+function buildOperadorAggregates(
+  operadores: OperadoresRow[],
+  cotizaciones: CotizacionesRow[],
+): Map<string, OperadorAggregate> {
+  const map = new Map<string, OperadorAggregate>()
+
+  for (const operador of operadores) {
+    const key = operador.usuario_id ?? operador.id
+    map.set(key, {
+      operador,
+      enviadas: 0,
+      borradores: 0,
+      totalVenta: 0,
+      lastActivityIso: null,
+    })
+  }
+
+  for (const cot of cotizaciones) {
+    const entry = map.get(cot.operador_id)
+    if (!entry) continue
+
+    if (cot.estado === "enviada") {
+      entry.enviadas += 1
+      entry.totalVenta += Number(cot.total_venta ?? 0)
+    } else if (cot.estado === "borrador") {
+      entry.borradores += 1
+    }
+
+    const candidate = cot.updated_at ?? cot.created_at
+    if (
+      candidate &&
+      (!entry.lastActivityIso ||
+        new Date(candidate).getTime() > new Date(entry.lastActivityIso).getTime())
+    ) {
+      entry.lastActivityIso = candidate
+    }
+  }
+
+  return map
+}
+
 export default async function DashboardOperadoresPage() {
   const operadoresController = await createServerOperadoresController()
   const solicitudesController = await createServerSolicitudesOperadorController()
+  const cotizacionesController = await createServerCotizacionesController()
 
-  const [operadores, pendientes, enRevision] = await Promise.all([
+  const [operadores, pendientes, enRevision, cotizaciones] = await Promise.all([
     operadoresController.list(),
     solicitudesController.list({ estado: "pendiente" }),
     solicitudesController.list({ estado: "en_revision" }),
+    cotizacionesController.listAll(),
   ])
 
   const activos = operadores.filter((o) => o.activo !== false)
@@ -48,6 +163,77 @@ export default async function DashboardOperadoresPage() {
     (a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   )
   const totalPorRevisar = porRevisar.length
+
+  // KPI: operadores nuevos en últimos 30 días
+  const now = getNow()
+  const last30Start = now - 30 * DAY_MS
+  const prev30Start = now - 60 * DAY_MS
+
+  const operadoresNuevos30 = operadores.filter((o) => {
+    if (!o.created_at) return false
+    const t = new Date(o.created_at).getTime()
+    return t >= last30Start
+  }).length
+
+  // Cotizaciones enviadas
+  const enviadas = cotizaciones.filter((c) => c.estado === "enviada")
+  const enviadasLast30 = enviadas.filter((c) => {
+    const ref = c.updated_at ?? c.created_at
+    if (!ref) return false
+    const t = new Date(ref).getTime()
+    return t >= last30Start
+  })
+  const enviadasPrev30 = enviadas.filter((c) => {
+    const ref = c.updated_at ?? c.created_at
+    if (!ref) return false
+    const t = new Date(ref).getTime()
+    return t >= prev30Start && t < last30Start
+  })
+
+  const trendEnviadas = computeTrend(enviadasLast30.length, enviadasPrev30.length)
+
+  const totalVentaEnviadas = enviadas.reduce(
+    (sum, c) => sum + Number(c.total_venta ?? 0),
+    0,
+  )
+  const totalComisionEnviadas = enviadas.reduce(
+    (sum, c) => sum + Number(c.total_comision ?? 0),
+    0,
+  )
+
+  // Últimas enviadas
+  const ultimasEnviadas = [...enviadas]
+    .sort(
+      (a, b) =>
+        new Date(b.updated_at ?? b.created_at).getTime() -
+        new Date(a.updated_at ?? a.created_at).getTime(),
+    )
+    .slice(0, 8)
+
+  // El map se indexa por `usuario_id` (lo que `cotizaciones.operador_id`
+  // realmente apunta) con fallback a `id`. Las cotizaciones almacenan el
+  // auth user id en `operador_id`, no la PK de la tabla `operadores`.
+  const operadoresMap = new Map(
+    operadores.map((o) => [o.usuario_id ?? o.id, o]),
+  )
+  const aggregates = buildOperadorAggregates(operadores, cotizaciones)
+
+  // Activos ordenados por última actividad (con actividad primero, luego sin)
+  const activosConData = activos
+    .map((o) => aggregates.get(o.usuario_id ?? o.id))
+    .filter((agg): agg is OperadorAggregate => Boolean(agg))
+
+  const activosConActividad = activosConData
+    .filter((agg) => agg.lastActivityIso !== null)
+    .sort(
+      (a, b) =>
+        new Date(b.lastActivityIso ?? 0).getTime() -
+        new Date(a.lastActivityIso ?? 0).getTime(),
+    )
+
+  const activosSinActividad = activosConData.filter(
+    (agg) => agg.lastActivityIso === null,
+  )
 
   return (
     <div className="p-4 sm:p-6 lg:p-8 space-y-8">
@@ -60,36 +246,56 @@ export default async function DashboardOperadoresPage() {
         </p>
       </header>
 
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Card>
-          <CardHeader>
-            <CardTitle>{activos.length} operadores activos</CardTitle>
-            <CardDescription>Con acceso al panel de cotización.</CardDescription>
-          </CardHeader>
-        </Card>
-        <Card className={totalPorRevisar > 0 ? "border-amber-300 bg-amber-50/60" : ""}>
-          <CardHeader className="flex flex-row items-start justify-between gap-3">
-            <div>
-              <CardTitle>
-                {totalPorRevisar} {totalPorRevisar === 1 ? "solicitud" : "solicitudes"} por revisar
-              </CardTitle>
-              <CardDescription>
-                {pendientes.length} pendientes · {enRevision.length} en revisión
-              </CardDescription>
-            </div>
-            <Button asChild size="sm">
-              <Link href="/dashboard/operadores/solicitudes">Ver todas</Link>
-            </Button>
-          </CardHeader>
-        </Card>
+      {/* KPIs */}
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <KpiCard
+          icon={<UsersThree size={22} weight="duotone" />}
+          label="Operadores activos"
+          value={String(activos.length)}
+          trend={
+            operadoresNuevos30 > 0
+              ? {
+                  label: `+${operadoresNuevos30} nuevos (30 días)`,
+                  direction: "up",
+                }
+              : undefined
+          }
+          helper={operadoresNuevos30 === 0 ? "Sin altas en 30 días" : undefined}
+        />
+        <KpiCard
+          icon={<FileText size={22} weight="duotone" />}
+          label="Cotizaciones enviadas (30d)"
+          value={String(enviadasLast30.length)}
+          trend={trendEnviadas}
+          accentClassName="bg-emerald-100 text-emerald-700"
+        />
+        <KpiCard
+          icon={<CurrencyDollar size={22} weight="duotone" />}
+          label="Venta acumulada"
+          value={formatCurrency(totalVentaEnviadas)}
+          helper={`${enviadas.length} cotizaciones enviadas`}
+          accentClassName="bg-sky-100 text-sky-700"
+        />
+        <KpiCard
+          icon={<HandCoins size={22} weight="duotone" />}
+          label="Comisión operadores"
+          value={formatCurrency(totalComisionEnviadas)}
+          helper="Total de cotizaciones enviadas"
+          accentClassName="bg-amber-100 text-amber-700"
+        />
       </div>
 
-      {/* Solicitudes pendientes — inline */}
+      {/* Solicitudes pendientes */}
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="font-playfair text-lg font-semibold">
-            Solicitudes por revisar
-          </h2>
+          <div>
+            <h2 className="font-playfair text-lg font-semibold">
+              Solicitudes por revisar
+            </h2>
+            <p className="text-xs text-neutral-500">
+              {pendientes.length} pendientes · {enRevision.length} en revisión
+            </p>
+          </div>
           {totalPorRevisar > 0 ? (
             <Button asChild variant="outline" size="sm">
               <Link href="/dashboard/operadores/solicitudes">Ver todas →</Link>
@@ -160,8 +366,40 @@ export default async function DashboardOperadoresPage() {
         )}
       </section>
 
+      {/* Últimas cotizaciones enviadas */}
       <section className="space-y-4">
-        <h2 className="font-playfair text-lg font-semibold">Operadores activos</h2>
+        <div className="flex items-center justify-between gap-3">
+          <div>
+            <h2 className="font-playfair text-lg font-semibold">
+              Últimas cotizaciones enviadas
+            </h2>
+            <p className="text-xs text-neutral-500">
+              Cotizaciones marcadas como enviadas por los operadores.
+            </p>
+          </div>
+          {enviadas.length > 0 ? (
+            <Button asChild variant="outline" size="sm">
+              <Link href="/dashboard/cotizador/cotizaciones">Ver todas →</Link>
+            </Button>
+          ) : null}
+        </div>
+        <CotizacionesEnviadasRecientes
+          cotizaciones={ultimasEnviadas}
+          operadoresMap={operadoresMap}
+          formatCurrency={formatCurrency}
+          formatRelative={formatRelative}
+        />
+      </section>
+
+      {/* Operadores activos */}
+      <section className="space-y-4">
+        <div>
+          <h2 className="font-playfair text-lg font-semibold">Operadores activos</h2>
+          <p className="text-xs text-neutral-500">
+            Ordenados por última actividad en el cotizador.
+          </p>
+        </div>
+
         {activos.length === 0 ? (
           <Card>
             <CardContent className="py-8 text-center text-sm text-muted-foreground">
@@ -169,37 +407,72 @@ export default async function DashboardOperadoresPage() {
             </CardContent>
           </Card>
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            {activos.map((operador) => (
-              <Link
-                key={operador.id}
-                href={`/dashboard/operadores/${operador.id}`}
-                className="block transition-shadow hover:shadow-md"
-              >
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="text-base">
-                      {operador.nombre_comercial ?? operador.nombre}
-                    </CardTitle>
-                    <CardDescription>{operador.email}</CardDescription>
-                  </CardHeader>
-                  <CardContent className="text-sm text-neutral-600 space-y-1">
-                    {operador.zona_operacion ? (
-                      <p>
-                        <strong>Zona:</strong> {operador.zona_operacion}
-                      </p>
-                    ) : null}
-                    {operador.telefono_contacto ? (
-                      <p>
-                        <strong>Tel:</strong> {operador.telefono_contacto}
-                      </p>
-                    ) : null}
-                  </CardContent>
-                </Card>
-              </Link>
-            ))}
-          </div>
+          <>
+            {activosConActividad.length > 0 ? (
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                {activosConActividad.map((agg) => (
+                  <OperadorActivityCard
+                    key={agg.operador.id}
+                    operador={agg.operador}
+                    enviadasCount={agg.enviadas}
+                    borradorCount={agg.borradores}
+                    totalVenta={agg.totalVenta}
+                    lastActivityIso={agg.lastActivityIso}
+                    formatCurrency={formatCurrency}
+                    formatRelative={formatRelative}
+                  />
+                ))}
+              </div>
+            ) : null}
+
+            {activosSinActividad.length > 0 ? (
+              <div className="space-y-3 pt-2">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-neutral-700">
+                    Operadores sin actividad
+                  </h3>
+                  <span className="text-xs text-neutral-400">
+                    ({activosSinActividad.length})
+                  </span>
+                </div>
+                <p className="text-xs text-neutral-500">
+                  Estos operadores todavía no usaron el cotizador.
+                </p>
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {activosSinActividad.map((agg) => (
+                    <OperadorActivityCard
+                      key={agg.operador.id}
+                      operador={agg.operador}
+                      enviadasCount={agg.enviadas}
+                      borradorCount={agg.borradores}
+                      totalVenta={agg.totalVenta}
+                      lastActivityIso={agg.lastActivityIso}
+                      formatCurrency={formatCurrency}
+                      formatRelative={formatRelative}
+                      muted
+                    />
+                  ))}
+                </div>
+              </div>
+            ) : null}
+          </>
         )}
+
+        {/* Inactivos (referencia rápida) */}
+        {operadores.some((o) => o.activo === false) ? (
+          <Card className="border-dashed">
+            <CardHeader>
+              <CardTitle className="text-sm">Operadores inactivos</CardTitle>
+              <CardDescription>
+                {operadores.filter((o) => o.activo === false).length}{" "}
+                {operadores.filter((o) => o.activo === false).length === 1
+                  ? "operador deshabilitado"
+                  : "operadores deshabilitados"}
+                .
+              </CardDescription>
+            </CardHeader>
+          </Card>
+        ) : null}
       </section>
     </div>
   )

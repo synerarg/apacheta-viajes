@@ -1,15 +1,31 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
+import type { CotizacionesItemsRow } from "@/types/cotizaciones-items/cotizaciones-items.types"
 
 function formatMoney(v: number) {
   return `$${Math.round(v || 0).toLocaleString("es-AR")}`
 }
 
+function formatDay(iso: string | null) {
+  if (!iso) return ""
+  return new Date(iso + "T00:00:00").toLocaleDateString("es-AR", {
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+  })
+}
+
+type DayBreakdown = {
+  index: number
+  fecha: string
+  items: CotizacionesItemsRow[]
+}
+
 export function TotalesPanel({
-  totalVenta,
+  items,
+  days,
   totalComision,
-  totalNeto,
   totalImpuesto,
   totalFinal,
   impuestoPct,
@@ -17,9 +33,11 @@ export function TotalesPanel({
   readonly,
   onToggleImpuesto,
 }: {
-  totalVenta: number
+  items: CotizacionesItemsRow[]
+  days: string[]
+  totalVenta?: number
   totalComision: number
-  totalNeto: number
+  totalNeto?: number
   totalImpuesto: number
   totalFinal: number
   impuestoPct: number
@@ -27,16 +45,23 @@ export function TotalesPanel({
   readonly?: boolean
   onToggleImpuesto: (next: boolean) => void
 }) {
+  const breakdown: DayBreakdown[] = days.map((fecha, index) => ({
+    index,
+    fecha,
+    items: items
+      .filter((it) => it.dia_offset === index)
+      .sort(
+        (a, b) =>
+          (a.orden ?? 999) - (b.orden ?? 999) ||
+          a.servicio_nombre.localeCompare(b.servicio_nombre),
+      ),
+  }))
+
+  const hasItems = items.length > 0
+
   return (
     <div className="space-y-4">
-      {/* Detalle */}
       <div className="space-y-2 text-sm">
-        <div className="flex items-center justify-between">
-          <span className="text-neutral-500 text-xs">Subtotal venta cliente</span>
-          <span className="font-medium text-neutral-900 tabular-nums">
-            {formatMoney(totalVenta)}
-          </span>
-        </div>
         <div className="flex items-center justify-between bg-primary/5 -mx-1 px-1 py-1 rounded">
           <span className="text-neutral-700 text-xs font-medium">
             Tu comisión total
@@ -45,15 +70,65 @@ export function TotalesPanel({
             {formatMoney(totalComision)}
           </span>
         </div>
-        <div className="flex items-center justify-between">
-          <span className="text-neutral-500 text-xs">Neto Apacheta</span>
-          <span className="text-neutral-700 tabular-nums text-sm">
-            {formatMoney(totalNeto)}
-          </span>
-        </div>
       </div>
 
-      {/* Impuesto */}
+      {hasItems ? (
+        <div className="border-t border-neutral-200 pt-3 space-y-3">
+          <p className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
+            Detalle por servicio
+          </p>
+          <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+            {breakdown.map((day) =>
+              day.items.length === 0 ? null : (
+                <div key={day.index} className="space-y-1.5">
+                  <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold flex items-center justify-between">
+                    <span>
+                      Día {day.index + 1} · {formatDay(day.fecha)}
+                    </span>
+                  </p>
+                  <ul className="space-y-1.5">
+                    {day.items.map((it) => (
+                      <li
+                        key={it.id}
+                        className="text-xs leading-snug flex items-start justify-between gap-2"
+                      >
+                        <div className="min-w-0 flex-1">
+                          <p className="font-medium text-neutral-800 truncate">
+                            {it.servicio_nombre}
+                          </p>
+                          {!it.is_special ? (
+                            <p className="text-[10px] text-neutral-400">
+                              {it.adultos} ad · {it.menores} ch
+                              {it.comision_pct
+                                ? ` · ${it.comision_pct}% com.`
+                                : ""}
+                            </p>
+                          ) : (
+                            <p className="text-[10px] text-neutral-400">
+                              Especial · sin comisión
+                            </p>
+                          )}
+                        </div>
+                        <div className="text-right shrink-0 tabular-nums">
+                          <p className="text-neutral-900 font-medium">
+                            {formatMoney(it.subtotal_venta)}
+                          </p>
+                          {it.subtotal_comision > 0 ? (
+                            <p className="text-[10px] text-primary">
+                              +{formatMoney(it.subtotal_comision)}
+                            </p>
+                          ) : null}
+                        </div>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ),
+            )}
+          </div>
+        </div>
+      ) : null}
+
       <div className="border-t border-neutral-200 pt-3 space-y-2">
         <label
           className={`flex items-center gap-2 text-xs ${
@@ -77,12 +152,11 @@ export function TotalesPanel({
         ) : null}
       </div>
 
-      {/* Total final */}
       <div className="border-t-2 border-neutral-900 pt-3">
         <div className="flex items-end justify-between gap-2">
           <div>
             <p className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">
-              Total final cliente
+              Total
             </p>
             <p className="text-xs text-neutral-500 mt-0.5">
               {aplicaImpuesto

@@ -67,3 +67,35 @@ export async function getTrasladosCatalogData() {
     tipos,
   }
 }
+
+export async function getFeaturedTrasladosData(
+  limit = 3,
+): Promise<StorefrontTrasladoItem[]> {
+  const trasladosController = await createServerTrasladosController()
+  const traslados = await trasladosController.list({ activo: true })
+
+  return [...traslados]
+    .sort((left, right) => {
+      const leftDate = left.created_at ?? ""
+      const rightDate = right.created_at ?? ""
+
+      return rightDate.localeCompare(leftDate)
+    })
+    .slice(0, limit)
+    .map<StorefrontTrasladoItem>((traslado) => ({
+      id: traslado.id,
+      slug: traslado.slug,
+      nombre: traslado.nombre,
+      descripcion: traslado.descripcion_corta ?? traslado.descripcion ?? "",
+      origen: traslado.origen,
+      destino: traslado.destino,
+      tipoServicio: traslado.tipo_servicio,
+      modalidad: traslado.modalidad,
+      vehiculoTipo: traslado.vehiculo_tipo,
+      precioDesde: Number(traslado.precio_desde ?? 0),
+      moneda: traslado.moneda ?? "ARS",
+      duracionMinutos: traslado.duracion_minutos,
+      imagen: withFallbackImage(traslado.imagen_url, "/landing/placeholder.png"),
+      basePax: traslado.base_minima_pax ?? 1,
+    }))
+}

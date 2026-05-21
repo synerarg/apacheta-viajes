@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Minus, Plus, Trash } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
@@ -11,16 +11,25 @@ function formatMoney(v: number) {
   return `$${Math.round(v || 0).toLocaleString("es-AR")}`
 }
 
+const MAX_PERSONAS = 99
+
+function clampPersonas(value: number, min = 0) {
+  if (!Number.isFinite(value)) return min
+  return Math.max(min, Math.min(MAX_PERSONAS, Math.floor(value)))
+}
+
 function Stepper({
   label,
   value,
+  min = 0,
   readonly,
   onChange,
 }: {
   label: string
   value: number
+  min?: number
   readonly?: boolean
-  onChange: (delta: number) => void
+  onChange: (next: number) => void
 }) {
   return (
     <div className="flex items-center justify-between gap-2 sm:justify-start sm:gap-3">
@@ -29,8 +38,8 @@ function Stepper({
         <Button
           variant="outline"
           size="icon-xs"
-          disabled={readonly || value <= 0}
-          onClick={() => onChange(-1)}
+          disabled={readonly || value <= min}
+          onClick={() => onChange(clampPersonas(value - 1, min))}
           aria-label={`Reducir ${label.toLowerCase()}`}
         >
           <Minus />
@@ -41,8 +50,8 @@ function Stepper({
         <Button
           variant="outline"
           size="icon-xs"
-          disabled={readonly}
-          onClick={() => onChange(1)}
+          disabled={readonly || value >= MAX_PERSONAS}
+          onClick={() => onChange(clampPersonas(value + 1, min))}
           aria-label={`Aumentar ${label.toLowerCase()}`}
         >
           <Plus />
@@ -70,30 +79,48 @@ export function ItemCard({
   const [menores, setMenores] = useState(item.menores)
   const [deleting, setDeleting] = useState(false)
 
+  // Sincronizar state local cuando el item viene del server (e.g. tras refresh
+  // del header). Si hay un cambio pendiente sin flushear, lo respetamos.
+  const dirtyRef = useRef(false)
+  // Sincronizar con los valores del server cuando el padre refresca.
+  useEffect(() => {
+    if (dirtyRef.current) return
+    setAdultos(item.adultos)
+    setMenores(item.menores)
+  }, [item.adultos, item.menores])
+
   const debouncedUpdate = useDebouncedCallback(
     (patch: { adultos?: number; menores?: number }) => {
-      onUpdate(item.id, patch)
+      dirtyRef.current = false
+      onUpdate(item.id, patch).catch(() => {
+        dirtyRef.current = false
+      })
     },
     400,
   )
 
-  function changeAdultos(delta: number) {
-    const next = Math.max(0, adultos + delta)
-    setAdultos(next)
-    debouncedUpdate({ adultos: next })
+  const minAdultos = item.is_special ? 1 : 0
+
+  function changeAdultos(next: number) {
+    const safe = clampPersonas(next, minAdultos)
+    if (safe === adultos) return
+    dirtyRef.current = true
+    setAdultos(safe)
+    debouncedUpdate({ adultos: safe })
   }
 
-  function changeMenores(delta: number) {
-    const next = Math.max(0, menores + delta)
-    setMenores(next)
-    debouncedUpdate({ menores: next })
+  function changeMenores(next: number) {
+    const safe = clampPersonas(next, 0)
+    if (safe === menores) return
+    dirtyRef.current = true
+    setMenores(safe)
+    debouncedUpdate({ menores: safe })
   }
 
   const isSpecial = !!item.is_special
 
   return (
     <div className="rounded-md border border-neutral-200 bg-white border-l-2 border-l-primary/60 overflow-hidden">
-      {/* Header: nombre + delete */}
       <div className="flex items-start justify-between gap-2 px-3 py-3 sm:px-4">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2 flex-wrap">
@@ -124,6 +151,7 @@ export function ItemCard({
             disabled={deleting}
             onClick={async () => {
               setDeleting(true)
+              debouncedUpdate.cancel()
               try {
                 await onDelete(item.id)
               } finally {
@@ -138,12 +166,12 @@ export function ItemCard({
         )}
       </div>
 
-      {/* Steppers */}
       {!isSpecial ? (
         <div className="px-3 sm:px-4 pb-3 grid gap-2 grid-cols-1 sm:grid-cols-2 sm:gap-4">
           <Stepper
             label="Adultos"
             value={adultos}
+            min={minAdultos}
             readonly={readonly}
             onChange={changeAdultos}
           />
@@ -162,11 +190,10 @@ export function ItemCard({
         </div>
       )}
 
-      {/* Totales */}
-      <div className="grid grid-cols-3 gap-1 px-3 sm:px-4 py-2.5 bg-neutral-50 border-t border-neutral-100">
+      <div className="grid grid-cols-2 gap-1 px-3 sm:px-4 py-2.5 bg-neutral-50 border-t border-neutral-100">
         <div className="min-w-0">
           <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold truncate">
-            Cliente paga
+            Total
           </p>
           <p className="font-semibold text-xs sm:text-sm text-neutral-900 truncate">
             {formatMoney(item.subtotal_venta)}
@@ -178,14 +205,6 @@ export function ItemCard({
           </p>
           <p className="font-semibold text-xs sm:text-sm text-primary truncate">
             {formatMoney(item.subtotal_comision)}
-          </p>
-        </div>
-        <div className="min-w-0">
-          <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-semibold truncate">
-            Neto Apacheta
-          </p>
-          <p className="font-semibold text-xs sm:text-sm text-neutral-600 truncate">
-            {formatMoney(item.subtotal_neto)}
           </p>
         </div>
       </div>

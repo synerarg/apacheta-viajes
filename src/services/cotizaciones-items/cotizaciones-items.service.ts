@@ -4,6 +4,11 @@ import {
   CotizacionesItemsValidationException,
 } from "@/exceptions/cotizaciones-items/cotizaciones-items.exceptions"
 import { calcItemSubtotals } from "@/lib/cotizador/calculations"
+import {
+  addDaysIso,
+  daysBetweenInclusive,
+  isValidIsoDate,
+} from "@/lib/cotizador/dates"
 import { detectSeason } from "@/lib/cotizador/season"
 import { CotizadorPreciosRepository } from "@/repositories/cotizador-precios/cotizador-precios.repository"
 import { CotizadorServiciosRepository } from "@/repositories/cotizador-servicios/cotizador-servicios.repository"
@@ -14,6 +19,7 @@ import type {
   CotizacionesItemsRow,
   CotizacionesItemsUpdate,
 } from "@/types/cotizaciones-items/cotizaciones-items.types"
+import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
 
 export interface AddItemPayload {
   servicio_id: string
@@ -79,6 +85,44 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
+  private async assertDiaOffsetInRange(
+    cotizacionId: string,
+    diaOffset: number,
+    fechaIn?: string | null,
+  ): Promise<{ cotizacion: CotizacionesRow; fechaResolved: string | null }> {
+    const cotizacion = await this.cotizacionesService.getById(cotizacionId)
+    const totalDias = daysBetweenInclusive(
+      cotizacion.fecha_inicio,
+      cotizacion.fecha_fin,
+    )
+
+    if (totalDias === 0) {
+      throw new CotizacionesItemsValidationException(
+        "Definí fecha de inicio y fin del viaje antes de cargar servicios.",
+      )
+    }
+
+    if (diaOffset < 0 || diaOffset >= totalDias) {
+      throw new CotizacionesItemsValidationException(
+        `El día ${diaOffset + 1} está fuera del rango del viaje (${totalDias} días).`,
+      )
+    }
+
+    const computedFecha = cotizacion.fecha_inicio
+      ? addDaysIso(cotizacion.fecha_inicio, diaOffset)
+      : null
+
+    if (fechaIn && !isValidIsoDate(fechaIn)) {
+      throw new CotizacionesItemsValidationException(
+        "Fecha inválida (formato YYYY-MM-DD).",
+      )
+    }
+
+    const fechaResolved = fechaIn ?? computedFecha
+
+    return { cotizacion, fechaResolved }
+  }
+
   /**
    * Agrega un item normal (referencia a un servicio del catálogo).
    * - Resuelve servicio + temporada via detectSeason(fecha) si no se pasa explícita.
@@ -90,6 +134,12 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
     payload: AddItemPayload,
   ): Promise<CotizacionesItemsRow> {
     try {
+      const { fechaResolved } = await this.assertDiaOffsetInRange(
+        cotizacionId,
+        payload.dia_offset,
+        payload.fecha,
+      )
+
       const servicio = (await this.serviciosRepository.findById(
         payload.servicio_id,
       )) as unknown as
@@ -106,7 +156,9 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
       // Resolver temporada
       let temporada = payload.temporada
       if (!temporada) {
-        const fechaForSeason = payload.fecha ? new Date(`${payload.fecha}T00:00:00`) : new Date()
+        const fechaForSeason = fechaResolved
+          ? new Date(`${fechaResolved}T00:00:00`)
+          : new Date()
         temporada = detectSeason(
           fechaForSeason,
           precios.map((p) => p.temporada),
@@ -136,7 +188,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         cotizacion_id: cotizacionId,
         servicio_id: servicio.id,
         dia_offset: payload.dia_offset,
-        fecha: payload.fecha ?? null,
+        fecha: fechaResolved,
         servicio_nombre: servicio.nombre,
         servicio_descripcion: servicio.descripcion ?? null,
         adultos: payload.adultos,
@@ -166,6 +218,12 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
     payload: AddSpecialPayload,
   ): Promise<CotizacionesItemsRow> {
     try {
+      const { fechaResolved } = await this.assertDiaOffsetInRange(
+        cotizacionId,
+        payload.dia_offset,
+        payload.fecha,
+      )
+
       const precioAdulto = Math.max(0, Number(payload.precio_unit) || 0)
       const totals = calcItemSubtotals({
         adultos: payload.adultos ?? 1,
@@ -179,7 +237,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         cotizacion_id: cotizacionId,
         servicio_id: null,
         dia_offset: payload.dia_offset,
-        fecha: payload.fecha ?? null,
+        fecha: fechaResolved,
         servicio_nombre: payload.nombre,
         servicio_descripcion: payload.descripcion ?? null,
         adultos: payload.adultos ?? 1,
@@ -203,6 +261,14 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
   async updateItem(itemId: string, payload: UpdateItemPayload): Promise<CotizacionesItemsRow> {
     try {
       const current = await this.getById(itemId)
+
+      if (payload.dia_offset !== undefined) {
+        await this.assertDiaOffsetInRange(
+          current.cotizacion_id,
+          payload.dia_offset,
+          payload.fecha ?? current.fecha,
+        )
+      }
 
       const adultos = payload.adultos ?? current.adultos
       const menores = payload.menores ?? current.menores
@@ -229,7 +295,14 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         subtotal_neto: totals.subtotalNeto,
       }
       if (payload.dia_offset !== undefined) update.dia_offset = payload.dia_offset
-      if (payload.fecha !== undefined) update.fecha = payload.fecha
+      if (payload.fecha !== undefined) {
+        if (payload.fecha !== null && !isValidIsoDate(payload.fecha)) {
+          throw new CotizacionesItemsValidationException(
+            "Fecha del item inválida (formato YYYY-MM-DD).",
+          )
+        }
+        update.fecha = payload.fecha
+      }
       if (payload.servicio_nombre !== undefined) update.servicio_nombre = payload.servicio_nombre
       if (payload.servicio_descripcion !== undefined) {
         update.servicio_descripcion = payload.servicio_descripcion

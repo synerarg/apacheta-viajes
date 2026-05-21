@@ -69,7 +69,7 @@ function SidebarContent({
           <button
             type="button"
             onClick={onClose}
-            className="text-neutral-500 hover:text-neutral-900 transition-colors cursor-pointer"
+            className="text-white/60 hover:text-white transition-colors cursor-pointer"
             aria-label="Cerrar menú"
           >
             <X className="h-5 w-5" />
@@ -78,7 +78,7 @@ function SidebarContent({
       </div>
 
       <div className="px-6 pb-3">
-        <p className="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">
+        <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
           Panel de operador
         </p>
       </div>
@@ -93,8 +93,8 @@ function SidebarContent({
               onClick={onClose}
               className={`flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors ${
                 active
-                  ? "border-l-2 border-primary bg-neutral-100 pl-[10px] text-neutral-900 font-medium"
-                  : "text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900"
+                  ? "border-l-2 border-primary bg-white/5 pl-[10px] text-white"
+                  : "text-white/60 hover:bg-white/5 hover:text-white/90"
               }`}
             >
               <Icon
@@ -107,13 +107,13 @@ function SidebarContent({
         })}
       </nav>
 
-      <div className="border-t border-neutral-200 px-3 py-4 flex flex-col gap-1">
+      <div className="border-t border-white/10 px-3 py-4 flex flex-col gap-1">
         {bottomItems.map(({ href, label, icon: Icon }) => (
           <Link
             key={href}
             href={href}
             onClick={onClose}
-            className="flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+            className="flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white/90"
           >
             <Icon className="h-4 w-4 shrink-0" />
             {label}
@@ -123,7 +123,7 @@ function SidebarContent({
           type="button"
           onClick={handleSignOut}
           disabled={isSigningOut}
-          className="flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm text-neutral-600 transition-colors hover:bg-neutral-100 hover:text-neutral-900 disabled:opacity-50 cursor-pointer"
+          className="flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm text-white/60 transition-colors hover:bg-white/5 hover:text-white/90 disabled:opacity-50 cursor-pointer"
         >
           <SignOut className="h-4 w-4 shrink-0" />
           {isSigningOut ? "Saliendo..." : "Cerrar sesión"}
@@ -148,7 +148,7 @@ export function OperadorSidebarClient() {
 
   return (
     <>
-      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 h-screen w-[250px] flex-col bg-white border-r border-neutral-200">
+      <aside className="hidden lg:flex fixed inset-y-0 left-0 z-40 h-screen w-[250px] flex-col bg-[#2E2726]">
         <SidebarContent
           pathname={pathname}
           isSigningOut={isSigningOut}
@@ -156,7 +156,7 @@ export function OperadorSidebarClient() {
         />
       </aside>
 
-      <div className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between bg-white border-b border-neutral-200 px-4 lg:hidden">
+      <div className="fixed top-0 left-0 right-0 z-50 flex h-14 items-center justify-between bg-[#2E2726] px-4 lg:hidden">
         <Link href="/operador">
           <Image
             src="/logo.png"
@@ -169,7 +169,7 @@ export function OperadorSidebarClient() {
         <button
           type="button"
           onClick={() => setIsOpen(true)}
-          className="flex items-center justify-center p-1.5 text-neutral-600 hover:text-neutral-900 transition-colors cursor-pointer"
+          className="flex items-center justify-center p-1.5 text-white/70 hover:text-white transition-colors cursor-pointer"
           aria-label="Abrir menú"
         >
           <List className="h-6 w-6" />
@@ -177,14 +177,14 @@ export function OperadorSidebarClient() {
       </div>
 
       <div
-        className={`fixed inset-0 z-[60] bg-black/40 transition-opacity duration-300 lg:hidden ${
+        className={`fixed inset-0 z-[60] bg-black/50 transition-opacity duration-300 lg:hidden ${
           isOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
         onClick={() => setIsOpen(false)}
       />
 
       <div
-        className={`fixed top-0 left-0 z-[70] flex h-full w-[min(280px,85vw)] flex-col bg-white transition-transform duration-300 ease-in-out lg:hidden ${
+        className={`fixed top-0 left-0 z-[70] flex h-full w-[min(280px,85vw)] flex-col bg-[#2E2726] transition-transform duration-300 ease-in-out lg:hidden ${
           isOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >

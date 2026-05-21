@@ -1,12 +1,13 @@
 "use client"
 
-import { useMemo, useState, useTransition } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { toast } from "sonner"
 import {
   ArrowLeft,
-  PaperPlaneTilt,
+  WhatsappLogo,
+  Copy,
   Archive,
   ArrowCounterClockwise,
   CaretUp,
@@ -14,15 +15,20 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
+import { isoRange } from "@/lib/cotizador/dates"
 import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
 import type { CotizacionesItemsRow } from "@/types/cotizaciones-items/cotizaciones-items.types"
 import type { CotizadorCategoriasRow } from "@/types/cotizador-categorias/cotizador-categorias.types"
 import type { CotizadorServiciosRow } from "@/types/cotizador-servicios/cotizador-servicios.types"
 
 import { AgregarEspecialDialog, type EspecialKind } from "./agregar-especial-dialog"
-import { ClienteInfoForm } from "./cliente-info-form"
+import {
+  ClienteInfoForm,
+  type ClienteInfoFormHandle,
+} from "./cliente-info-form"
 import { DateRangeSection } from "./date-range-section"
 import { DiaCard } from "./dia-card"
+import { EliminarCotizacionButton } from "./eliminar-cotizacion-button"
 import { SeleccionarServicioSheet } from "./seleccionar-servicio-sheet"
 import { TotalesPanel } from "./totales-panel"
 import { SalidaActions } from "./salida-actions"
@@ -34,27 +40,11 @@ type Props = {
   servicios: CotizadorServiciosRow[]
 }
 
-function isoBetween(start: string | null, end: string | null): string[] {
-  if (!start || !end) return []
-  const s = new Date(start + "T00:00:00")
-  const e = new Date(end + "T00:00:00")
-  if (isNaN(s.getTime()) || isNaN(e.getTime()) || e < s) return []
-  const out: string[] = []
-  const cur = new Date(s)
-  while (cur <= e) {
-    out.push(cur.toISOString().slice(0, 10))
-    cur.setDate(cur.getDate() + 1)
-  }
-  return out
-}
+type CotizacionWithItems = CotizacionesRow & { items?: CotizacionesItemsRow[] }
 
-function formatDate(iso: string | null) {
-  if (!iso) return ""
-  return new Date(iso + "T00:00:00").toLocaleDateString("es-AR", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  })
+type CotizacionApiResponse = {
+  cotizacion?: CotizacionWithItems
+  data?: CotizacionWithItems
 }
 
 function formatMoney(v: number) {
@@ -63,23 +53,59 @@ function formatMoney(v: number) {
 
 const ESTADO_BADGE: Record<
   CotizacionesRow["estado"],
-  { bg: string; text: string; label: string }
+  { bg: string; text: string; ring: string; dot: string; label: string }
 > = {
   borrador: {
-    bg: "bg-amber-100",
+    bg: "bg-amber-50",
     text: "text-amber-800",
-    label: "Borrador",
+    ring: "ring-amber-200",
+    dot: "bg-amber-500",
+    label: "Activa",
   },
   enviada: {
-    bg: "bg-emerald-100",
+    bg: "bg-emerald-50",
     text: "text-emerald-800",
+    ring: "ring-emerald-200",
+    dot: "bg-emerald-500",
     label: "Enviada",
   },
   archivada: {
-    bg: "bg-neutral-200",
+    bg: "bg-neutral-100",
     text: "text-neutral-700",
+    ring: "ring-neutral-200",
+    dot: "bg-neutral-400",
     label: "Archivada",
   },
+}
+
+async function readApiResponse(res: Response): Promise<{
+  data: CotizacionWithItems | null
+  error: string | null
+  status: number
+}> {
+  const contentType = res.headers.get("content-type") ?? ""
+  if (!contentType.includes("application/json")) {
+    return {
+      data: null,
+      error: `Error del servidor (HTTP ${res.status}).`,
+      status: res.status,
+    }
+  }
+  let parsed: CotizacionApiResponse & { error?: string; message?: string } = {}
+  try {
+    parsed = (await res.json()) as typeof parsed
+  } catch {
+    return { data: null, error: "Respuesta inválida del servidor.", status: res.status }
+  }
+  if (!res.ok) {
+    return {
+      data: null,
+      error: parsed.error || parsed.message || `Error HTTP ${res.status}.`,
+      status: res.status,
+    }
+  }
+  const cot = parsed.cotizacion ?? parsed.data ?? null
+  return { data: cot, error: null, status: res.status }
 }
 
 export function CotizadorBuilder({
@@ -98,23 +124,27 @@ export function CotizadorBuilder({
     { kind: EspecialKind; diaOffset: number; fecha: string | null } | null
   >(null)
   const [isSending, startSending] = useTransition()
+  const [isMutating, setIsMutating] = useState(false)
   const [publicUrl, setPublicUrl] = useState<string | null>(null)
   const [mobileTotalsOpen, setMobileTotalsOpen] = useState(false)
+
+  const clienteFormRef = useRef<ClienteInfoFormHandle | null>(null)
 
   const readonly = cotizacion.estado !== "borrador"
   const estadoBadge =
     ESTADO_BADGE[cotizacion.estado] ?? {
       bg: "bg-neutral-100",
       text: "text-neutral-700",
+      ring: "ring-neutral-200",
+      dot: "bg-neutral-400",
       label: cotizacion.estado ?? "—",
     }
 
   const days = useMemo(
-    () => isoBetween(cotizacion.fecha_inicio, cotizacion.fecha_fin),
+    () => isoRange(cotizacion.fecha_inicio, cotizacion.fecha_fin),
     [cotizacion.fecha_inicio, cotizacion.fecha_fin],
   )
 
-  // Group items by dia_offset
   const itemsByDay = useMemo(() => {
     const map = new Map<number, CotizacionesItemsRow[]>()
     for (const it of items) {
@@ -133,42 +163,71 @@ export function CotizadorBuilder({
     return map
   }, [items])
 
-  // ─── API helpers ─────────────────────────────────────────────
-  async function refreshCotizacion() {
+  const applyResponse = useCallback((data: CotizacionWithItems | null) => {
+    if (!data) return
+    const { items: itms, ...header } = data
+    setCotizacion(header as CotizacionesRow)
+    if (Array.isArray(itms)) setItems(itms)
+  }, [])
+
+  const refreshCotizacion = useCallback(async () => {
     try {
       const res = await fetch(`/api/cotizaciones/${cotizacion.id}`, {
         method: "GET",
         cache: "no-store",
       })
-      if (!res.ok) return
-      const data = await res.json()
-      const cot = data?.data ?? data
-      if (cot && typeof cot === "object") {
-        const { items: itms, ...header } = cot as CotizacionesRow & {
-          items?: CotizacionesItemsRow[]
-        }
-        setCotizacion(header as CotizacionesRow)
-        if (Array.isArray(itms)) setItems(itms)
-      }
+      const { data } = await readApiResponse(res)
+      applyResponse(data)
     } catch {
       // ignore
     }
-  }
+  }, [cotizacion.id, applyResponse])
 
-  async function patchHeader(patch: Partial<CotizacionesRow>) {
+  const pendingHeaderRef = useRef(0)
+
+  async function patchHeader(patch: Record<string, unknown>): Promise<boolean> {
+    // Asegurar que cualquier debounce pendiente del cliente se mande primero
+    // para no perderse en el refresh que dispara este PATCH.
+    clienteFormRef.current?.flush()
+
+    // Optimistic update: aplicar el patch al state local inmediatamente
+    // para que la UI (especialmente la grilla de días) responda al instante.
+    const previous = cotizacion
+    const optimistic = { ...previous } as CotizacionesRow & Record<string, unknown>
+    for (const [key, value] of Object.entries(patch)) {
+      if (value === undefined) continue
+      ;(optimistic as Record<string, unknown>)[key] = value
+    }
+    setCotizacion(optimistic as CotizacionesRow)
+
+    const requestId = ++pendingHeaderRef.current
+    setIsMutating(true)
     try {
       const res = await fetch(`/api/cotizaciones/${cotizacion.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(patch),
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "Error al guardar")
+      const { data, error } = await readApiResponse(res)
+      // Si llegó una respuesta a un request más viejo, ignorarla
+      if (requestId !== pendingHeaderRef.current) return true
+      if (error) {
+        setCotizacion(previous)
+        toast.error(error)
+        return false
       }
-      await refreshCotizacion()
+      applyResponse(data)
+      return true
     } catch (err) {
-      toast.error(err instanceof Error ? err.message : "Error al guardar")
+      if (requestId === pendingHeaderRef.current) {
+        setCotizacion(previous)
+        toast.error(err instanceof Error ? err.message : "Error al guardar")
+      }
+      return false
+    } finally {
+      if (requestId === pendingHeaderRef.current) {
+        setIsMutating(false)
+      }
     }
   }
 
@@ -184,21 +243,26 @@ export function CotizadorBuilder({
     precio_adulto_unit?: number
     precio_menor_unit?: number
     comision_pct?: number
+    precio_unit?: number
   }) {
+    setIsMutating(true)
     try {
       const res = await fetch(`/api/cotizaciones/${cotizacion.id}/items`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       })
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "No se pudo agregar el item")
+      const { error } = await readApiResponse(res)
+      if (error) {
+        toast.error(error)
+        return
       }
       await refreshCotizacion()
-      toast.success("Item agregado")
+      toast.success("Servicio agregado")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al agregar")
+    } finally {
+      setIsMutating(false)
     }
   }
 
@@ -215,9 +279,10 @@ export function CotizadorBuilder({
           body: JSON.stringify(patch),
         },
       )
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "Error al actualizar")
+      const { error } = await readApiResponse(res)
+      if (error) {
+        toast.error(error)
+        return
       }
       await refreshCotizacion()
     } catch (err) {
@@ -226,19 +291,23 @@ export function CotizadorBuilder({
   }
 
   async function deleteItem(itemId: string) {
+    setIsMutating(true)
     try {
       const res = await fetch(
         `/api/cotizaciones/${cotizacion.id}/items/${itemId}`,
         { method: "DELETE" },
       )
-      if (!res.ok) {
-        const data = await res.json().catch(() => ({}))
-        throw new Error(data?.message || "Error al eliminar")
+      const { error } = await readApiResponse(res)
+      if (error) {
+        toast.error(error)
+        return
       }
       await refreshCotizacion()
-      toast.success("Item eliminado")
+      toast.success("Servicio eliminado")
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Error al eliminar")
+    } finally {
+      setIsMutating(false)
     }
   }
 
@@ -283,27 +352,64 @@ export function CotizadorBuilder({
       menores: 0,
       dia_offset: diaOffset,
       fecha,
-      precio_adulto_unit: precio,
-      precio_menor_unit: 0,
-      comision_pct: 0,
+      precio_unit: precio,
     })
   }
 
-  function handleSend() {
+  function preflightSend(): boolean {
+    if (items.length === 0) {
+      toast.error("Agregá al menos un servicio antes de enviar.")
+      return false
+    }
+    if (!cotizacion.fecha_inicio || !cotizacion.fecha_fin) {
+      toast.error("Cargá las fechas del viaje antes de enviar.")
+      return false
+    }
+    if (
+      !cotizacion.cliente_nombre ||
+      cotizacion.cliente_nombre.trim().length === 0
+    ) {
+      toast.error("Cargá el nombre del cliente antes de enviar.")
+      return false
+    }
+    return true
+  }
+
+  async function sendCotizacion(): Promise<boolean> {
+    const res = await fetch(`/api/cotizaciones/${cotizacion.id}/send`, {
+      method: "POST",
+    })
+    const { data, error } = await readApiResponse(res)
+    if (error) {
+      toast.error(error)
+      return false
+    }
+    if (data) applyResponse(data)
+    return true
+  }
+
+  function buildWhatsAppUrl(text: string, phone: string | null | undefined) {
+    const clean = (phone ?? "").replace(/\D/g, "")
+    const encoded = encodeURIComponent(text)
+    return clean
+      ? `https://wa.me/${clean}?text=${encoded}`
+      : `https://wa.me/?text=${encoded}`
+  }
+
+  function handleSendWhatsApp(textToSend: string) {
+    if (!preflightSend()) return
+    clienteFormRef.current?.flush()
+    const waUrl = buildWhatsAppUrl(textToSend, cotizacion.cliente_telefono)
+    // Abrir WhatsApp inmediatamente (mismo gesto del usuario) para evitar bloqueo de pop-ups
+    const waWindow = window.open(waUrl, "_blank")
     startSending(async () => {
       try {
-        const res = await fetch(`/api/cotizaciones/${cotizacion.id}/send`, {
-          method: "POST",
-        })
-        if (!res.ok) {
-          const data = await res.json().catch(() => ({}))
-          throw new Error(data?.message || "Error al enviar")
+        const ok = await sendCotizacion()
+        if (!ok) {
+          waWindow?.close()
+          return
         }
-        const data = await res.json()
-        const url = data?.public_url ?? data?.url ?? data?.data?.public_url
-        if (url) setPublicUrl(url)
-        toast.success("Cotización marcada como enviada")
-        await refreshCotizacion()
+        toast.success("Cotización enviada por WhatsApp")
         router.refresh()
       } catch (err) {
         toast.error(err instanceof Error ? err.message : "Error al enviar")
@@ -311,86 +417,202 @@ export function CotizadorBuilder({
     })
   }
 
-  async function handleArchivar() {
-    await patchHeader({ estado: "archivada" } as Partial<CotizacionesRow>)
-    toast.success("Cotización archivada")
+  function handleSendCopy(textToCopy: string) {
+    if (!preflightSend()) return
+    clienteFormRef.current?.flush()
+    startSending(async () => {
+      try {
+        const ok = await sendCotizacion()
+        if (!ok) return
+        try {
+          await navigator.clipboard.writeText(textToCopy)
+          toast.success("Cotización copiada al portapapeles")
+        } catch {
+          toast.error(
+            "Cotización marcada como enviada, pero no pudimos copiar al portapapeles",
+          )
+        }
+        router.refresh()
+      } catch (err) {
+        toast.error(err instanceof Error ? err.message : "Error al enviar")
+      }
+    })
   }
 
-  async function handleVolverBorrador() {
-    await patchHeader({ estado: "borrador" } as Partial<CotizacionesRow>)
-    toast.success("Cotización vuelta a borrador")
+  async function changeEstado(estado: "borrador" | "archivada") {
+    setIsMutating(true)
+    try {
+      const res = await fetch(`/api/cotizaciones/${cotizacion.id}/estado`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ estado }),
+      })
+      const { data, error } = await readApiResponse(res)
+      if (error) {
+        toast.error(error)
+        return
+      }
+      if (data) applyResponse(data)
+      toast.success(
+        estado === "archivada"
+          ? "Cotización archivada"
+          : "Cotización vuelta a borrador",
+      )
+      router.refresh()
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Error al cambiar el estado")
+    } finally {
+      setIsMutating(false)
+    }
   }
 
-  // ─── Resolved public URL ─────────────────────────────────────
   const resolvedPublicUrl = useMemo(() => {
     if (publicUrl) return publicUrl
     if (typeof window === "undefined") return ""
     return `${window.location.origin}/cotizacion/${cotizacion.token}`
   }, [publicUrl, cotizacion.token])
 
-  // ─── Itinerary text (whatsapp/email/copy) ────────────────────
-  const itineraryText = useMemo(() => {
-    const lines: string[] = []
-    lines.push("🌄 *Cotización Apacheta Viajes*")
-    if (cotizacion.cliente_nombre) lines.push(`👤 ${cotizacion.cliente_nombre}`)
-    const contact = [
-      cotizacion.cliente_email ? `📧 ${cotizacion.cliente_email}` : "",
-      cotizacion.cliente_telefono ? `📞 ${cotizacion.cliente_telefono}` : "",
-    ]
-      .filter(Boolean)
-      .join(" | ")
-    if (contact) lines.push(contact)
-    if (cotizacion.fecha_inicio || cotizacion.fecha_fin) {
-      lines.push(
-        `📅 ${formatDate(cotizacion.fecha_inicio)} al ${formatDate(cotizacion.fecha_fin)}`,
-      )
+  useEffect(() => {
+    if (cotizacion.estado === "enviada" && !publicUrl && typeof window !== "undefined") {
+      setPublicUrl(`${window.location.origin}/cotizacion/${cotizacion.token}`)
     }
-    lines.push("")
+  }, [cotizacion.estado, cotizacion.token, publicUrl])
 
+  const itineraryText = useMemo(() => {
+    // Buenas prácticas WhatsApp:
+    // - *bold* sólo para títulos y precio final
+    // - _italic_ para descripciones largas
+    // - separadores con caracteres unicode para airear secciones
+    // - URLs siempre en su propia línea (mejora la preview)
+    const SEPARATOR = "━━━━━━━━━━━━━━━━━━━━"
+    const lines: string[] = []
+
+    function pushBlank() {
+      lines.push("")
+    }
+
+    function capitalize(text: string) {
+      return text.length ? text[0].toUpperCase() + text.slice(1) : text
+    }
+
+    function formatLongDate(iso: string) {
+      const raw = new Date(iso + "T00:00:00").toLocaleDateString("es-AR", {
+        weekday: "long",
+        day: "numeric",
+        month: "long",
+      })
+      return capitalize(raw)
+    }
+
+    function formatShortDate(iso: string | null) {
+      if (!iso) return ""
+      const raw = new Date(iso + "T00:00:00").toLocaleDateString("es-AR", {
+        day: "numeric",
+        month: "long",
+        year: "numeric",
+      })
+      return raw
+    }
+
+    function pluralize(n: number, singular: string, plural: string) {
+      return `${n} ${n === 1 ? singular : plural}`
+    }
+
+    // ─── Encabezado de marca ─────────────────────────────────
+    lines.push("*APACHETA VIAJES*")
+    lines.push("_Cotización personalizada_")
+    pushBlank()
+    lines.push(SEPARATOR)
+    pushBlank()
+
+    // ─── Datos del cliente ───────────────────────────────────
+    if (cotizacion.cliente_nombre) {
+      lines.push(`*Cliente:* ${cotizacion.cliente_nombre}`)
+    }
+    if (cotizacion.cliente_email) {
+      lines.push(`*Email:* ${cotizacion.cliente_email}`)
+    }
+    if (cotizacion.cliente_telefono) {
+      lines.push(`*Teléfono:* ${cotizacion.cliente_telefono}`)
+    }
+    if (cotizacion.cliente_nombre || cotizacion.cliente_email || cotizacion.cliente_telefono) {
+      pushBlank()
+    }
+
+    // ─── Fechas del viaje ────────────────────────────────────
+    if (cotizacion.fecha_inicio && cotizacion.fecha_fin) {
+      lines.push(
+        `*Fechas:* ${formatShortDate(cotizacion.fecha_inicio)} → ${formatShortDate(cotizacion.fecha_fin)}`,
+      )
+      const totalDays = days.length
+      if (totalDays > 0) {
+        const noches = Math.max(totalDays - 1, 0)
+        lines.push(
+          `${pluralize(totalDays, "día", "días")} / ${pluralize(noches, "noche", "noches")}`,
+        )
+      }
+      pushBlank()
+    }
+
+    lines.push(SEPARATOR)
+    pushBlank()
+
+    // ─── Itinerario día por día ─────────────────────────────
     days.forEach((fecha, i) => {
       const dayItems = itemsByDay.get(i) ?? []
-      const fechaTxt = new Date(fecha + "T00:00:00").toLocaleDateString(
-        "es-AR",
-        { weekday: "long", day: "numeric", month: "long" },
-      )
-      lines.push(`*Día ${i + 1}: ${fechaTxt}*`)
+      lines.push(`*DÍA ${i + 1}*  ·  ${formatLongDate(fecha)}`)
+      pushBlank()
+
       if (dayItems.length === 0) {
-        lines.push("   (sin servicios)")
+        lines.push("_Sin servicios cargados_")
       } else {
-        for (const s of dayItems) {
-          lines.push(`• ${s.servicio_nombre}`)
-          if (s.servicio_descripcion) lines.push(`   ${s.servicio_descripcion}`)
-          if (s.is_special) {
-            lines.push(`   Precio: ${formatMoney(s.subtotal_venta)}`)
-          } else {
-            lines.push(
-              `   (${s.adultos} ad / ${s.menores} ch) → ${formatMoney(s.subtotal_venta)}`,
-            )
+        dayItems.forEach((s, index) => {
+          lines.push(`*› ${s.servicio_nombre}*`)
+          if (s.servicio_descripcion) {
+            lines.push(`_${s.servicio_descripcion}_`)
           }
-        }
+          if (s.is_special) {
+            lines.push(`Precio: *${formatMoney(s.subtotal_venta)}*`)
+          } else {
+            const personas: string[] = []
+            if (s.adultos > 0) personas.push(pluralize(s.adultos, "adulto", "adultos"))
+            if (s.menores > 0) personas.push(pluralize(s.menores, "menor", "menores"))
+            const personasTxt = personas.join(" + ") || "—"
+            lines.push(`${personasTxt} · *${formatMoney(s.subtotal_venta)}*`)
+          }
+          if (index < dayItems.length - 1) pushBlank()
+        })
       }
-      lines.push("")
+      pushBlank()
+      lines.push(SEPARATOR)
+      pushBlank()
     })
 
-    lines.push("💰 *RESUMEN*")
-    lines.push(`Total con comisiones: ${formatMoney(cotizacion.total_venta)}`)
+    // ─── Resumen económico ───────────────────────────────────
+    lines.push("*RESUMEN*")
+    pushBlank()
+    lines.push(`Subtotal servicios: ${formatMoney(cotizacion.total_venta)}`)
     if (cotizacion.aplica_impuesto) {
       lines.push(
         `Impuestos (${cotizacion.impuesto_pct}%): ${formatMoney(cotizacion.total_impuesto)}`,
       )
     } else {
-      lines.push(`Impuestos (${cotizacion.impuesto_pct}%): No aplicado`)
+      lines.push(`Impuestos (${cotizacion.impuesto_pct}%): no aplicados`)
     }
+    pushBlank()
     lines.push(`*TOTAL FINAL: ${formatMoney(cotizacion.total_final)}*`)
 
-    if (cotizacion.recomendaciones && cotizacion.recomendaciones.length > 0) {
-      lines.push("")
-      lines.push("💡 *RECOMENDACIONES*")
-      for (const r of cotizacion.recomendaciones) lines.push(r)
+    // ─── Footer ──────────────────────────────────────────────
+    pushBlank()
+    lines.push(SEPARATOR)
+    pushBlank()
+    if (resolvedPublicUrl) {
+      lines.push("*Ver cotización online:*")
+      lines.push(resolvedPublicUrl)
+      pushBlank()
     }
-
-    lines.push("")
-    lines.push(`🔗 ${resolvedPublicUrl}`)
+    lines.push("_Quedamos a tu disposición._")
+    lines.push("_Apacheta Viajes_")
 
     return lines.join("\n")
   }, [cotizacion, days, itemsByDay, resolvedPublicUrl])
@@ -401,7 +623,6 @@ export function CotizadorBuilder({
   return (
     <>
       <div className="p-3 sm:p-6 lg:p-8 space-y-5 max-w-7xl mx-auto pb-32 lg:pb-8">
-        {/* Header */}
         <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-3 min-w-0">
             <Button asChild variant="ghost" size="icon-sm" className="shrink-0">
@@ -420,8 +641,9 @@ export function CotizadorBuilder({
           </div>
           <div className="flex items-center gap-2 flex-wrap pl-11 sm:pl-0">
             <span
-              className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${estadoBadge.bg} ${estadoBadge.text}`}
+              className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ring-1 ${estadoBadge.bg} ${estadoBadge.text} ${estadoBadge.ring}`}
             >
+              <span className={`h-1.5 w-1.5 rounded-full ${estadoBadge.dot}`} />
               {estadoBadge.label}
             </span>
             {totalDias > 0 ? (
@@ -438,27 +660,25 @@ export function CotizadorBuilder({
         </header>
 
         <div className="grid gap-5 lg:gap-6 lg:grid-cols-[1fr_320px]">
-          {/* Main column */}
           <div className="space-y-5 min-w-0">
-            {/* Cliente */}
             <Card>
               <CardContent className="space-y-4 py-4 sm:py-5">
                 <h2 className="font-semibold text-sm text-neutral-900">
                   Datos del cliente
                 </h2>
                 <ClienteInfoForm
+                  ref={clienteFormRef}
                   initial={{
                     cliente_nombre: cotizacion.cliente_nombre,
                     cliente_email: cotizacion.cliente_email,
                     cliente_telefono: cotizacion.cliente_telefono,
                   }}
                   readonly={readonly}
-                  onPatch={(patch) => patchHeader(patch as Partial<CotizacionesRow>)}
+                  onPatch={(patch) => patchHeader(patch).then(() => undefined)}
                 />
               </CardContent>
             </Card>
 
-            {/* Fechas */}
             <Card>
               <CardContent className="space-y-4 py-4 sm:py-5">
                 <h2 className="font-semibold text-sm text-neutral-900">
@@ -468,14 +688,11 @@ export function CotizadorBuilder({
                   inicio={cotizacion.fecha_inicio}
                   fin={cotizacion.fecha_fin}
                   readonly={readonly}
-                  onCommit={(patch) =>
-                    patchHeader(patch as Partial<CotizacionesRow>)
-                  }
+                  onCommit={(patch) => patchHeader(patch).then(() => undefined)}
                 />
               </CardContent>
             </Card>
 
-            {/* Días */}
             {days.length === 0 ? (
               <Card>
                 <CardContent className="py-10 text-center text-sm text-neutral-500">
@@ -511,10 +728,8 @@ export function CotizadorBuilder({
                 ))}
               </div>
             )}
-
           </div>
 
-          {/* Sidebar desktop */}
           <aside className="hidden lg:block lg:sticky lg:top-6 self-start space-y-4">
             <Card>
               <CardContent className="py-5 space-y-4">
@@ -522,16 +737,16 @@ export function CotizadorBuilder({
                   Totales
                 </h2>
                 <TotalesPanel
-                  totalVenta={cotizacion.total_venta}
+                  items={items}
+                  days={days}
                   totalComision={cotizacion.total_comision}
-                  totalNeto={cotizacion.total_neto}
                   totalImpuesto={cotizacion.total_impuesto}
                   totalFinal={cotizacion.total_final}
                   impuestoPct={cotizacion.impuesto_pct}
                   aplicaImpuesto={!!cotizacion.aplica_impuesto}
                   readonly={readonly}
                   onToggleImpuesto={(next) =>
-                    patchHeader({ aplica_impuesto: next } as Partial<CotizacionesRow>)
+                    patchHeader({ aplica_impuesto: next })
                   }
                 />
               </CardContent>
@@ -544,22 +759,59 @@ export function CotizadorBuilder({
                     Enviar cotización
                   </h2>
                   <p className="text-xs text-neutral-500 leading-relaxed">
-                    Una vez enviada, podés compartir el link público o usar los
-                    botones de salida.
+                    Mandala por WhatsApp al cliente o copiala al portapapeles
+                    para pegarla donde quieras. Al hacerlo, la cotización pasa
+                    al estado <strong>Enviada</strong>.
                   </p>
                   <Button
                     className="w-full"
-                    onClick={handleSend}
-                    disabled={isSending || items.length === 0}
+                    onClick={() => handleSendWhatsApp(itineraryText)}
+                    disabled={
+                      isSending ||
+                      isMutating ||
+                      items.length === 0 ||
+                      !cotizacion.fecha_inicio ||
+                      !cotizacion.fecha_fin ||
+                      !cotizacion.cliente_nombre
+                    }
                   >
-                    <PaperPlaneTilt />
-                    {isSending ? "Enviando…" : "Marcar como enviada"}
+                    <WhatsappLogo />
+                    {isSending ? "Enviando…" : "Enviar por WhatsApp"}
+                  </Button>
+                  <Button
+                    variant="outline"
+                    className="w-full"
+                    onClick={() => handleSendCopy(itineraryText)}
+                    disabled={
+                      isSending ||
+                      isMutating ||
+                      items.length === 0 ||
+                      !cotizacion.fecha_inicio ||
+                      !cotizacion.fecha_fin ||
+                      !cotizacion.cliente_nombre
+                    }
+                  >
+                    <Copy />
+                    {isSending ? "Procesando…" : "Copiar al portapapeles"}
                   </Button>
                   {items.length === 0 ? (
                     <p className="text-[10px] text-neutral-400 text-center">
                       Agregá al menos un servicio.
                     </p>
+                  ) : !cotizacion.cliente_telefono ? (
+                    <p className="text-[11px] text-neutral-400 leading-relaxed text-center">
+                      Sin teléfono del cliente cargado: WhatsApp se va a abrir
+                      sin contacto preseleccionado.
+                    </p>
                   ) : null}
+                  <div className="pt-3 border-t border-neutral-100">
+                    <EliminarCotizacionButton
+                      cotizacionId={cotizacion.id}
+                      clienteNombre={cotizacion.cliente_nombre}
+                      redirectTo="/operador"
+                      disabled={isSending || isMutating}
+                    />
+                  </div>
                 </CardContent>
               </Card>
             ) : (
@@ -571,7 +823,6 @@ export function CotizadorBuilder({
                   <SalidaActions
                     text={itineraryText}
                     publicUrl={resolvedPublicUrl}
-                    clienteEmail={cotizacion.cliente_email}
                     clienteTelefono={cotizacion.cliente_telefono}
                   />
                   <div className="pt-3 border-t border-neutral-100 flex flex-col gap-2">
@@ -580,7 +831,8 @@ export function CotizadorBuilder({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={handleVolverBorrador}
+                          disabled={isMutating}
+                          onClick={() => changeEstado("borrador")}
                         >
                           <ArrowCounterClockwise />
                           Volver a borrador
@@ -588,7 +840,8 @@ export function CotizadorBuilder({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={handleArchivar}
+                          disabled={isMutating}
+                          onClick={() => changeEstado("archivada")}
                         >
                           <Archive />
                           Archivar
@@ -598,12 +851,21 @@ export function CotizadorBuilder({
                       <Button
                         variant="outline"
                         size="sm"
-                        onClick={handleVolverBorrador}
+                        disabled={isMutating}
+                        onClick={() => changeEstado("borrador")}
                       >
                         <ArrowCounterClockwise />
                         Volver a borrador
                       </Button>
                     )}
+                  </div>
+                  <div className="pt-3 border-t border-neutral-100">
+                    <EliminarCotizacionButton
+                      cotizacionId={cotizacion.id}
+                      clienteNombre={cotizacion.cliente_nombre}
+                      redirectTo="/operador"
+                      disabled={isMutating}
+                    />
                   </div>
                 </CardContent>
               </Card>
@@ -633,14 +895,12 @@ export function CotizadorBuilder({
         />
       </div>
 
-      {/* Mobile sticky bottom — totals + actions */}
       <div className="fixed bottom-0 left-0 right-0 z-30 lg:hidden">
         <div
           className={`bg-white border-t border-neutral-200 shadow-[0_-4px_12px_-4px_rgba(0,0,0,0.08)] transition-[max-height] duration-300 overflow-hidden ${
             mobileTotalsOpen ? "max-h-[80vh]" : "max-h-[160px]"
           }`}
         >
-          {/* Always visible: total + expand */}
           <button
             type="button"
             onClick={() => setMobileTotalsOpen((v) => !v)}
@@ -667,33 +927,57 @@ export function CotizadorBuilder({
             />
           </button>
 
-          {/* Expanded: full totals + action */}
           {mobileTotalsOpen ? (
             <div className="px-4 pb-4 space-y-4 overflow-y-auto max-h-[calc(80vh-72px)]">
               <TotalesPanel
-                totalVenta={cotizacion.total_venta}
+                items={items}
+                days={days}
                 totalComision={cotizacion.total_comision}
-                totalNeto={cotizacion.total_neto}
                 totalImpuesto={cotizacion.total_impuesto}
                 totalFinal={cotizacion.total_final}
                 impuestoPct={cotizacion.impuesto_pct}
                 aplicaImpuesto={!!cotizacion.aplica_impuesto}
                 readonly={readonly}
                 onToggleImpuesto={(next) =>
-                  patchHeader({ aplica_impuesto: next } as Partial<CotizacionesRow>)
+                  patchHeader({ aplica_impuesto: next })
                 }
               />
 
               <div className="border-t border-neutral-200 pt-4 space-y-2">
                 {cotizacion.estado === "borrador" ? (
-                  <Button
-                    className="w-full"
-                    onClick={handleSend}
-                    disabled={isSending || items.length === 0}
-                  >
-                    <PaperPlaneTilt />
-                    {isSending ? "Enviando…" : "Marcar como enviada"}
-                  </Button>
+                  <>
+                    <Button
+                      className="w-full"
+                      onClick={() => handleSendWhatsApp(itineraryText)}
+                      disabled={
+                        isSending ||
+                        isMutating ||
+                        items.length === 0 ||
+                        !cotizacion.fecha_inicio ||
+                        !cotizacion.fecha_fin ||
+                        !cotizacion.cliente_nombre
+                      }
+                    >
+                      <WhatsappLogo />
+                      {isSending ? "Enviando…" : "Enviar por WhatsApp"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full"
+                      onClick={() => handleSendCopy(itineraryText)}
+                      disabled={
+                        isSending ||
+                        isMutating ||
+                        items.length === 0 ||
+                        !cotizacion.fecha_inicio ||
+                        !cotizacion.fecha_fin ||
+                        !cotizacion.cliente_nombre
+                      }
+                    >
+                      <Copy />
+                      {isSending ? "Procesando…" : "Copiar al portapapeles"}
+                    </Button>
+                  </>
                 ) : (
                   <>
                     <SalidaActions
@@ -707,7 +991,8 @@ export function CotizadorBuilder({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={handleVolverBorrador}
+                          disabled={isMutating}
+                          onClick={() => changeEstado("borrador")}
                         >
                           <ArrowCounterClockwise />
                           Borrador
@@ -715,7 +1000,8 @@ export function CotizadorBuilder({
                         <Button
                           variant="outline"
                           size="sm"
-                          onClick={handleArchivar}
+                          disabled={isMutating}
+                          onClick={() => changeEstado("archivada")}
                         >
                           <Archive />
                           Archivar
@@ -726,7 +1012,8 @@ export function CotizadorBuilder({
                         variant="outline"
                         size="sm"
                         className="w-full"
-                        onClick={handleVolverBorrador}
+                        disabled={isMutating}
+                        onClick={() => changeEstado("borrador")}
                       >
                         <ArrowCounterClockwise />
                         Volver a borrador
@@ -739,6 +1026,7 @@ export function CotizadorBuilder({
           ) : null}
         </div>
       </div>
+
     </>
   )
 }

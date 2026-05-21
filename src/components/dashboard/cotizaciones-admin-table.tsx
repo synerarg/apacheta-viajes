@@ -17,6 +17,7 @@ import type { CotizacionEstado, CotizacionesRow } from "@/types/cotizaciones/cot
 
 type OperadorMini = {
   id: string
+  usuario_id: string | null
   nombre_comercial: string | null
   nombre: string
 }
@@ -65,9 +66,14 @@ export function CotizacionesAdminTable({
   const [desde, setDesde] = useState("")
   const [hasta, setHasta] = useState("")
 
+  // `cotizaciones.operador_id` apunta a `usuarios.id` (auth), no a la PK
+  // de `operadores`. Mapeamos por `usuario_id` con fallback al `id` por si
+  // algún operador todavía no tiene cuenta vinculada.
   const operadorMap = useMemo(() => {
     const map = new Map<string, OperadorMini>()
-    operadores.forEach((operador) => map.set(operador.id, operador))
+    operadores.forEach((operador) =>
+      map.set(operador.usuario_id ?? operador.id, operador),
+    )
     return map
   }, [operadores])
 
@@ -107,7 +113,7 @@ export function CotizacionesAdminTable({
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-1 gap-4 border border-neutral-200 bg-white p-4 md:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:gap-4 border border-neutral-200 bg-white p-3 sm:p-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">
           <Label>Operador</Label>
           <Select value={operadorFilter} onValueChange={setOperadorFilter}>
@@ -117,7 +123,10 @@ export function CotizacionesAdminTable({
             <SelectContent>
               <SelectItem value="__all__">Todos</SelectItem>
               {operadores.map((operador) => (
-                <SelectItem key={operador.id} value={operador.id}>
+                <SelectItem
+                  key={operador.id}
+                  value={operador.usuario_id ?? operador.id}
+                >
                   {operador.nombre_comercial ?? operador.nombre}
                 </SelectItem>
               ))}
@@ -158,18 +167,18 @@ export function CotizacionesAdminTable({
         </div>
       </div>
 
-      <div className="overflow-x-auto border border-neutral-200 bg-white">
-        <table className="w-full min-w-[1100px] text-sm">
+      <div className="overflow-x-auto border border-neutral-200 bg-white -mx-3 sm:mx-0">
+        <table className="w-full min-w-[900px] text-xs sm:text-sm">
           <thead className="bg-neutral-50 text-xs uppercase text-neutral-500">
             <tr>
               <th className="px-3 py-2 text-left">Cliente</th>
-              <th className="px-3 py-2 text-left">Operador</th>
-              <th className="px-3 py-2 text-left">Fechas viaje</th>
-              <th className="px-3 py-2 text-right">Venta</th>
-              <th className="px-3 py-2 text-right">Comisión</th>
+              <th className="hidden md:table-cell px-3 py-2 text-left">Operador</th>
+              <th className="hidden lg:table-cell px-3 py-2 text-left">Fechas viaje</th>
+              <th className="hidden md:table-cell px-3 py-2 text-right">Venta</th>
+              <th className="hidden lg:table-cell px-3 py-2 text-right">Comisión</th>
               <th className="px-3 py-2 text-right">Total final</th>
               <th className="px-3 py-2 text-left">Estado</th>
-              <th className="px-3 py-2 text-left">Creada</th>
+              <th className="hidden lg:table-cell px-3 py-2 text-left">Creada</th>
               <th className="px-3 py-2 text-right">Detalle</th>
             </tr>
           </thead>
@@ -198,17 +207,17 @@ export function CotizacionesAdminTable({
                         </div>
                       ) : null}
                     </td>
-                    <td className="px-3 py-2 text-neutral-700">
+                    <td className="hidden md:table-cell px-3 py-2 text-neutral-700">
                       {operador?.nombre_comercial ?? operador?.nombre ?? "—"}
                     </td>
-                    <td className="px-3 py-2 text-neutral-700">
+                    <td className="hidden lg:table-cell px-3 py-2 text-neutral-700">
                       {formatDate(cot.fecha_inicio)} →{" "}
                       {formatDate(cot.fecha_fin)}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
+                    <td className="hidden md:table-cell px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(cot.total_venta ?? 0))}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
+                    <td className="hidden lg:table-cell px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(cot.total_comision ?? 0))}
                     </td>
                     <td className="px-3 py-2 text-right tabular-nums font-medium">
@@ -223,7 +232,7 @@ export function CotizacionesAdminTable({
                         {ESTADO_LABELS[cot.estado]}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-neutral-500 text-xs">
+                    <td className="hidden lg:table-cell px-3 py-2 text-neutral-500 text-xs">
                       {formatDate(cot.created_at)}
                     </td>
                     <td className="px-3 py-2 text-right">
@@ -241,14 +250,20 @@ export function CotizacionesAdminTable({
           </tbody>
           {filtered.length > 0 && (
             <tfoot className="bg-neutral-50">
-              <tr className="border-t border-neutral-200 text-sm">
-                <td colSpan={3} className="px-3 py-2 text-right font-medium">
+              <tr className="border-t border-neutral-200 text-xs sm:text-sm">
+                <td colSpan={1} className="px-3 py-2 text-right font-medium md:hidden">
                   Totales
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums">
+                <td colSpan={3} className="hidden md:table-cell lg:hidden px-3 py-2 text-right font-medium">
+                  Totales
+                </td>
+                <td colSpan={3} className="hidden lg:table-cell px-3 py-2 text-right font-medium">
+                  Totales
+                </td>
+                <td className="hidden md:table-cell px-3 py-2 text-right tabular-nums">
                   {formatMoney(totales.venta)}
                 </td>
-                <td className="px-3 py-2 text-right tabular-nums">
+                <td className="hidden lg:table-cell px-3 py-2 text-right tabular-nums">
                   {formatMoney(totales.comision)}
                 </td>
                 <td className="px-3 py-2 text-right tabular-nums font-medium">

@@ -25,12 +25,13 @@ export default async function CotizacionesPage() {
 
   const operadoresMini = operadores.map((o) => ({
     id: o.id,
+    usuario_id: o.usuario_id,
     nombre_comercial: o.nombre_comercial,
     nombre: o.nombre,
   }))
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 lg:space-y-8">
       <div>
         <Link
           href="/dashboard/cotizador"
@@ -39,10 +40,10 @@ export default async function CotizacionesPage() {
           <CaretLeft className="h-3.5 w-3.5" />
           Volver al cotizador
         </Link>
-        <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-neutral-900">
+        <h1 className="font-playfair text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900">
           Cotizaciones
         </h1>
-        <p className="mt-1 text-sm text-neutral-500">
+        <p className="mt-1 text-sm sm:text-base text-neutral-500">
           Todas las cotizaciones generadas por los operadores.
         </p>
       </div>

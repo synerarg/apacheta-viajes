@@ -72,14 +72,17 @@ export default async function CotizacionDetallePage({
     operadoresController.list(),
   ])
 
-  const operador = operadores.find((o) => o.id === cotizacion.operador_id)
+  // `cotizacion.operador_id` apunta a `usuarios.id`, no a `operadores.id`.
+  const operador = operadores.find(
+    (o) => o.usuario_id === cotizacion.operador_id,
+  )
   const sortedItems = [...items].sort((a, b) => {
     if (a.dia_offset !== b.dia_offset) return a.dia_offset - b.dia_offset
     return (a.orden ?? 0) - (b.orden ?? 0)
   })
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 space-y-6">
+    <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 lg:space-y-8">
       <div>
         <Link
           href="/dashboard/cotizador/cotizaciones"
@@ -88,15 +91,15 @@ export default async function CotizacionDetallePage({
           <CaretLeft className="h-3.5 w-3.5" />
           Volver a cotizaciones
         </Link>
-        <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
           <div>
             <p className="text-xs uppercase tracking-wide text-neutral-500">
               Cotización #{cotizacion.token.slice(0, 8).toUpperCase()}
             </p>
-            <h1 className="font-playfair text-2xl sm:text-3xl font-bold text-neutral-900">
+            <h1 className="font-playfair text-xl sm:text-2xl lg:text-3xl font-bold text-neutral-900">
               {cotizacion.cliente_nombre ?? "Sin cliente"}
             </h1>
-            <p className="mt-1 text-sm text-neutral-500">
+            <p className="mt-1 text-sm sm:text-base text-neutral-500">
               Creada {formatDate(cotizacion.created_at)} · Última actualización{" "}
               {formatDate(cotizacion.updated_at)}
             </p>
@@ -111,18 +114,18 @@ export default async function CotizacionDetallePage({
         </div>
       </div>
 
-      <section className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <div className="border border-neutral-200 bg-white p-4 space-y-2">
           <h2 className="text-xs uppercase tracking-wide text-neutral-500">
             Cliente
           </h2>
-          <p className="text-sm font-medium text-neutral-900">
+          <p className="text-sm font-medium text-neutral-900 break-words">
             {cotizacion.cliente_nombre ?? "—"}
           </p>
-          <p className="text-sm text-neutral-700">
+          <p className="text-sm text-neutral-700 break-words">
             {cotizacion.cliente_email ?? "Sin email"}
           </p>
-          <p className="text-sm text-neutral-700">
+          <p className="text-sm text-neutral-700 break-words">
             {cotizacion.cliente_telefono ?? "Sin teléfono"}
           </p>
         </div>
@@ -139,7 +142,7 @@ export default async function CotizacionDetallePage({
           </p>
         </div>
 
-        <div className="border border-neutral-200 bg-white p-4 space-y-2">
+        <div className="border border-neutral-200 bg-white p-4 space-y-2 sm:col-span-2 lg:col-span-1">
           <h2 className="text-xs uppercase tracking-wide text-neutral-500">
             Operador
           </h2>
@@ -147,10 +150,10 @@ export default async function CotizacionDetallePage({
             {operador?.nombre_comercial ?? operador?.nombre ?? "—"}
           </p>
           {operador?.email ? (
-            <p className="text-sm text-neutral-700">{operador.email}</p>
+            <p className="text-sm text-neutral-700 break-words">{operador.email}</p>
           ) : null}
           {operador?.telefono_contacto ? (
-            <p className="text-sm text-neutral-700">
+            <p className="text-sm text-neutral-700 break-words">
               {operador.telefono_contacto}
             </p>
           ) : null}
@@ -174,18 +177,18 @@ export default async function CotizacionDetallePage({
             Esta cotización no tiene ítems cargados.
           </div>
         ) : (
-          <div className="overflow-x-auto border border-neutral-200 bg-white">
-            <table className="w-full min-w-[900px] text-sm">
+          <div className="overflow-x-auto border border-neutral-200 bg-white -mx-3 sm:mx-0">
+            <table className="w-full min-w-[700px] text-xs sm:text-sm">
               <thead className="bg-neutral-50 text-xs uppercase text-neutral-500">
                 <tr>
                   <th className="px-3 py-2 text-left">Día</th>
                   <th className="px-3 py-2 text-left">Servicio</th>
                   <th className="px-3 py-2 text-right">Adultos</th>
-                  <th className="px-3 py-2 text-right">Menores</th>
-                  <th className="px-3 py-2 text-right">Precio adulto</th>
-                  <th className="px-3 py-2 text-right">Precio menor</th>
+                  <th className="hidden sm:table-cell px-3 py-2 text-right">Menores</th>
+                  <th className="hidden md:table-cell px-3 py-2 text-right">Precio adulto</th>
+                  <th className="hidden lg:table-cell px-3 py-2 text-right">Precio menor</th>
                   <th className="px-3 py-2 text-right">Subtotal venta</th>
-                  <th className="px-3 py-2 text-right">Comisión</th>
+                  <th className="hidden md:table-cell px-3 py-2 text-right">Comisión</th>
                 </tr>
               </thead>
               <tbody>
@@ -217,13 +220,13 @@ export default async function CotizacionDetallePage({
                     <td className="px-3 py-2 text-right tabular-nums">
                       {item.adultos}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
+                    <td className="hidden sm:table-cell px-3 py-2 text-right tabular-nums">
                       {item.menores}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
+                    <td className="hidden md:table-cell px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(item.precio_adulto_unit ?? 0))}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
+                    <td className="hidden lg:table-cell px-3 py-2 text-right tabular-nums">
                       {item.precio_menor_unit !== null
                         ? formatMoney(Number(item.precio_menor_unit))
                         : "—"}
@@ -231,7 +234,7 @@ export default async function CotizacionDetallePage({
                     <td className="px-3 py-2 text-right tabular-nums font-medium">
                       {formatMoney(Number(item.subtotal_venta ?? 0))}
                     </td>
-                    <td className="px-3 py-2 text-right tabular-nums">
+                    <td className="hidden md:table-cell px-3 py-2 text-right tabular-nums">
                       {formatMoney(Number(item.subtotal_comision ?? 0))}
                     </td>
                   </tr>
@@ -241,19 +244,6 @@ export default async function CotizacionDetallePage({
           </div>
         )}
       </section>
-
-      {cotizacion.recomendaciones && cotizacion.recomendaciones.length > 0 ? (
-        <section className="space-y-2">
-          <h2 className="font-playfair text-lg font-semibold text-neutral-900">
-            Recomendaciones
-          </h2>
-          <ul className="list-disc space-y-1 border border-neutral-200 bg-white p-4 pl-8 text-sm text-neutral-700">
-            {cotizacion.recomendaciones.map((rec, idx) => (
-              <li key={idx}>{rec}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       {cotizacion.notas_internas ? (
         <section className="space-y-2">
@@ -266,11 +256,11 @@ export default async function CotizacionDetallePage({
         </section>
       ) : null}
 
-      <section className="border-2 border-primary bg-white p-5">
+      <section className="border-2 border-primary bg-white p-4 sm:p-5">
         <h2 className="mb-4 font-playfair text-lg font-semibold text-neutral-900">
           Totales
         </h2>
-        <dl className="grid grid-cols-1 gap-3 sm:grid-cols-5">
+        <dl className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
           <div>
             <dt className="text-xs uppercase tracking-wide text-neutral-500">
               Venta
@@ -303,7 +293,7 @@ export default async function CotizacionDetallePage({
               {formatMoney(Number(cotizacion.total_impuesto ?? 0))}
             </dd>
           </div>
-          <div>
+          <div className="col-span-2 sm:col-span-3 lg:col-span-1">
             <dt className="text-xs uppercase tracking-wide text-primary">
               Total final
             </dt>

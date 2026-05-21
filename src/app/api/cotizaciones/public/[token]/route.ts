@@ -33,7 +33,6 @@ export async function GET(
       total_impuesto: cotizacion.total_impuesto,
       total_final: cotizacion.total_final,
       estado: cotizacion.estado,
-      recomendaciones: cotizacion.recomendaciones,
       created_at: cotizacion.created_at,
       items: cotizacion.items.map((it) => ({
         id: it.id,

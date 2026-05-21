@@ -4,7 +4,11 @@ import {
   CotizacionesValidationException,
 } from "@/exceptions/cotizaciones/cotizaciones.exceptions"
 import { calcCotizacionTotals } from "@/lib/cotizador/calculations"
-import { generateRecommendations } from "@/lib/cotizador/recommendations"
+import {
+  addDaysIso,
+  daysBetweenInclusive,
+  isValidIsoDate,
+} from "@/lib/cotizador/dates"
 import { CotizacionesItemsRepository } from "@/repositories/cotizaciones-items/cotizaciones-items.repository"
 import { CotizacionesRepository } from "@/repositories/cotizaciones/cotizaciones.repository"
 import { BaseService } from "@/services/base/base.service"
@@ -97,18 +101,91 @@ export class CotizacionesService extends BaseService<"cotizaciones"> {
     id: string,
     payload: CotizacionHeaderPayload,
   ): Promise<CotizacionesRow> {
-    const update: CotizacionesUpdate = {
-      cliente_nombre: payload.cliente_nombre ?? null,
-      cliente_email: payload.cliente_email ?? null,
-      cliente_telefono: payload.cliente_telefono ?? null,
-      fecha_inicio: payload.fecha_inicio ?? null,
-      fecha_fin: payload.fecha_fin ?? null,
-      aplica_impuesto: payload.aplica_impuesto ?? false,
-      impuesto_pct: payload.impuesto_pct ?? 1.2,
-      notas_internas: payload.notas_internas ?? null,
+    const current = await this.getById(id)
+
+    if (current.estado !== "borrador") {
+      throw new CotizacionesValidationException(
+        "Solo se pueden editar cotizaciones en estado borrador.",
+      )
     }
-    await this.updateByFilters({ id }, update, `id ${id}`)
+
+    const update: CotizacionesUpdate = {}
+    const keys = Object.keys(payload) as (keyof CotizacionHeaderPayload)[]
+
+    for (const key of keys) {
+      const value = payload[key]
+      if (value === undefined) continue
+      ;(update as Record<string, unknown>)[key] = value
+    }
+
+    if (
+      update.fecha_inicio !== undefined &&
+      update.fecha_inicio !== null &&
+      !isValidIsoDate(update.fecha_inicio as string)
+    ) {
+      throw new CotizacionesValidationException(
+        "fecha_inicio inválida (formato YYYY-MM-DD).",
+      )
+    }
+    if (
+      update.fecha_fin !== undefined &&
+      update.fecha_fin !== null &&
+      !isValidIsoDate(update.fecha_fin as string)
+    ) {
+      throw new CotizacionesValidationException(
+        "fecha_fin inválida (formato YYYY-MM-DD).",
+      )
+    }
+
+    const nextInicio =
+      update.fecha_inicio !== undefined
+        ? (update.fecha_inicio as string | null)
+        : current.fecha_inicio
+    const nextFin =
+      update.fecha_fin !== undefined
+        ? (update.fecha_fin as string | null)
+        : current.fecha_fin
+
+    if (nextInicio && nextFin && nextFin < nextInicio) {
+      throw new CotizacionesValidationException(
+        "La fecha de fin no puede ser anterior a la de inicio.",
+      )
+    }
+
+    const rangeChanged =
+      update.fecha_inicio !== undefined || update.fecha_fin !== undefined
+
+    if (Object.keys(update).length > 0) {
+      await this.updateByFilters({ id }, update, `id ${id}`)
+    }
+
+    if (rangeChanged) {
+      await this.reconcileItemsWithDateRange(id, nextInicio, nextFin)
+    }
+
     return this.recalculateTotals(id)
+  }
+
+  private async reconcileItemsWithDateRange(
+    cotizacionId: string,
+    fechaInicio: string | null,
+    fechaFin: string | null,
+  ): Promise<void> {
+    const items = await this.itemsRepository.listByCotizacion(cotizacionId)
+    if (items.length === 0) return
+
+    const totalDias = daysBetweenInclusive(fechaInicio, fechaFin)
+
+    for (const item of items) {
+      if (totalDias === 0 || item.dia_offset >= totalDias) {
+        await this.itemsRepository.deleteById(item.id)
+        continue
+      }
+      const nuevaFecha = fechaInicio ? addDaysIso(fechaInicio, item.dia_offset) : null
+      if (nuevaFecha !== item.fecha) {
+        await this.itemsRepository.updateById(item.id, { fecha: nuevaFecha })
+      }
+    }
   }
 
   async deleteById(id: string): Promise<void> {
@@ -124,11 +201,31 @@ export class CotizacionesService extends BaseService<"cotizaciones"> {
     if (current.estado === "archivada") {
       throw new CotizacionesValidationException("No se puede enviar una cotización archivada.")
     }
+    const items = await this.itemsRepository.listByCotizacion(id)
+    if (items.length === 0) {
+      throw new CotizacionesValidationException(
+        "No se puede enviar una cotización sin servicios.",
+      )
+    }
+    if (!current.fecha_inicio || !current.fecha_fin) {
+      throw new CotizacionesValidationException(
+        "Cargá las fechas del viaje antes de enviar la cotización.",
+      )
+    }
+    if (!current.cliente_nombre || current.cliente_nombre.trim().length === 0) {
+      throw new CotizacionesValidationException(
+        "Cargá el nombre del cliente antes de enviar la cotización.",
+      )
+    }
     return this.setEstado(id, "enviada")
   }
 
   async archive(id: string): Promise<CotizacionesRow> {
     return this.setEstado(id, "archivada")
+  }
+
+  async reopenAsDraft(id: string): Promise<CotizacionesRow> {
+    return this.setEstado(id, "borrador")
   }
 
   async getByToken(token: string): Promise<CotizacionWithItems | null> {
@@ -167,14 +264,6 @@ export class CotizacionesService extends BaseService<"cotizaciones"> {
         Number(cotizacion.impuesto_pct),
       )
 
-      const fechaInicio = cotizacion.fecha_inicio
-        ? new Date(`${cotizacion.fecha_inicio}T00:00:00`)
-        : null
-      const recomendaciones = generateRecommendations(
-        items.map((it) => ({ servicio_nombre: it.servicio_nombre })),
-        fechaInicio,
-      )
-
       return await this.updateByFilters(
         { id },
         {
@@ -183,7 +272,6 @@ export class CotizacionesService extends BaseService<"cotizaciones"> {
           total_neto: totals.totalNeto,
           total_impuesto: totals.totalImpuesto,
           total_final: totals.totalFinal,
-          recomendaciones,
         },
         `id ${id}`,
       )

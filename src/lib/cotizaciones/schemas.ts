@@ -6,31 +6,39 @@ const optionalString = z.preprocess((value) => {
   return trimmed.length > 0 ? trimmed : undefined
 }, z.string().min(1).optional())
 
-const optionalEmail = z.preprocess((value) => {
-  if (typeof value !== "string") return value
-  const trimmed = value.trim()
-  return trimmed.length > 0 ? trimmed : undefined
-}, z.string().email().optional())
-
-// Cabecera (cliente / fechas / impuesto)
-export const cotizacionHeaderSchema = z.object({
-  cliente_nombre: optionalString,
-  cliente_email: optionalEmail,
-  cliente_telefono: optionalString,
-  fecha_inicio: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
-    .optional()
-    .nullable(),
-  fecha_fin: z
-    .string()
-    .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
-    .optional()
-    .nullable(),
-  aplica_impuesto: z.boolean().optional(),
-  impuesto_pct: z.number().min(0).max(100).optional(),
-  notas_internas: optionalString,
-})
+// Cabecera (cliente / fechas / impuesto). Todos los campos son opcionales:
+// solo se actualizan las claves enviadas (partial update).
+// El email se guarda como texto libre para que el operador pueda completarlo
+// progresivamente sin que el server rechace estados intermedios.
+export const cotizacionHeaderSchema = z
+  .object({
+    cliente_nombre: optionalString,
+    cliente_email: optionalString,
+    cliente_telefono: optionalString,
+    fecha_inicio: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
+      .optional()
+      .nullable(),
+    fecha_fin: z
+      .string()
+      .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
+      .optional()
+      .nullable(),
+    aplica_impuesto: z.boolean().optional(),
+    impuesto_pct: z.number().min(0).max(100).optional(),
+    notas_internas: optionalString,
+  })
+  .refine(
+    (data) => {
+      if (!data.fecha_inicio || !data.fecha_fin) return true
+      return data.fecha_fin >= data.fecha_inicio
+    },
+    {
+      message: "fecha_fin no puede ser anterior a fecha_inicio",
+      path: ["fecha_fin"],
+    },
+  )
 
 export type CotizacionHeaderInput = z.infer<typeof cotizacionHeaderSchema>
 
@@ -38,14 +46,14 @@ export type CotizacionHeaderInput = z.infer<typeof cotizacionHeaderSchema>
 export const addItemSchema = z.object({
   type: z.literal("service"),
   servicio_id: z.string().uuid(),
-  dia_offset: z.number().int().min(0),
+  dia_offset: z.number().int().min(0).max(365),
   fecha: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
     .optional()
     .nullable(),
-  adultos: z.number().int().min(0).default(1),
-  menores: z.number().int().min(0).default(0),
+  adultos: z.number().int().min(1).max(99).default(1),
+  menores: z.number().int().min(0).max(99).default(0),
   comision_pct: z.number().min(0).max(100).optional(),
   precio_adulto_unit: z.number().min(0).optional(),
   precio_menor_unit: z.number().min(0).optional(),
@@ -57,10 +65,10 @@ export const addSpecialItemSchema = z.object({
   type: z.literal("special"),
   nombre: z.string().trim().min(1).max(200),
   descripcion: optionalString,
-  precio_unit: z.number().min(0),
-  adultos: z.number().int().min(1).default(1),
-  menores: z.number().int().min(0).default(0),
-  dia_offset: z.number().int().min(0),
+  precio_unit: z.number().min(0).max(100_000_000),
+  adultos: z.number().int().min(1).max(99).default(1),
+  menores: z.number().int().min(0).max(99).default(0),
+  dia_offset: z.number().int().min(0).max(365),
   fecha: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
@@ -79,18 +87,18 @@ export type AddItemRequest = z.infer<typeof addItemRequestSchema>
 
 // Update item (overrides puntuales)
 export const updateItemSchema = z.object({
-  adultos: z.number().int().min(0).optional(),
-  menores: z.number().int().min(0).optional(),
-  precio_adulto_unit: z.number().min(0).optional(),
-  precio_menor_unit: z.number().min(0).optional(),
+  adultos: z.number().int().min(0).max(99).optional(),
+  menores: z.number().int().min(0).max(99).optional(),
+  precio_adulto_unit: z.number().min(0).max(100_000_000).optional(),
+  precio_menor_unit: z.number().min(0).max(100_000_000).optional(),
   comision_pct: z.number().min(0).max(100).optional(),
-  dia_offset: z.number().int().min(0).optional(),
+  dia_offset: z.number().int().min(0).max(365).optional(),
   fecha: z
     .string()
     .regex(/^\d{4}-\d{2}-\d{2}$/, "Formato fecha YYYY-MM-DD")
     .optional()
     .nullable(),
-  servicio_nombre: z.string().trim().min(1).optional(),
+  servicio_nombre: z.string().trim().min(1).max(200).optional(),
   servicio_descripcion: optionalString,
 })
 

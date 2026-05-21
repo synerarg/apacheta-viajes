@@ -45,6 +45,10 @@ export class CotizacionesController extends BaseIdController<"cotizaciones", Cot
     return this.service.archive(id)
   }
 
+  reopenAsDraft(id: string) {
+    return this.service.reopenAsDraft(id)
+  }
+
   getByToken(token: string) {
     return this.service.getByToken(token)
   }
