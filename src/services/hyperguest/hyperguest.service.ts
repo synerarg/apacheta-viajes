@@ -802,6 +802,41 @@ function assertPrebookPayloadIsValid(payload: {
   })
 }
 
+function redactPaymentDetails(
+  payload: Record<string, unknown>,
+): Record<string, unknown> {
+  const paymentDetails = payload.paymentDetails
+
+  if (!isRecord(paymentDetails)) {
+    return payload
+  }
+
+  const details = isRecord(paymentDetails.details)
+    ? paymentDetails.details
+    : null
+
+  if (!details) {
+    return payload
+  }
+
+  const last4 =
+    typeof details.number === "string"
+      ? details.number.replace(/\D/g, "").slice(-4)
+      : ""
+
+  return {
+    ...payload,
+    paymentDetails: {
+      ...paymentDetails,
+      details: {
+        ...details,
+        number: last4 ? `****${last4}` : "****",
+        cvv: "***",
+      },
+    },
+  }
+}
+
 function buildRoomsFromOffers(
   offers: Array<Record<string, unknown> | undefined> | undefined,
 ) {
@@ -1223,6 +1258,22 @@ export class HyperGuestService {
 
       const rooms = buildRoomsWithGuests(repricedRooms)
 
+      const paymentDetailsForProvider: Record<string, unknown> =
+        input.paymentDetails?.type === "credit_card" &&
+        input.paymentDetails.details
+          ? {
+              type: "credit_card",
+              details: {
+                number: input.paymentDetails.details.number,
+                cvv: input.paymentDetails.details.cvv,
+                expiry: {
+                  month: input.paymentDetails.details.expiry.month,
+                  year: input.paymentDetails.details.expiry.year,
+                },
+              },
+            }
+          : { type: "external" }
+
       const buildPayload = (
         roomsForRequest: Record<string, unknown>[],
       ): Record<string, unknown> => {
@@ -1236,9 +1287,7 @@ export class HyperGuestService {
           reference: {
             agency: intent.id,
           },
-          paymentDetails: {
-            type: "external",
-          },
+          paymentDetails: paymentDetailsForProvider,
           rooms: roomsForRequest,
           isTest: intent.hyperguest_property_id === "19912",
           groupBooking: false,
@@ -1263,12 +1312,15 @@ export class HyperGuestService {
       }
 
       const payload = buildPayload(rooms)
+      // Strip raw card data before anything touches storage, events or logs:
+      // PAN/CVV must never persist outside the outbound HG request.
+      const payloadForPersistence = redactPaymentDetails(payload)
 
       await this.hyperGuestRepository.updateBookingIntent(intent.id, {
         status: "book_started",
-        book_payload: payload as HyperGuestJson,
+        book_payload: payloadForPersistence as HyperGuestJson,
       })
-      await this.createEvent(intent.id, "booking", "started", payload)
+      await this.createEvent(intent.id, "booking", "started", payloadForPersistence)
 
       let response: unknown
       let bookErrorForRetry: ReturnType<typeof parsePriceFromBookError> = null

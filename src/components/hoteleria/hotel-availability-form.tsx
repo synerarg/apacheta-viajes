@@ -115,6 +115,10 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
   const [guestCountry, setGuestCountry] = useState("AR")
   const [guestBirthDate, setGuestBirthDate] = useState("")
   const [specialRequests, setSpecialRequests] = useState("")
+  const [cardNumber, setCardNumber] = useState("4111111111111111")
+  const [cardCvv, setCardCvv] = useState("123")
+  const [cardExpiryMonth, setCardExpiryMonth] = useState("1")
+  const [cardExpiryYear, setCardExpiryYear] = useState("2028")
 
   const abortRef = useRef<AbortController | null>(null)
   const hasMountedRef = useRef(false)
@@ -399,6 +403,21 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
         .map((line) => line.trim())
         .filter((line) => line.length > 0)
 
+      const normalizedCardNumber = cardNumber.replace(/\s+/g, "")
+      const paymentDetails = normalizedCardNumber
+        ? {
+            type: "credit_card" as const,
+            details: {
+              number: normalizedCardNumber,
+              cvv: cardCvv.trim(),
+              expiry: {
+                month: cardExpiryMonth.trim(),
+                year: cardExpiryYear.trim(),
+              },
+            },
+          }
+        : undefined
+
       const response = await fetch("/api/hoteleria/hyperguest/book", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -423,6 +442,7 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
           },
           specialRequests:
             trimmedRequests.length > 0 ? trimmedRequests : undefined,
+          paymentDetails,
         }),
       })
 
@@ -828,6 +848,63 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
               Se envían como hints a HyperGuest. No están garantizados por el hotel.
             </span>
           </label>
+
+          <div className="space-y-3 border border-dark-brown/15 bg-white/60 p-4">
+            <p className="font-sans text-xs uppercase tracking-[0.18em] text-subtle">
+              Datos de la tarjeta
+            </p>
+            <p className="font-sans text-xs text-subtle">
+              Solo en testing contra la Certification Property (19912). HyperGuest provee tarjeta de prueba — no usar tarjeta real.
+            </p>
+            <label className="block font-sans text-sm text-dark-brown">
+              Número de tarjeta
+              <input
+                value={cardNumber}
+                onChange={(event) => setCardNumber(event.target.value)}
+                inputMode="numeric"
+                autoComplete="off"
+                className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
+                required
+              />
+            </label>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <label className="block font-sans text-sm text-dark-brown">
+                CVV
+                <input
+                  value={cardCvv}
+                  onChange={(event) => setCardCvv(event.target.value)}
+                  inputMode="numeric"
+                  autoComplete="off"
+                  maxLength={4}
+                  className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
+                  required
+                />
+              </label>
+              <label className="block font-sans text-sm text-dark-brown">
+                Mes (1-12)
+                <input
+                  value={cardExpiryMonth}
+                  onChange={(event) => setCardExpiryMonth(event.target.value)}
+                  inputMode="numeric"
+                  maxLength={2}
+                  className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
+                  required
+                />
+              </label>
+              <label className="block font-sans text-sm text-dark-brown">
+                Año
+                <input
+                  value={cardExpiryYear}
+                  onChange={(event) => setCardExpiryYear(event.target.value)}
+                  inputMode="numeric"
+                  maxLength={4}
+                  className="mt-2 w-full border border-dark-brown/20 bg-off-white px-3 py-3 font-sans text-sm text-dark-brown"
+                  required
+                />
+              </label>
+            </div>
+          </div>
+
           <button
             type="button"
             disabled={isLoading || Boolean(bookResult)}

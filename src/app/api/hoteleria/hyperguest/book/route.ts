@@ -31,6 +31,38 @@ const guestSchema = z.object({
   contact: guestContactSchema.nullable().optional(),
 })
 
+const cardDetailsSchema = z.object({
+  number: z
+    .string()
+    .trim()
+    .regex(/^\d{12,19}$/, "Numero de tarjeta invalido"),
+  cvv: z
+    .string()
+    .trim()
+    .regex(/^\d{3,4}$/, "CVV invalido"),
+  expiry: z.object({
+    month: z
+      .string()
+      .trim()
+      .regex(/^(0?[1-9]|1[0-2])$/, "Mes invalido"),
+    year: z
+      .string()
+      .trim()
+      .regex(/^(20)\d{2}$/, "Año invalido"),
+  }),
+})
+
+const paymentDetailsSchema = z.union([
+  z.object({
+    type: z.literal("external"),
+    details: z.undefined().optional(),
+  }),
+  z.object({
+    type: z.literal("credit_card"),
+    details: cardDetailsSchema,
+  }),
+])
+
 const bookSchema = z.object({
   bookingIntentId: z.string().uuid(),
   guest: guestSchema.extend({
@@ -42,6 +74,7 @@ const bookSchema = z.object({
   meta: z
     .array(z.object({ key: z.string().min(1), value: z.string() }))
     .optional(),
+  paymentDetails: paymentDetailsSchema.optional(),
   providerPayload: providerPayloadSchema,
 })
 
