@@ -1258,12 +1258,18 @@ export class HyperGuestService {
 
       const rooms = buildRoomsWithGuests(repricedRooms)
 
+      const cardholderName = `${input.guest.firstName} ${input.guest.lastName}`
+        .trim()
+        .replace(/\s+/g, " ")
       const paymentDetailsForProvider: Record<string, unknown> =
         input.paymentDetails?.type === "credit_card" &&
         input.paymentDetails.details
           ? {
               type: "credit_card",
               details: {
+                // HG validates BN.400 "required validation failed on name"
+                // when the credit_card details do not include the cardholder.
+                name: cardholderName || "Cardholder",
                 number: input.paymentDetails.details.number,
                 cvv: input.paymentDetails.details.cvv,
                 expiry: {
