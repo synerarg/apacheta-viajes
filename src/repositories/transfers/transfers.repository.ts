@@ -1,22 +1,22 @@
-import { TrasladosRepositoryException } from "@/exceptions/traslados/traslados.exceptions"
+import { TransfersRepositoryException } from "@/exceptions/transfers/transfers.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { TrasladosUpdate } from "@/types/traslados/traslados.types"
+import type { TransfersUpdate } from "@/types/transfers/transfers.types"
 
-export class TrasladosRepository extends BaseRepository<"traslados"> {
+export class TransfersRepository extends BaseRepository<"traslados"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "traslados")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new TrasladosRepositoryException(operation, cause)
+    return new TransfersRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: TrasladosUpdate) {
+  async updateById(id: string, payload: TransfersUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class TrasladosRepository extends BaseRepository<"traslados"> {
   }
 }
 
-export function createTrasladosRepository(supabase: DatabaseClient) {
-  return new TrasladosRepository(supabase)
+export function createTransfersRepository(supabase: DatabaseClient) {
+  return new TransfersRepository(supabase)
 }

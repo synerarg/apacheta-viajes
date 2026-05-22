@@ -2,24 +2,24 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import { createServerCotizacionesItemsController } from "@/controllers/cotizaciones-items/cotizaciones-items.controller"
-import { createServerOperadoresController } from "@/controllers/operadores/operadores.controller"
-import type { CotizacionEstado } from "@/types/cotizaciones/cotizaciones.types"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import { createServerQuoteItemsController } from "@/controllers/quote-items/quote-items.controller"
+import { createServerOperatorsController } from "@/controllers/operators/operators.controller"
+import type { QuoteStatus } from "@/types/quotes/quotes.types"
 
 export const dynamic = "force-dynamic"
 
-interface CotizacionDetallePageProps {
+interface QuoteDetallePageProps {
   params: Promise<{ id: string }>
 }
 
-const ESTADO_LABELS: Record<CotizacionEstado, string> = {
+const ESTADO_LABELS: Record<QuoteStatus, string> = {
   borrador: "Borrador",
   enviada: "Enviada",
   archivada: "Archivada",
 }
 
-const ESTADO_STYLES: Record<CotizacionEstado, string> = {
+const ESTADO_STYLES: Record<QuoteStatus, string> = {
   borrador: "bg-neutral-100 text-neutral-700",
   enviada: "bg-emerald-100 text-emerald-800",
   archivada: "bg-blue-100 text-blue-800",
@@ -43,24 +43,24 @@ function formatMoney(value: number) {
   }).format(value)
 }
 
-export default async function CotizacionDetallePage({
+export default async function QuoteDetallePage({
   params,
-}: CotizacionDetallePageProps) {
+}: QuoteDetallePageProps) {
   const { id } = await params
 
   const [
-    cotizacionesController,
+    quotesController,
     itemsController,
-    operadoresController,
+    operatorsController,
   ] = await Promise.all([
-    createServerCotizacionesController(),
-    createServerCotizacionesItemsController(),
-    createServerOperadoresController(),
+    createServerQuotesController(),
+    createServerQuoteItemsController(),
+    createServerOperatorsController(),
   ])
 
   let cotizacion
   try {
-    cotizacion = await cotizacionesController.getById(id)
+    cotizacion = await quotesController.getById(id)
   } catch {
     notFound()
   }
@@ -69,7 +69,7 @@ export default async function CotizacionDetallePage({
 
   const [items, operadores] = await Promise.all([
     itemsController.list({ cotizacion_id: id }),
-    operadoresController.list(),
+    operatorsController.list(),
   ])
 
   // `cotizacion.operador_id` apunta a `usuarios.id`, no a `operadores.id`.

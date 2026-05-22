@@ -3,7 +3,7 @@
 import { useState } from "react"
 import { Calendar, Clock, Ruler } from "lucide-react"
 
-interface SidebarCotizacionProps {
+interface SidebarQuoteProps {
   precio: number
   moneda: string
   fecha?: string
@@ -13,14 +13,14 @@ interface SidebarCotizacionProps {
   onAgregarAlCarro?: () => void
 }
 
-export function SidebarCotizacion({
+export function SidebarQuote({
   precio,
   moneda,
   fecha,
   duracion,
   longitud,
   onAgregarAlCarro,
-}: SidebarCotizacionProps) {
+}: SidebarQuoteProps) {
   const [added, setAdded] = useState(false)
 
   const handleAgregar = () => {

@@ -7,7 +7,6 @@ import {
   CheckCircleIcon,
   ChatCircleTextIcon,
   CurrencyDollarIcon,
-  EnvelopeSimpleIcon,
   HourglassMediumIcon,
   PaperPlaneTiltIcon,
   ShareNetworkIcon,
@@ -16,12 +15,13 @@ import {
 } from "@phosphor-icons/react/dist/ssr"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { SolicitudOperadorCancelarButton } from "@/components/account/solicitud-operador-cancelar-button"
-import { SolicitudOperadorForm } from "@/components/account/solicitud-operador-form"
+import { OperatorRequestCancelButton } from "@/components/account/operator-request-cancel-button"
+import { OperatorRequestForm } from "@/components/account/operator-request-form"
 import { Button } from "@/components/ui/button"
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
+import { createServerOperatorTypesController } from "@/controllers/operator-types/operator-types.controller"
 import { createClient } from "@/lib/supabase/server"
-import type { SolicitudesOperadorRow } from "@/types/solicitudes-operador/solicitudes-operador.types"
+import type { OperatorRequestsRow } from "@/types/operator-requests/operator-requests.types"
 
 export const dynamic = "force-dynamic"
 
@@ -38,7 +38,7 @@ function formatDate(iso: string) {
   })
 }
 
-type Estado = SolicitudesOperadorRow["estado"]
+type Estado = OperatorRequestsRow["estado"]
 
 const STATUS_STEPS: { key: Estado; label: string }[] = [
   { key: "pendiente", label: "Recibida" },
@@ -128,23 +128,17 @@ const STEPS = [
     icon: HourglassMediumIcon,
     title: "Revisamos tu alta",
     description:
-      "Validamos tus datos en un plazo de 24 a 72 hs hábiles. Si necesitamos algo más, te escribimos.",
-  },
-  {
-    icon: EnvelopeSimpleIcon,
-    title: "Te avisamos por email",
-    description:
-      "Recibís la confirmación y un correo con el acceso al panel de operador.",
+      "Validamos tus datos en un plazo de 24 a 72 hs hábiles. Si necesitamos algo más, nos comunicamos con vos.",
   },
   {
     icon: BriefcaseIcon,
     title: "Empezás a cotizar",
     description:
-      "Ingresás al panel, armás itinerarios y los compartís con tus clientes.",
+      "Una vez aprobada, entrás al panel desde tu cuenta y empezás a armar cotizaciones.",
   },
 ]
 
-export default async function CuentaOperadorPage() {
+export default async function CuentaOperatorPage() {
   const supabase = await createClient()
   const {
     data: { user },
@@ -216,8 +210,12 @@ export default async function CuentaOperadorPage() {
     )
   }
 
-  const controller = await createServerSolicitudesOperadorController()
-  const solicitudes = await controller.listMine(user.id)
+  const controller = await createServerOperatorRequestsController()
+  const tiposController = await createServerOperatorTypesController()
+  const [solicitudes, tipos] = await Promise.all([
+    controller.listMine(user.id),
+    tiposController.listActiveOrdered(),
+  ])
   const active = solicitudes.find((s) =>
     s.estado === "pendiente" || s.estado === "en_revision",
   )
@@ -270,19 +268,15 @@ export default async function CuentaOperadorPage() {
                 <div className="flex items-start gap-2">
                   <ChatCircleTextIcon className="h-4 w-4 mt-0.5 shrink-0 text-neutral-500" />
                   <p>
-                    Te vamos a avisar por email a{" "}
-                    <span className="font-semibold text-neutral-900">
-                      {active.email_contacto}
-                    </span>{" "}
-                    cuando esté revisada. Si necesitás corregir datos, cancelá la
-                    solicitud y enviá una nueva.
+                    Volvé a esta página para ver el estado de tu solicitud. Si
+                    necesitás corregir datos, cancelala y enviá una nueva.
                   </p>
                 </div>
               </div>
 
               {active.estado === "pendiente" ? (
                 <div className="pt-2">
-                  <SolicitudOperadorCancelarButton solicitudId={active.id} />
+                  <OperatorRequestCancelButton requestId={active.id} />
                 </div>
               ) : null}
             </CardContent>
@@ -313,10 +307,10 @@ export default async function CuentaOperadorPage() {
                   Cómo funciona
                 </p>
                 <h2 className="font-playfair text-2xl font-bold text-neutral-900">
-                  De solicitud a primera cotización en 4 pasos
+                  De solicitud a primera cotización en 3 pasos
                 </h2>
               </div>
-              <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+              <ol className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 {STEPS.map(({ icon: Icon, title, description }, idx) => (
                   <li
                     key={title}
@@ -367,9 +361,10 @@ export default async function CuentaOperadorPage() {
               <div className="grid gap-6 lg:grid-cols-[1fr_320px] lg:items-start">
                 <Card>
                   <CardContent className="py-6 px-6">
-                    <SolicitudOperadorForm
+                    <OperatorRequestForm
                       defaultEmail={profile?.email ?? user.email ?? null}
                       defaultName={[profile?.nombre, profile?.apellido].filter(Boolean).join(" ") || null}
+                      tipos={tipos}
                     />
                   </CardContent>
                 </Card>

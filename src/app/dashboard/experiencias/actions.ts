@@ -76,11 +76,11 @@ async function checkDestacadoLimit(excludeId?: string): Promise<boolean> {
   return (count ?? 0) >= 3
 }
 
-async function syncExperienceGallery(experienciaId: string, gallery: string[]) {
+async function syncExperienceGallery(experienceId: string, gallery: string[]) {
   await adminClient
     .from("experiencias_imagenes")
     .delete()
-    .eq("experiencia_id", experienciaId)
+    .eq("experiencia_id", experienceId)
 
   if (gallery.length === 0) {
     return
@@ -88,7 +88,7 @@ async function syncExperienceGallery(experienciaId: string, gallery: string[]) {
 
   await adminClient.from("experiencias_imagenes").insert(
     gallery.map((url, index) => ({
-      experiencia_id: experienciaId,
+      experiencia_id: experienceId,
       url,
       orden: index,
     })),

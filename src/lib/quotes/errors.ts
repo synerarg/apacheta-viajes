@@ -2,32 +2,32 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import {
-  CotizacionesNotFoundException,
-  CotizacionesServiceException,
-  CotizacionesValidationException,
-} from "@/exceptions/cotizaciones/cotizaciones.exceptions"
+  QuotesNotFoundException,
+  QuotesServiceException,
+  QuotesValidationException,
+} from "@/exceptions/quotes/quotes.exceptions"
 import {
-  CotizacionesItemsNotFoundException,
-  CotizacionesItemsServiceException,
-  CotizacionesItemsValidationException,
-} from "@/exceptions/cotizaciones-items/cotizaciones-items.exceptions"
+  QuoteItemsNotFoundException,
+  QuoteItemsServiceException,
+  QuoteItemsValidationException,
+} from "@/exceptions/quote-items/quote-items.exceptions"
 import {
-  CotizadorCategoriasNotFoundException,
-  CotizadorCategoriasServiceException,
-  CotizadorCategoriasValidationException,
-} from "@/exceptions/cotizador-categorias/cotizador-categorias.exceptions"
+  QuoterCategoriesNotFoundException,
+  QuoterCategoriesServiceException,
+  QuoterCategoriesValidationException,
+} from "@/exceptions/quoter-categories/quoter-categories.exceptions"
 import {
-  CotizadorPreciosNotFoundException,
-  CotizadorPreciosServiceException,
-  CotizadorPreciosValidationException,
-} from "@/exceptions/cotizador-precios/cotizador-precios.exceptions"
+  QuoterPricesNotFoundException,
+  QuoterPricesServiceException,
+  QuoterPricesValidationException,
+} from "@/exceptions/quoter-prices/quoter-prices.exceptions"
 import {
-  CotizadorServiciosNotFoundException,
-  CotizadorServiciosServiceException,
-  CotizadorServiciosValidationException,
-} from "@/exceptions/cotizador-servicios/cotizador-servicios.exceptions"
+  QuoterServicesNotFoundException,
+  QuoterServicesServiceException,
+  QuoterServicesValidationException,
+} from "@/exceptions/quoter-services/quoter-services.exceptions"
 
-export function handleCotizadorError(error: unknown): NextResponse {
+export function handleQuoterError(error: unknown): NextResponse {
   if (error instanceof z.ZodError) {
     return NextResponse.json(
       { error: "Datos inválidos", details: error.issues },
@@ -35,29 +35,29 @@ export function handleCotizadorError(error: unknown): NextResponse {
     )
   }
   if (
-    error instanceof CotizacionesValidationException ||
-    error instanceof CotizacionesItemsValidationException ||
-    error instanceof CotizadorCategoriasValidationException ||
-    error instanceof CotizadorServiciosValidationException ||
-    error instanceof CotizadorPreciosValidationException
+    error instanceof QuotesValidationException ||
+    error instanceof QuoteItemsValidationException ||
+    error instanceof QuoterCategoriesValidationException ||
+    error instanceof QuoterServicesValidationException ||
+    error instanceof QuoterPricesValidationException
   ) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
   if (
-    error instanceof CotizacionesNotFoundException ||
-    error instanceof CotizacionesItemsNotFoundException ||
-    error instanceof CotizadorCategoriasNotFoundException ||
-    error instanceof CotizadorServiciosNotFoundException ||
-    error instanceof CotizadorPreciosNotFoundException
+    error instanceof QuotesNotFoundException ||
+    error instanceof QuoteItemsNotFoundException ||
+    error instanceof QuoterCategoriesNotFoundException ||
+    error instanceof QuoterServicesNotFoundException ||
+    error instanceof QuoterPricesNotFoundException
   ) {
     return NextResponse.json({ error: error.message }, { status: 404 })
   }
   if (
-    error instanceof CotizacionesServiceException ||
-    error instanceof CotizacionesItemsServiceException ||
-    error instanceof CotizadorCategoriasServiceException ||
-    error instanceof CotizadorServiciosServiceException ||
-    error instanceof CotizadorPreciosServiceException
+    error instanceof QuotesServiceException ||
+    error instanceof QuoteItemsServiceException ||
+    error instanceof QuoterCategoriesServiceException ||
+    error instanceof QuoterServicesServiceException ||
+    error instanceof QuoterPricesServiceException
   ) {
     console.error("cotizador service error", error)
     return NextResponse.json({ error: "No se pudo procesar la solicitud" }, { status: 500 })

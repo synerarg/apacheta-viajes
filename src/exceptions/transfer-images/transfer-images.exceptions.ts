@@ -2,19 +2,19 @@ import { NotFoundException } from "@/exceptions/base/not-found.exception"
 import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
 
-export class TrasladosImagenesRepositoryException extends RepositoryException {
+export class TransferImagesRepositoryException extends RepositoryException {
   constructor(operation: string, cause?: unknown) {
     super("traslados_imagenes", operation, cause)
   }
 }
 
-export class TrasladosImagenesServiceException extends ServiceException {
+export class TransferImagesServiceException extends ServiceException {
   constructor(operation: string, cause?: unknown) {
     super("traslados_imagenes", operation, cause)
   }
 }
 
-export class TrasladosImagenesNotFoundException extends NotFoundException {
+export class TransferImagesNotFoundException extends NotFoundException {
   constructor(criteria: string) {
     super("traslados_imagenes", criteria)
   }

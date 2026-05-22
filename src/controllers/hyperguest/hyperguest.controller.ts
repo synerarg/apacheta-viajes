@@ -4,7 +4,7 @@ import {
   createHyperGuestRepository,
   type HyperGuestRepository,
 } from "@/repositories/hyperguest/hyperguest.repository"
-import { createHotelesRepository } from "@/repositories/hoteles/hoteles.repository"
+import { createHotelsRepository } from "@/repositories/hotels/hotels.repository"
 import {
   createHyperGuestService,
   type HyperGuestService,
@@ -54,10 +54,10 @@ export class HyperGuestController {
 
 function createController(supabase: DatabaseClient) {
   const hyperGuestRepository = createHyperGuestRepository(supabase)
-  const hotelesRepository = createHotelesRepository(supabase)
+  const hotelsRepository = createHotelsRepository(supabase)
 
   return new HyperGuestController(
-    createHyperGuestService(hyperGuestRepository, hotelesRepository),
+    createHyperGuestService(hyperGuestRepository, hotelsRepository),
     hyperGuestRepository,
   )
 }

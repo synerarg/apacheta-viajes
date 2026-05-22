@@ -10,16 +10,16 @@ import type { CheckoutProfilesUpdate } from "@/types/checkout-profiles/checkout-
 export class CheckoutProfilesController {
   constructor(private readonly checkoutProfilesService: CheckoutProfilesService) {}
 
-  async getByUsuarioId(usuarioId: string) {
-    return this.checkoutProfilesService.getByUsuarioId(usuarioId)
+  async getByUserId(userId: string) {
+    return this.checkoutProfilesService.getByUserId(userId)
   }
 
-  async upsertByUsuarioId(usuarioId: string, payload: CheckoutProfilesUpdate) {
-    return this.checkoutProfilesService.upsertByUsuarioId(usuarioId, payload)
+  async upsertByUserId(userId: string, payload: CheckoutProfilesUpdate) {
+    return this.checkoutProfilesService.upsertByUserId(userId, payload)
   }
 
-  async deleteByUsuarioId(usuarioId: string) {
-    return this.checkoutProfilesService.deleteByUsuarioId(usuarioId)
+  async deleteByUserId(userId: string) {
+    return this.checkoutProfilesService.deleteByUserId(userId)
   }
 }
 

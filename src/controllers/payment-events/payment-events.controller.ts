@@ -1,21 +1,21 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createPagosEventosRepository } from "@/repositories/pagos-eventos/pagos-eventos.repository"
+import { createPaymentEventsRepository } from "@/repositories/payment-events/payment-events.repository"
 import {
-  createPagosEventosService,
-  PagosEventosService,
-} from "@/services/pagos-eventos/pagos-eventos.service"
+  createPaymentEventsService,
+  PaymentEventsService,
+} from "@/services/payment-events/payment-events.service"
 
-export class PagosEventosController extends BaseIdController<"pagos_eventos"> {
-  constructor(service: PagosEventosService) {
+export class PaymentEventsController extends BaseIdController<"pagos_eventos"> {
+  constructor(service: PaymentEventsService) {
     super(service)
   }
 }
 
-export async function createServerPagosEventosController() {
+export async function createServerPaymentEventsController() {
   const supabase = await createClient()
 
-  return new PagosEventosController(
-    createPagosEventosService(createPagosEventosRepository(supabase)),
+  return new PaymentEventsController(
+    createPaymentEventsService(createPaymentEventsRepository(supabase)),
   )
 }

@@ -1,35 +1,35 @@
 import {
-  ExperienciasImagenesNotFoundException,
-  ExperienciasImagenesServiceException,
-} from "@/exceptions/experiencias-imagenes/experiencias-imagenes.exceptions"
-import { ExperienciasImagenesRepository } from "@/repositories/experiencias-imagenes/experiencias-imagenes.repository"
+  ExperienceImagesNotFoundException,
+  ExperienceImagesServiceException,
+} from "@/exceptions/experience-images/experience-images.exceptions"
+import { ExperienceImagesRepository } from "@/repositories/experience-images/experience-images.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  ExperienciasImagenesRow,
-  ExperienciasImagenesUpdate,
-} from "@/types/experiencias-imagenes/experiencias-imagenes.types"
+  ExperienceImagesRow,
+  ExperienceImagesUpdate,
+} from "@/types/experience-images/experience-images.types"
 
-export class ExperienciasImagenesService extends BaseService<"experiencias_imagenes"> {
-  constructor(repository: ExperienciasImagenesRepository) {
+export class ExperienceImagesService extends BaseService<"experiencias_imagenes"> {
+  constructor(repository: ExperienceImagesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new ExperienciasImagenesServiceException(operation, cause)
+    return new ExperienceImagesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new ExperienciasImagenesNotFoundException(criteria)
+    return new ExperienceImagesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<ExperienciasImagenesRow> {
+  async getById(id: string): Promise<ExperienceImagesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: ExperienciasImagenesUpdate,
-  ): Promise<ExperienciasImagenesRow> {
+    payload: ExperienceImagesUpdate,
+  ): Promise<ExperienceImagesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class ExperienciasImagenesService extends BaseService<"experiencias_image
   }
 }
 
-export function createExperienciasImagenesService(
-  repository: ExperienciasImagenesRepository,
+export function createExperienceImagesService(
+  repository: ExperienceImagesRepository,
 ) {
-  return new ExperienciasImagenesService(repository)
+  return new ExperienceImagesService(repository)
 }

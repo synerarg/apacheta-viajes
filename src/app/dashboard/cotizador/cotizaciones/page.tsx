@@ -1,21 +1,21 @@
 import Link from "next/link"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
-import { CotizacionesAdminTable } from "@/components/dashboard/cotizaciones-admin-table"
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import { createServerOperadoresController } from "@/controllers/operadores/operadores.controller"
+import { QuotesAdminTable } from "@/components/dashboard/quotes-admin-table"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import { createServerOperatorsController } from "@/controllers/operators/operators.controller"
 
 export const dynamic = "force-dynamic"
 
-export default async function CotizacionesPage() {
-  const [cotizacionesController, operadoresController] = await Promise.all([
-    createServerCotizacionesController(),
-    createServerOperadoresController(),
+export default async function QuotesPage() {
+  const [quotesController, operatorsController] = await Promise.all([
+    createServerQuotesController(),
+    createServerOperatorsController(),
   ])
 
   const [cotizaciones, operadores] = await Promise.all([
-    cotizacionesController.list(),
-    operadoresController.list(),
+    quotesController.list(),
+    operatorsController.list(),
   ])
 
   const sorted = [...cotizaciones].sort(
@@ -23,7 +23,7 @@ export default async function CotizacionesPage() {
       new Date(b.created_at).getTime() - new Date(a.created_at).getTime(),
   )
 
-  const operadoresMini = operadores.map((o) => ({
+  const operatorsMini = operadores.map((o) => ({
     id: o.id,
     usuario_id: o.usuario_id,
     nombre_comercial: o.nombre_comercial,
@@ -48,9 +48,9 @@ export default async function CotizacionesPage() {
         </p>
       </div>
 
-      <CotizacionesAdminTable
+      <QuotesAdminTable
         cotizaciones={sorted}
-        operadores={operadoresMini}
+        operadores={operatorsMini}
       />
     </div>
   )

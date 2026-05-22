@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server"
 
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
 import {
-  SolicitudesOperadorNotFoundException,
-  SolicitudesOperadorServiceException,
-  SolicitudesOperadorValidationException,
-} from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
-import { sendSolicitudOperadorAprobada } from "@/services/notifications/solicitud-operador-email.service"
+  OperatorRequestsNotFoundException,
+  OperatorRequestsServiceException,
+  OperatorRequestsValidationException,
+} from "@/exceptions/operator-requests/operator-requests.exceptions"
+import { sendOperatorRequestAprobada } from "@/services/notifications/solicitud-operador-email.service"
 import { createClient } from "@/lib/supabase/server"
 
 export async function PATCH(
@@ -24,23 +24,23 @@ export async function PATCH(
       return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     }
 
-    const controller = await createServerSolicitudesOperadorController()
+    const controller = await createServerOperatorRequestsController()
     const solicitud = await controller.approve(id, user.id)
 
-    sendSolicitudOperadorAprobada(solicitud, {
+    sendOperatorRequestAprobada(solicitud, {
       email: solicitud.email_contacto,
       greetingName: solicitud.nombre_comercial,
     }).catch((err) => console.error("send solicitud aprobada email failed", err))
 
     return NextResponse.json({ solicitud }, { status: 200 })
   } catch (error) {
-    if (error instanceof SolicitudesOperadorNotFoundException) {
+    if (error instanceof OperatorRequestsNotFoundException) {
       return NextResponse.json({ error: error.message }, { status: 404 })
     }
-    if (error instanceof SolicitudesOperadorValidationException) {
+    if (error instanceof OperatorRequestsValidationException) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
-    if (error instanceof SolicitudesOperadorServiceException) {
+    if (error instanceof OperatorRequestsServiceException) {
       console.error("approve solicitud failed", error)
       return NextResponse.json({ error: "No se pudo aprobar la solicitud" }, { status: 500 })
     }

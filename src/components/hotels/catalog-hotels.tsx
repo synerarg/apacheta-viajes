@@ -1,15 +1,15 @@
 "use client"
 
 import { useState } from "react"
-import { HotelCard, type HotelCardItem } from "@/components/hoteleria/hotel-card"
+import { HotelCard, type HotelCardItem } from "@/components/hotels/hotel-card"
 
 const ITEMS_PER_PAGE = 6
 
-interface CatalogoHoteleriaProps {
+interface CatalogHotelsProps {
   hoteles: HotelCardItem[]
 }
 
-export function CatalogoHoteleria({ hoteles }: CatalogoHoteleriaProps) {
+export function CatalogHotels({ hoteles }: CatalogHotelsProps) {
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 
   const visible = hoteles.slice(0, visibleCount)

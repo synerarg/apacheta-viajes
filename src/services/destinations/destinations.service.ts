@@ -1,29 +1,29 @@
 import {
-  DestinosNotFoundException,
-  DestinosServiceException,
-} from "@/exceptions/destinos/destinos.exceptions"
-import { DestinosRepository } from "@/repositories/destinos/destinos.repository"
+  DestinationsNotFoundException,
+  DestinationsServiceException,
+} from "@/exceptions/destinations/destinations.exceptions"
+import { DestinationsRepository } from "@/repositories/destinations/destinations.repository"
 import { BaseService } from "@/services/base/base.service"
-import type { DestinosRow, DestinosUpdate } from "@/types/destinos/destinos.types"
+import type { DestinationsRow, DestinationsUpdate } from "@/types/destinations/destinations.types"
 
-export class DestinosService extends BaseService<"destinos"> {
-  constructor(repository: DestinosRepository) {
+export class DestinationsService extends BaseService<"destinos"> {
+  constructor(repository: DestinationsRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new DestinosServiceException(operation, cause)
+    return new DestinationsServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new DestinosNotFoundException(criteria)
+    return new DestinationsNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<DestinosRow> {
+  async getById(id: string): Promise<DestinationsRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
-  async updateById(id: string, payload: DestinosUpdate): Promise<DestinosRow> {
+  async updateById(id: string, payload: DestinationsUpdate): Promise<DestinationsRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -32,6 +32,6 @@ export class DestinosService extends BaseService<"destinos"> {
   }
 }
 
-export function createDestinosService(repository: DestinosRepository) {
-  return new DestinosService(repository)
+export function createDestinationsService(repository: DestinationsRepository) {
+  return new DestinationsService(repository)
 }

@@ -1,34 +1,34 @@
-import { OrdenesItemsRepositoryException } from "@/exceptions/ordenes-items/ordenes-items.exceptions"
+import { OrderItemsRepositoryException } from "@/exceptions/order-items/order-items.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { OrdenesItemsUpdate } from "@/types/ordenes-items/ordenes-items.types"
+import type { OrderItemsUpdate } from "@/types/order-items/order-items.types"
 
-export class OrdenesItemsRepository extends BaseRepository<"ordenes_items"> {
+export class OrderItemsRepository extends BaseRepository<"ordenes_items"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "ordenes_items")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new OrdenesItemsRepositoryException(operation, cause)
+    return new OrderItemsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async listByOrdenId(ordenId: string) {
-    return this.findMany({ orden_id: ordenId })
+  async listByOrderId(orderId: string) {
+    return this.findMany({ orden_id: orderId })
   }
 
-  async findByReservaId(reservaId: string) {
-    return this.findOne({ reserva_id: reservaId })
+  async findByReservationId(reservationId: string) {
+    return this.findOne({ reserva_id: reservationId })
   }
 
-  async updateById(id: string, payload: OrdenesItemsUpdate) {
+  async updateById(id: string, payload: OrderItemsUpdate) {
     return this.update({ id }, payload)
   }
 }
 
-export function createOrdenesItemsRepository(supabase: DatabaseClient) {
-  return new OrdenesItemsRepository(supabase)
+export function createOrderItemsRepository(supabase: DatabaseClient) {
+  return new OrderItemsRepository(supabase)
 }

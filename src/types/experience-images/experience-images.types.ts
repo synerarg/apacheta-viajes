@@ -1,4 +1,4 @@
-export interface ExperienciasImagenesRow {
+export interface ExperienceImagesRow {
   id: string
   experiencia_id: string
   url: string
@@ -7,7 +7,7 @@ export interface ExperienciasImagenesRow {
   created_at: string | null
 }
 
-export interface ExperienciasImagenesInsert {
+export interface ExperienceImagesInsert {
   id?: string
   experiencia_id: string
   url: string
@@ -16,7 +16,7 @@ export interface ExperienciasImagenesInsert {
   created_at?: string | null
 }
 
-export interface ExperienciasImagenesUpdate {
+export interface ExperienceImagesUpdate {
   id?: string
   experiencia_id?: string
   url?: string

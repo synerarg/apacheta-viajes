@@ -1,68 +1,68 @@
 import {
-  PaquetesCategoriasNotFoundException,
-  PaquetesCategoriasServiceException,
-} from "@/exceptions/paquetes-categorias/paquetes-categorias.exceptions"
-import { PaquetesCategoriasRepository } from "@/repositories/paquetes-categorias/paquetes-categorias.repository"
+  PackageCategoriesNotFoundException,
+  PackageCategoriesServiceException,
+} from "@/exceptions/package-categories/package-categories.exceptions"
+import { PackageCategoriesRepository } from "@/repositories/package-categories/package-categories.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  PaquetesCategoriasRow,
-  PaquetesCategoriasUpdate,
-} from "@/types/paquetes-categorias/paquetes-categorias.types"
+  PackageCategoriesRow,
+  PackageCategoriesUpdate,
+} from "@/types/package-categories/package-categories.types"
 
-export class PaquetesCategoriasService extends BaseService<"paquetes_categorias"> {
-  constructor(repository: PaquetesCategoriasRepository) {
+export class PackageCategoriesService extends BaseService<"paquetes_categorias"> {
+  constructor(repository: PackageCategoriesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new PaquetesCategoriasServiceException(operation, cause)
+    return new PackageCategoriesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new PaquetesCategoriasNotFoundException(criteria)
+    return new PackageCategoriesNotFoundException(criteria)
   }
 
   async getByCompositeKey(
-    paqueteId: string,
-    categoriaId: string,
-  ): Promise<PaquetesCategoriasRow> {
+    packageId: string,
+    categoryId: string,
+  ): Promise<PackageCategoriesRow> {
     return this.getOrThrow(
       {
-        paquete_id: paqueteId,
-        categoria_id: categoriaId,
+        paquete_id: packageId,
+        categoria_id: categoryId,
       },
-      `paquete_id ${paqueteId} + categoria_id ${categoriaId}`,
+      `paquete_id ${packageId} + categoria_id ${categoryId}`,
     )
   }
 
   async updateByCompositeKey(
-    paqueteId: string,
-    categoriaId: string,
-    payload: PaquetesCategoriasUpdate,
-  ): Promise<PaquetesCategoriasRow> {
+    packageId: string,
+    categoryId: string,
+    payload: PackageCategoriesUpdate,
+  ): Promise<PackageCategoriesRow> {
     return this.updateByFilters(
       {
-        paquete_id: paqueteId,
-        categoria_id: categoriaId,
+        paquete_id: packageId,
+        categoria_id: categoryId,
       },
       payload,
-      `paquete_id ${paqueteId} + categoria_id ${categoriaId}`,
+      `paquete_id ${packageId} + categoria_id ${categoryId}`,
     )
   }
 
   async deleteByCompositeKey(
-    paqueteId: string,
-    categoriaId: string,
+    packageId: string,
+    categoryId: string,
   ): Promise<void> {
     return this.deleteByFilters({
-      paquete_id: paqueteId,
-      categoria_id: categoriaId,
+      paquete_id: packageId,
+      categoria_id: categoryId,
     })
   }
 }
 
-export function createPaquetesCategoriasService(
-  repository: PaquetesCategoriasRepository,
+export function createPackageCategoriesService(
+  repository: PackageCategoriesRepository,
 ) {
-  return new PaquetesCategoriasService(repository)
+  return new PackageCategoriesService(repository)
 }

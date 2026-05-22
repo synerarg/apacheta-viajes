@@ -1,4 +1,4 @@
-export interface CotizacionesItemsRow {
+export interface QuoteItemsRow {
   id: string
   cotizacion_id: string
   servicio_id: string | null
@@ -19,7 +19,7 @@ export interface CotizacionesItemsRow {
   created_at: string
 }
 
-export interface CotizacionesItemsInsert {
+export interface QuoteItemsInsert {
   id?: string
   cotizacion_id: string
   servicio_id?: string | null
@@ -40,7 +40,7 @@ export interface CotizacionesItemsInsert {
   created_at?: string
 }
 
-export interface CotizacionesItemsUpdate {
+export interface QuoteItemsUpdate {
   id?: string
   cotizacion_id?: string
   servicio_id?: string | null

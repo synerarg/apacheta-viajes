@@ -1,32 +1,32 @@
 import {
-  CotizadorPreciosNotFoundException,
-  CotizadorPreciosServiceException,
-} from "@/exceptions/cotizador-precios/cotizador-precios.exceptions"
-import { CotizadorPreciosRepository } from "@/repositories/cotizador-precios/cotizador-precios.repository"
+  QuoterPricesNotFoundException,
+  QuoterPricesServiceException,
+} from "@/exceptions/quoter-prices/quoter-prices.exceptions"
+import { QuoterPricesRepository } from "@/repositories/quoter-prices/quoter-prices.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  CotizadorPreciosRow,
-  CotizadorPreciosUpdate,
-} from "@/types/cotizador-precios/cotizador-precios.types"
+  QuoterPricesRow,
+  QuoterPricesUpdate,
+} from "@/types/quoter-prices/quoter-prices.types"
 
-export class CotizadorPreciosService extends BaseService<"cotizador_servicio_precios"> {
-  constructor(private readonly preciosRepository: CotizadorPreciosRepository) {
-    super(preciosRepository)
+export class QuoterPricesService extends BaseService<"cotizador_servicio_precios"> {
+  constructor(private readonly pricesRepository: QuoterPricesRepository) {
+    super(pricesRepository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new CotizadorPreciosServiceException(operation, cause)
+    return new QuoterPricesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new CotizadorPreciosNotFoundException(criteria)
+    return new QuoterPricesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<CotizadorPreciosRow> {
+  async getById(id: string): Promise<QuoterPricesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
-  async updateById(id: string, payload: CotizadorPreciosUpdate): Promise<CotizadorPreciosRow> {
+  async updateById(id: string, payload: QuoterPricesUpdate): Promise<QuoterPricesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -34,34 +34,34 @@ export class CotizadorPreciosService extends BaseService<"cotizador_servicio_pre
     return this.deleteByFilters({ id })
   }
 
-  async findByServicio(servicioId: string): Promise<CotizadorPreciosRow[]> {
+  async findByService(serviceId: string): Promise<QuoterPricesRow[]> {
     try {
-      return await this.preciosRepository.findByServicio(servicioId)
+      return await this.pricesRepository.findByService(serviceId)
     } catch (error) {
-      this.handleServiceError("findByServicio", error)
+      this.handleServiceError("findByService", error)
     }
   }
 
-  async findActiveForDate(servicioId: string, date: string): Promise<CotizadorPreciosRow | null> {
+  async findActiveForDate(serviceId: string, date: string): Promise<QuoterPricesRow | null> {
     try {
-      return await this.preciosRepository.findActiveForDate(servicioId, date)
+      return await this.pricesRepository.findActiveForDate(serviceId, date)
     } catch (error) {
       this.handleServiceError("findActiveForDate", error)
     }
   }
 
-  async findByServicioTemporada(
-    servicioId: string,
+  async findByServiceSeason(
+    serviceId: string,
     temporada: string,
-  ): Promise<CotizadorPreciosRow | null> {
+  ): Promise<QuoterPricesRow | null> {
     try {
-      return await this.preciosRepository.findByServicioTemporada(servicioId, temporada)
+      return await this.pricesRepository.findByServiceSeason(serviceId, temporada)
     } catch (error) {
-      this.handleServiceError("findByServicioTemporada", error)
+      this.handleServiceError("findByServiceSeason", error)
     }
   }
 }
 
-export function createCotizadorPreciosService(repository: CotizadorPreciosRepository) {
-  return new CotizadorPreciosService(repository)
+export function createQuoterPricesService(repository: QuoterPricesRepository) {
+  return new QuoterPricesService(repository)
 }

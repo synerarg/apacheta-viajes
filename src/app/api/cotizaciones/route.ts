@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
-import { cotizacionHeaderSchema } from "@/lib/cotizaciones/schemas"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import { handleQuoterError } from "@/lib/quotes/errors"
+import { quoteHeaderSchema } from "@/lib/quotes/schemas"
 import { createClient } from "@/lib/supabase/server"
 
 async function getAuthContext() {
@@ -31,12 +31,12 @@ export async function POST(request: Request) {
     if (!isOperador) return NextResponse.json({ error: "No autorizado" }, { status: 403 })
 
     const body = await request.json()
-    const payload = cotizacionHeaderSchema.parse(body)
-    const controller = await createServerCotizacionesController()
+    const payload = quoteHeaderSchema.parse(body)
+    const controller = await createServerQuotesController()
     const cotizacion = await controller.createDraft(user.id, payload)
     return NextResponse.json({ cotizacion }, { status: 201 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -47,7 +47,7 @@ export async function GET(request: Request) {
 
     const url = new URL(request.url)
     const todas = url.searchParams.get("todas") === "1"
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
 
     const cotizaciones =
       todas && isAdmin
@@ -55,6 +55,6 @@ export async function GET(request: Request) {
         : await controller.listMine(user.id)
     return NextResponse.json({ cotizaciones }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

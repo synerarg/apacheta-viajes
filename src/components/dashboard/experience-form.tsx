@@ -18,11 +18,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { CategoriasExperienciaRow } from "@/types/categorias-experiencia/categorias-experiencia.types"
-import type { DestinosRow } from "@/types/destinos/destinos.types"
+import type { ExperienceCategoriesRow } from "@/types/experience-categories/experience-categories.types"
+import type { DestinationsRow } from "@/types/destinations/destinations.types"
 import type { Moneda } from "@/types/shared/enums"
 
-interface ExperienciaFormProps {
+interface ExperienceFormProps {
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>
   initialData?: {
     nombre?: string
@@ -43,8 +43,8 @@ interface ExperienciaFormProps {
     orden?: number | null
     gallery?: string[]
   }
-  categorias: CategoriasExperienciaRow[]
-  destinos: DestinosRow[]
+  categorias: ExperienceCategoriesRow[]
+  destinos: DestinationsRow[]
   canToggleDestacado: boolean
   isEdit?: boolean
 }
@@ -52,14 +52,14 @@ interface ExperienciaFormProps {
 const initialState: ActionState = {}
 const MONEDAS: Moneda[] = ["ARS", "USD", "EUR", "BRL", "MXN", "CLP", "COP", "PEN", "UYU"]
 
-export function ExperienciaForm({
+export function ExperienceForm({
   action,
   initialData,
   categorias,
   destinos,
   canToggleDestacado,
   isEdit = false,
-}: ExperienciaFormProps) {
+}: ExperienceFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState)
   const [selectedCategoria, setSelectedCategoria] = useState<string>(
     initialData?.categoria_id ?? "__none__",

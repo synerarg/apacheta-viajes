@@ -1,29 +1,29 @@
 import {
-  HotelesNotFoundException,
-  HotelesServiceException,
-} from "@/exceptions/hoteles/hoteles.exceptions"
-import { HotelesRepository } from "@/repositories/hoteles/hoteles.repository"
+  HotelsNotFoundException,
+  HotelsServiceException,
+} from "@/exceptions/hotels/hotels.exceptions"
+import { HotelsRepository } from "@/repositories/hotels/hotels.repository"
 import { BaseService } from "@/services/base/base.service"
-import type { HotelesRow, HotelesUpdate } from "@/types/hoteles/hoteles.types"
+import type { HotelsRow, HotelsUpdate } from "@/types/hotels/hotels.types"
 
-export class HotelesService extends BaseService<"hoteles"> {
-  constructor(repository: HotelesRepository) {
+export class HotelsService extends BaseService<"hoteles"> {
+  constructor(repository: HotelsRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new HotelesServiceException(operation, cause)
+    return new HotelsServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new HotelesNotFoundException(criteria)
+    return new HotelsNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<HotelesRow> {
+  async getById(id: string): Promise<HotelsRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
-  async updateById(id: string, payload: HotelesUpdate): Promise<HotelesRow> {
+  async updateById(id: string, payload: HotelsUpdate): Promise<HotelsRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -32,6 +32,6 @@ export class HotelesService extends BaseService<"hoteles"> {
   }
 }
 
-export function createHotelesService(repository: HotelesRepository) {
-  return new HotelesService(repository)
+export function createHotelsService(repository: HotelsRepository) {
+  return new HotelsService(repository)
 }

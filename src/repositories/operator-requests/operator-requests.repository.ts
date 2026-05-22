@@ -1,48 +1,48 @@
-import { SolicitudesOperadorRepositoryException } from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
+import { OperatorRequestsRepositoryException } from "@/exceptions/operator-requests/operator-requests.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type {
-  SolicitudesOperadorRow,
-  SolicitudesOperadorUpdate,
-} from "@/types/solicitudes-operador/solicitudes-operador.types"
+  OperatorRequestsRow,
+  OperatorRequestsUpdate,
+} from "@/types/operator-requests/operator-requests.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
-export class SolicitudesOperadorRepository extends BaseRepository<"solicitudes_operador"> {
+export class OperatorRequestsRepository extends BaseRepository<"solicitudes_operador"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "solicitudes_operador")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new SolicitudesOperadorRepositoryException(operation, cause)
+    return new OperatorRequestsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async findActiveByUsuarioId(usuarioId: string): Promise<SolicitudesOperadorRow | null> {
+  async findActiveByUserId(userId: string): Promise<OperatorRequestsRow | null> {
     const { data, error } = await this.supabase
       .from("solicitudes_operador")
       .select("*")
-      .eq("usuario_id", usuarioId)
+      .eq("usuario_id", userId)
       .in("estado", ["pendiente", "en_revision"])
       .maybeSingle()
 
-    if (error) throw this.createRepositoryException("findActiveByUsuarioId", error)
-    return (data as SolicitudesOperadorRow | null) ?? null
+    if (error) throw this.createRepositoryException("findActiveByUserId", error)
+    return (data as OperatorRequestsRow | null) ?? null
   }
 
-  async listByUsuarioId(usuarioId: string): Promise<SolicitudesOperadorRow[]> {
+  async listByUserId(userId: string): Promise<OperatorRequestsRow[]> {
     const { data, error } = await this.supabase
       .from("solicitudes_operador")
       .select("*")
-      .eq("usuario_id", usuarioId)
+      .eq("usuario_id", userId)
       .order("created_at", { ascending: false })
 
-    if (error) throw this.createRepositoryException("listByUsuarioId", error)
-    return (data as SolicitudesOperadorRow[]) ?? []
+    if (error) throw this.createRepositoryException("listByUserId", error)
+    return (data as OperatorRequestsRow[]) ?? []
   }
 
-  async updateById(id: string, payload: SolicitudesOperadorUpdate) {
+  async updateById(id: string, payload: OperatorRequestsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -50,14 +50,14 @@ export class SolicitudesOperadorRepository extends BaseRepository<"solicitudes_o
     return this.delete({ id })
   }
 
-  async callApproveRpc(solicitudId: string, adminId: string): Promise<SolicitudesOperadorRow> {
+  async callApproveRpc(requestId: string, adminId: string): Promise<OperatorRequestsRow> {
     const { data, error } = await (
       this.supabase.rpc as unknown as (
         fn: string,
         args: Record<string, unknown>,
-      ) => Promise<{ data: SolicitudesOperadorRow | null; error: unknown }>
+      ) => Promise<{ data: OperatorRequestsRow | null; error: unknown }>
     )("approve_solicitud_operador", {
-      p_solicitud_id: solicitudId,
+      p_solicitud_id: requestId,
       p_admin_id: adminId,
     })
 
@@ -67,6 +67,6 @@ export class SolicitudesOperadorRepository extends BaseRepository<"solicitudes_o
   }
 }
 
-export function createSolicitudesOperadorRepository(supabase: DatabaseClient) {
-  return new SolicitudesOperadorRepository(supabase)
+export function createOperatorRequestsRepository(supabase: DatabaseClient) {
+  return new OperatorRequestsRepository(supabase)
 }

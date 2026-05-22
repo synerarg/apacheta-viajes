@@ -1,22 +1,22 @@
-import { UsuariosRepositoryException } from "@/exceptions/usuarios/usuarios.exceptions"
+import { UsersRepositoryException } from "@/exceptions/users/users.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { UsuariosUpdate } from "@/types/usuarios/usuarios.types"
+import type { UsersUpdate } from "@/types/users/users.types"
 
-export class UsuariosRepository extends BaseRepository<"usuarios"> {
+export class UsersRepository extends BaseRepository<"usuarios"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "usuarios")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new UsuariosRepositoryException(operation, cause)
+    return new UsersRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: UsuariosUpdate) {
+  async updateById(id: string, payload: UsersUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class UsuariosRepository extends BaseRepository<"usuarios"> {
   }
 }
 
-export function createUsuariosRepository(supabase: DatabaseClient) {
-  return new UsuariosRepository(supabase)
+export function createUsersRepository(supabase: DatabaseClient) {
+  return new UsersRepository(supabase)
 }

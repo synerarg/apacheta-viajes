@@ -1,4 +1,4 @@
-export interface EmisivoDestinosRow {
+export interface OutboundDestinationsRow {
   id: string
   nombre: string
   slug: string
@@ -12,7 +12,7 @@ export interface EmisivoDestinosRow {
   updated_at: string | null
 }
 
-export interface EmisivoDestinosInsert {
+export interface OutboundDestinationsInsert {
   id?: string
   nombre: string
   slug: string
@@ -26,7 +26,7 @@ export interface EmisivoDestinosInsert {
   updated_at?: string | null
 }
 
-export interface EmisivoDestinosUpdate {
+export interface OutboundDestinationsUpdate {
   id?: string
   nombre?: string
   slug?: string

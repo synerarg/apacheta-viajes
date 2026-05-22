@@ -1,23 +1,23 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createExperienciasImagenesRepository } from "@/repositories/experiencias-imagenes/experiencias-imagenes.repository"
+import { createExperienceImagesRepository } from "@/repositories/experience-images/experience-images.repository"
 import {
-  createExperienciasImagenesService,
-  ExperienciasImagenesService,
-} from "@/services/experiencias-imagenes/experiencias-imagenes.service"
+  createExperienceImagesService,
+  ExperienceImagesService,
+} from "@/services/experience-images/experience-images.service"
 
-export class ExperienciasImagenesController extends BaseIdController<"experiencias_imagenes"> {
-  constructor(service: ExperienciasImagenesService) {
+export class ExperienceImagesController extends BaseIdController<"experiencias_imagenes"> {
+  constructor(service: ExperienceImagesService) {
     super(service)
   }
 }
 
-export async function createServerExperienciasImagenesController() {
+export async function createServerExperienceImagesController() {
   const supabase = await createClient()
 
-  return new ExperienciasImagenesController(
-    createExperienciasImagenesService(
-      createExperienciasImagenesRepository(supabase),
+  return new ExperienceImagesController(
+    createExperienceImagesService(
+      createExperienceImagesRepository(supabase),
     ),
   )
 }

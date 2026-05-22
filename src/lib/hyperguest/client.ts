@@ -1,4 +1,4 @@
-import { HotelesServiceException } from "@/exceptions/hoteles/hoteles.exceptions"
+import { HotelsServiceException } from "@/exceptions/hotels/hotels.exceptions"
 import {
   assertHyperGuestConfigured,
   type HyperGuestConfig,
@@ -135,7 +135,7 @@ export async function hyperGuestRequest<TResponse>(
     if (!response.ok) {
       const errorBody = await response.text()
 
-      throw new HotelesServiceException(
+      throw new HotelsServiceException(
         "hyperGuestRequest",
         new Error(
           `HyperGuest API error ${response.status}: ${errorBody || response.statusText}`,
@@ -151,11 +151,11 @@ export async function hyperGuestRequest<TResponse>(
 
     return (await response.text()) as TResponse
   } catch (error) {
-    if (error instanceof HotelesServiceException) {
+    if (error instanceof HotelsServiceException) {
       throw error
     }
 
-    throw new HotelesServiceException("hyperGuestRequest", error)
+    throw new HotelsServiceException("hyperGuestRequest", error)
   } finally {
     clearTimeout(timeout)
   }

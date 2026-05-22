@@ -2,35 +2,35 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { CaretLeft, Pencil } from "@phosphor-icons/react/dist/ssr"
 
-import { CotizadorPreciosGrid } from "@/components/dashboard/cotizador-precios-grid"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
-import { createServerCotizadorPreciosController } from "@/controllers/cotizador-precios/cotizador-precios.controller"
-import { createServerCotizadorServiciosController } from "@/controllers/cotizador-servicios/cotizador-servicios.controller"
+import { QuoterPricesGrid } from "@/components/dashboard/quoter-prices-grid"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
+import { createServerQuoterPricesController } from "@/controllers/quoter-prices/quoter-prices.controller"
+import { createServerQuoterServicesController } from "@/controllers/quoter-services/quoter-services.controller"
 
 export const dynamic = "force-dynamic"
 
 interface PreciosPageProps {
-  params: Promise<{ servicioId: string }>
+  params: Promise<{ serviceId: string }>
 }
 
 export default async function PreciosServicioPage({
   params,
 }: PreciosPageProps) {
-  const { servicioId } = await params
+  const { serviceId } = await params
 
   const [
-    serviciosController,
-    categoriasController,
-    preciosController,
+    servicesController,
+    categoriesController,
+    pricesController,
   ] = await Promise.all([
-    createServerCotizadorServiciosController(),
-    createServerCotizadorCategoriasController(),
-    createServerCotizadorPreciosController(),
+    createServerQuoterServicesController(),
+    createServerQuoterCategoriesController(),
+    createServerQuoterPricesController(),
   ])
 
   let servicio
   try {
-    servicio = await serviciosController.getById(servicioId)
+    servicio = await servicesController.getById(serviceId)
   } catch {
     notFound()
   }
@@ -38,8 +38,8 @@ export default async function PreciosServicioPage({
   if (!servicio) notFound()
 
   const [categorias, precios] = await Promise.all([
-    categoriasController.list(),
-    preciosController.list({ servicio_id: servicioId }),
+    categoriesController.list(),
+    pricesController.list({ servicio_id: serviceId }),
   ])
 
   const categoria = servicio.categoria_id
@@ -80,7 +80,7 @@ export default async function PreciosServicioPage({
         </div>
       </div>
 
-      <CotizadorPreciosGrid servicioId={servicio.id} precios={precios} />
+      <QuoterPricesGrid serviceId={servicio.id} precios={precios} />
     </div>
   )
 }

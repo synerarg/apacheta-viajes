@@ -1,4 +1,4 @@
-export interface PaquetesImagenesRow {
+export interface PackageImagesRow {
   id: string
   paquete_id: string
   url: string
@@ -7,7 +7,7 @@ export interface PaquetesImagenesRow {
   created_at: string | null
 }
 
-export interface PaquetesImagenesInsert {
+export interface PackageImagesInsert {
   id?: string
   paquete_id: string
   url: string
@@ -16,7 +16,7 @@ export interface PaquetesImagenesInsert {
   created_at?: string | null
 }
 
-export interface PaquetesImagenesUpdate {
+export interface PackageImagesUpdate {
   id?: string
   paquete_id?: string
   url?: string

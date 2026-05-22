@@ -1,35 +1,35 @@
 import {
-  SolicitudesContactoNotFoundException,
-  SolicitudesContactoServiceException,
-} from "@/exceptions/solicitudes-contacto/solicitudes-contacto.exceptions"
-import { SolicitudesContactoRepository } from "@/repositories/solicitudes-contacto/solicitudes-contacto.repository"
+  ContactRequestsNotFoundException,
+  ContactRequestsServiceException,
+} from "@/exceptions/contact-requests/contact-requests.exceptions"
+import { ContactRequestsRepository } from "@/repositories/contact-requests/contact-requests.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  SolicitudesContactoRow,
-  SolicitudesContactoUpdate,
-} from "@/types/solicitudes-contacto/solicitudes-contacto.types"
+  ContactRequestsRow,
+  ContactRequestsUpdate,
+} from "@/types/contact-requests/contact-requests.types"
 
-export class SolicitudesContactoService extends BaseService<"solicitudes_contacto"> {
-  constructor(repository: SolicitudesContactoRepository) {
+export class ContactRequestsService extends BaseService<"solicitudes_contacto"> {
+  constructor(repository: ContactRequestsRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new SolicitudesContactoServiceException(operation, cause)
+    return new ContactRequestsServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new SolicitudesContactoNotFoundException(criteria)
+    return new ContactRequestsNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<SolicitudesContactoRow> {
+  async getById(id: string): Promise<ContactRequestsRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: SolicitudesContactoUpdate,
-  ): Promise<SolicitudesContactoRow> {
+    payload: ContactRequestsUpdate,
+  ): Promise<ContactRequestsRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class SolicitudesContactoService extends BaseService<"solicitudes_contact
   }
 }
 
-export function createSolicitudesContactoService(
-  repository: SolicitudesContactoRepository,
+export function createContactRequestsService(
+  repository: ContactRequestsRepository,
 ) {
-  return new SolicitudesContactoService(repository)
+  return new ContactRequestsService(repository)
 }

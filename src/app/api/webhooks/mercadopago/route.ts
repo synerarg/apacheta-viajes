@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { createAdminPaymentsController } from "@/controllers/payments/payments.controller"
+import { createAdminPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 import {
   assertMercadoPagoWebhookSecretInProduction,
   validateMercadoPagoWebhookSignature,
@@ -64,7 +64,7 @@ export async function POST(request: Request) {
       )
     }
 
-    const paymentsController = createAdminPaymentsController()
+    const paymentsController = createAdminPaymentProcessingController()
     const result = await paymentsController.handleMercadoPagoWebhook(paymentId)
 
     return NextResponse.json(

@@ -1,7 +1,7 @@
 "use client"
 
 import { Checkbox } from "@/components/ui/checkbox"
-import type { CotizacionesItemsRow } from "@/types/cotizaciones-items/cotizaciones-items.types"
+import type { QuoteItemsRow } from "@/types/quote-items/quote-items.types"
 
 function formatMoney(v: number) {
   return `$${Math.round(v || 0).toLocaleString("es-AR")}`
@@ -19,10 +19,10 @@ function formatDay(iso: string | null) {
 type DayBreakdown = {
   index: number
   fecha: string
-  items: CotizacionesItemsRow[]
+  items: QuoteItemsRow[]
 }
 
-export function TotalesPanel({
+export function TotalsPanel({
   items,
   days,
   totalComision,
@@ -33,7 +33,7 @@ export function TotalesPanel({
   readonly,
   onToggleImpuesto,
 }: {
-  items: CotizacionesItemsRow[]
+  items: QuoteItemsRow[]
   days: string[]
   totalVenta?: number
   totalComision: number

@@ -1,22 +1,22 @@
-import { DestinosRepositoryException } from "@/exceptions/destinos/destinos.exceptions"
+import { DestinationsRepositoryException } from "@/exceptions/destinations/destinations.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { DestinosUpdate } from "@/types/destinos/destinos.types"
+import type { DestinationsUpdate } from "@/types/destinations/destinations.types"
 
-export class DestinosRepository extends BaseRepository<"destinos"> {
+export class DestinationsRepository extends BaseRepository<"destinos"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "destinos")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new DestinosRepositoryException(operation, cause)
+    return new DestinationsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: DestinosUpdate) {
+  async updateById(id: string, payload: DestinationsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class DestinosRepository extends BaseRepository<"destinos"> {
   }
 }
 
-export function createDestinosRepository(supabase: DatabaseClient) {
-  return new DestinosRepository(supabase)
+export function createDestinationsRepository(supabase: DatabaseClient) {
+  return new DestinationsRepository(supabase)
 }

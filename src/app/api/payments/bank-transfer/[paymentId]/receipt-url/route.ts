@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
+import { createServerPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptUnavailableException,
   PaymentReceiptValidationException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
@@ -27,7 +27,7 @@ export async function GET(
       )
     }
 
-    const paymentsController = await createServerPaymentsController()
+    const paymentsController = await createServerPaymentProcessingController()
     const result = await paymentsController.getBankTransferReceiptDownloadUrl(
       paymentId,
       user.id,

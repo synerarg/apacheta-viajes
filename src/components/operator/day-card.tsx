@@ -10,7 +10,7 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import type { CotizacionesItemsRow } from "@/types/cotizaciones-items/cotizaciones-items.types"
+import type { QuoteItemsRow } from "@/types/quote-items/quote-items.types"
 import { ItemCard } from "./item-card"
 
 function formatDayDate(isoDate: string | null) {
@@ -27,7 +27,7 @@ function formatMoney(v: number) {
   return `$${Math.round(v || 0).toLocaleString("es-AR")}`
 }
 
-export function DiaCard({
+export function DayCard({
   diaOffset,
   fecha,
   items,
@@ -39,7 +39,7 @@ export function DiaCard({
 }: {
   diaOffset: number
   fecha: string | null
-  items: CotizacionesItemsRow[]
+  items: QuoteItemsRow[]
   readonly?: boolean
   onAddService: (diaOffset: number, fecha: string | null) => void
   onAddSpecial: (

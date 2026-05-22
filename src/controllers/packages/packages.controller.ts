@@ -1,18 +1,18 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createPaquetesRepository } from "@/repositories/paquetes/paquetes.repository"
-import { createPaquetesService, PaquetesService } from "@/services/paquetes/paquetes.service"
+import { createPackagesRepository } from "@/repositories/packages/packages.repository"
+import { createPackagesService, PackagesService } from "@/services/packages/packages.service"
 
-export class PaquetesController extends BaseIdController<"paquetes"> {
-  constructor(service: PaquetesService) {
+export class PackagesController extends BaseIdController<"paquetes"> {
+  constructor(service: PackagesService) {
     super(service)
   }
 }
 
-export async function createServerPaquetesController() {
+export async function createServerPackagesController() {
   const supabase = await createClient()
 
-  return new PaquetesController(
-    createPaquetesService(createPaquetesRepository(supabase)),
+  return new PackagesController(
+    createPackagesService(createPackagesRepository(supabase)),
   )
 }

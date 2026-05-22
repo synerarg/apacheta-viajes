@@ -9,11 +9,11 @@ import { Textarea } from "@/components/ui/textarea"
 
 type Estado = "pendiente" | "en_revision" | "aprobada" | "rechazada" | "cancelada"
 
-export function SolicitudOperadorActions({
-  solicitudId,
+export function OperatorRequestActions({
+  requestId,
   estado,
 }: {
-  solicitudId: string
+  requestId: string
   estado: Estado
 }) {
   const router = useRouter()
@@ -47,7 +47,7 @@ export function SolicitudOperadorActions({
       return
     }
     callAction(
-      `/api/dashboard/solicitudes-operador/${solicitudId}/rechazar`,
+      `/api/dashboard/solicitudes-operador/${requestId}/rechazar`,
       { motivo: motivo.trim() },
       "Solicitud rechazada",
     )
@@ -67,7 +67,7 @@ export function SolicitudOperadorActions({
         <Button
           onClick={() =>
             callAction(
-              `/api/dashboard/solicitudes-operador/${solicitudId}/aprobar`,
+              `/api/dashboard/solicitudes-operador/${requestId}/aprobar`,
               undefined,
               "Solicitud aprobada",
             )
@@ -81,7 +81,7 @@ export function SolicitudOperadorActions({
             variant="secondary"
             onClick={() =>
               callAction(
-                `/api/dashboard/solicitudes-operador/${solicitudId}/revisar`,
+                `/api/dashboard/solicitudes-operador/${requestId}/revisar`,
                 undefined,
                 "Marcada en revisión",
               )

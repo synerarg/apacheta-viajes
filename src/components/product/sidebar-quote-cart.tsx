@@ -2,11 +2,11 @@
 
 import { toast } from "sonner"
 
-import { SidebarCotizacion } from "@/components/product/sidebar-cotizacion"
+import { SidebarQuote } from "@/components/product/sidebar-quote"
 import { useCart } from "@/hooks/use-cart"
 import type { CartItem } from "@/types/cart/cart.types"
 
-interface SidebarCotizacionCartProps {
+interface SidebarQuoteCartProps {
   precio: number
   moneda: string
   fecha?: string
@@ -16,10 +16,10 @@ interface SidebarCotizacionCartProps {
   cartItem: CartItem | null
 }
 
-export function SidebarCotizacionCart({
+export function SidebarQuoteCart({
   cartItem,
   ...sidebarProps
-}: SidebarCotizacionCartProps) {
+}: SidebarQuoteCartProps) {
   const { addItem } = useCart()
 
   function handleAgregarAlCarro() {
@@ -33,7 +33,7 @@ export function SidebarCotizacionCart({
   }
 
   return (
-    <SidebarCotizacion
+    <SidebarQuote
       {...sidebarProps}
       onAgregarAlCarro={handleAgregarAlCarro}
     />

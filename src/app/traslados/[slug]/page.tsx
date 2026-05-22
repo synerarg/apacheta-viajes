@@ -1,22 +1,22 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
-import { createServerTrasladosController } from "@/controllers/traslados/traslados.controller"
-import { createServerTrasladosTarifasController } from "@/controllers/traslados-tarifas/traslados-tarifas.controller"
-import { createServerTrasladosImagenesController } from "@/controllers/traslados-imagenes/traslados-imagenes.controller"
+import { createServerTransfersController } from "@/controllers/transfers/transfers.controller"
+import { createServerTransferRatesController } from "@/controllers/transfer-rates/transfer-rates.controller"
+import { createServerTransferImagesController } from "@/controllers/transfer-images/transfer-images.controller"
 import {
-  TrasladoView,
-  type TrasladoTarifaRow,
-  type TrasladoViewData,
-} from "@/components/traslados/traslado-view"
+  TransferView,
+  type TransferRateRow,
+  type TransferViewData,
+} from "@/components/transfers/transfer-view"
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
-async function getTrasladoViewData(slug: string): Promise<TrasladoViewData | null> {
-  const trasladosController = await createServerTrasladosController()
-  const [traslado] = await trasladosController.list({
+async function getTransferViewData(slug: string): Promise<TransferViewData | null> {
+  const transfersController = await createServerTransfersController()
+  const [traslado] = await transfersController.list({
     slug,
     activo: true,
   })
@@ -26,8 +26,8 @@ async function getTrasladoViewData(slug: string): Promise<TrasladoViewData | nul
   }
 
   const [tarifasController, imagenesController] = await Promise.all([
-    createServerTrasladosTarifasController(),
-    createServerTrasladosImagenesController(),
+    createServerTransferRatesController(),
+    createServerTransferImagesController(),
   ])
 
   const [tarifas, imagenes] = await Promise.all([
@@ -42,7 +42,7 @@ async function getTrasladoViewData(slug: string): Promise<TrasladoViewData | nul
       .map((image) => image.url),
   ].filter((image): image is string => Boolean(image))
 
-  const tarifasOrdenadas: TrasladoTarifaRow[] = [...tarifas]
+  const tarifasOrdenadas: TransferRateRow[] = [...tarifas]
     .sort((leftTarifa, rightTarifa) => {
       const leftOrder = leftTarifa.orden ?? Number.MAX_SAFE_INTEGER
       const rightOrder = rightTarifa.orden ?? Number.MAX_SAFE_INTEGER
@@ -93,7 +93,7 @@ async function getTrasladoViewData(slug: string): Promise<TrasladoViewData | nul
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const traslado = await getTrasladoViewData(slug)
+  const traslado = await getTransferViewData(slug)
 
   if (!traslado) {
     return {}
@@ -107,11 +107,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function TrasladoDetailPage({ params }: Props) {
+export default async function TransferDetailPage({ params }: Props) {
   const { slug } = await params
-  const traslado = await getTrasladoViewData(slug)
+  const traslado = await getTransferViewData(slug)
 
   if (!traslado) notFound()
 
-  return <TrasladoView traslado={traslado} />
+  return <TransferView traslado={traslado} />
 }

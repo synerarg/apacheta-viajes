@@ -4,14 +4,14 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { ArrowLeft, Check, MapPin, Star } from "lucide-react"
 
-import { HotelAvailabilityForm } from "@/components/hoteleria/hotel-availability-form"
-import { createServerHotelesController } from "@/controllers/hoteles/hoteles.controller"
+import { HotelAvailabilityForm } from "@/components/hotels/hotel-availability-form"
+import { createServerHotelsController } from "@/controllers/hotels/hotels.controller"
 import { createServerHyperGuestController } from "@/controllers/hyperguest/hyperguest.controller"
 import {
   extractPropertyDisplay,
   type PropertyDisplay,
 } from "@/lib/hyperguest/offer-display"
-import type { HotelesRow } from "@/types/hoteles/hoteles.types"
+import type { HotelsRow } from "@/types/hotels/hotels.types"
 
 type HotelPageProps = {
   params: Promise<{
@@ -24,7 +24,7 @@ function buildStars(stars: number) {
 }
 
 async function getRealHotelBySlug(slug: string) {
-  const controller = await createServerHotelesController()
+  const controller = await createServerHotelsController()
 
   return controller.get({ slug, activo: true })
 }
@@ -58,7 +58,7 @@ async function getHyperGuestPropertyDisplay(
   }
 }
 
-function getHotelLocation(hotel: HotelesRow) {
+function getHotelLocation(hotel: HotelsRow) {
   return (
     [hotel.ciudad, hotel.provincia].filter(Boolean).join(", ") ||
     hotel.direccion ||

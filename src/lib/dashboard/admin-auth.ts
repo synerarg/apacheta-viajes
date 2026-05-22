@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server"
-import { createUsuariosRepository } from "@/repositories/usuarios/usuarios.repository"
+import { createUsersRepository } from "@/repositories/users/users.repository"
 
 export async function requireAdminSession() {
   const supabase = await createClient()
@@ -11,8 +11,8 @@ export async function requireAdminSession() {
     throw new Error("No autenticado")
   }
 
-  const usuariosRepo = createUsuariosRepository(supabase)
-  const profile = await usuariosRepo.findById(user.id)
+  const usersRepo = createUsersRepository(supabase)
+  const profile = await usersRepo.findById(user.id)
 
   if (profile?.tipo !== "admin") {
     throw new Error("No autorizado")

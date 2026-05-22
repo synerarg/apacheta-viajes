@@ -1,5 +1,5 @@
 import { adminClient } from "@/lib/supabase/admin-client"
-import { createPaymentsService, type PaymentsService } from "@/services/payments/payments.service"
+import { createPaymentProcessingService, type PaymentProcessingService } from "@/services/payment-processing/payment-processing.service"
 import type {
   AuthorizeBankTransferReceiptUploadInput,
   ConfirmBankTransferInput,
@@ -8,11 +8,11 @@ import type {
   CreatePaymentInput,
   RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
-} from "@/types/payments/payments.types"
+} from "@/types/payment-processing/payment-processing.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
-export class PaymentsController {
-  constructor(private readonly paymentsService: PaymentsService) {}
+export class PaymentProcessingController {
+  constructor(private readonly paymentsService: PaymentProcessingService) {}
 
   async createPayment(input: CreatePaymentInput) {
     return this.paymentsService.createPayment(input)
@@ -77,14 +77,14 @@ export class PaymentsController {
   }
 }
 
-export async function createServerPaymentsController() {
-  return new PaymentsController(
-    createPaymentsService(adminClient as DatabaseClient),
+export async function createServerPaymentProcessingController() {
+  return new PaymentProcessingController(
+    createPaymentProcessingService(adminClient as DatabaseClient),
   )
 }
 
-export function createAdminPaymentsController() {
-  return new PaymentsController(
-    createPaymentsService(adminClient as DatabaseClient),
+export function createAdminPaymentProcessingController() {
+  return new PaymentProcessingController(
+    createPaymentProcessingService(adminClient as DatabaseClient),
   )
 }

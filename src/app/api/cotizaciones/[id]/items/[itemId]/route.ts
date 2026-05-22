@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
 import {
-  authorizeCotizacion,
+  authorizeQuote,
   ensureEditable,
   isAuthFailure,
-} from "@/lib/cotizaciones/authorize"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
-import { updateItemSchema } from "@/lib/cotizaciones/schemas"
+} from "@/lib/quotes/authorize"
+import { handleQuoterError } from "@/lib/quotes/errors"
+import { updateItemSchema } from "@/lib/quotes/schemas"
 
 export async function PATCH(
   request: Request,
@@ -15,7 +15,7 @@ export async function PATCH(
 ) {
   try {
     const { id, itemId } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
     const blocked = ensureEditable(auth.cotizacion)
@@ -23,13 +23,12 @@ export async function PATCH(
 
     const body = await request.json()
     const payload = updateItemSchema.parse(body)
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     const item = await controller.updateItem(itemId, {
       adultos: payload.adultos,
       menores: payload.menores,
       precio_adulto_unit: payload.precio_adulto_unit,
       precio_menor_unit: payload.precio_menor_unit,
-      comision_pct: payload.comision_pct,
       dia_offset: payload.dia_offset,
       fecha: payload.fecha ?? undefined,
       servicio_nombre: payload.servicio_nombre,
@@ -37,7 +36,7 @@ export async function PATCH(
     })
     return NextResponse.json({ item }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -47,16 +46,16 @@ export async function DELETE(
 ) {
   try {
     const { id, itemId } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
     const blocked = ensureEditable(auth.cotizacion)
     if (blocked) return blocked
 
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     await controller.removeItem(itemId)
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

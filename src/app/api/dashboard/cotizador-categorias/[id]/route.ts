@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
-import { upsertCategoriaSchema } from "@/lib/cotizaciones/schemas"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
+import { handleQuoterError } from "@/lib/quotes/errors"
+import { upsertCategoriaSchema } from "@/lib/quotes/schemas"
 
 export async function GET(_req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params
-    const controller = await createServerCotizadorCategoriasController()
+    const controller = await createServerQuoterCategoriesController()
     const categoria = await controller.getById(id)
     return NextResponse.json({ categoria }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -23,11 +23,11 @@ export async function PATCH(
     const { id } = await context.params
     const body = await request.json()
     const payload = upsertCategoriaSchema.partial().parse(body)
-    const controller = await createServerCotizadorCategoriasController()
+    const controller = await createServerQuoterCategoriesController()
     const categoria = await controller.updateById(id, payload as never)
     return NextResponse.json({ categoria }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -37,10 +37,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params
-    const controller = await createServerCotizadorCategoriasController()
+    const controller = await createServerQuoterCategoriesController()
     await controller.deleteById(id)
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

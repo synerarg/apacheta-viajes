@@ -1,35 +1,35 @@
 import {
-  PaquetesItinerarioNotFoundException,
-  PaquetesItinerarioServiceException,
-} from "@/exceptions/paquetes-itinerario/paquetes-itinerario.exceptions"
-import { PaquetesItinerarioRepository } from "@/repositories/paquetes-itinerario/paquetes-itinerario.repository"
+  PackageItineraryNotFoundException,
+  PackageItineraryServiceException,
+} from "@/exceptions/package-itinerary/package-itinerary.exceptions"
+import { PackageItineraryRepository } from "@/repositories/package-itinerary/package-itinerary.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  PaquetesItinerarioRow,
-  PaquetesItinerarioUpdate,
-} from "@/types/paquetes-itinerario/paquetes-itinerario.types"
+  PackageItineraryRow,
+  PackageItineraryUpdate,
+} from "@/types/package-itinerary/package-itinerary.types"
 
-export class PaquetesItinerarioService extends BaseService<"paquetes_itinerario"> {
-  constructor(repository: PaquetesItinerarioRepository) {
+export class PackageItineraryService extends BaseService<"paquetes_itinerario"> {
+  constructor(repository: PackageItineraryRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new PaquetesItinerarioServiceException(operation, cause)
+    return new PackageItineraryServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new PaquetesItinerarioNotFoundException(criteria)
+    return new PackageItineraryNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<PaquetesItinerarioRow> {
+  async getById(id: string): Promise<PackageItineraryRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: PaquetesItinerarioUpdate,
-  ): Promise<PaquetesItinerarioRow> {
+    payload: PackageItineraryUpdate,
+  ): Promise<PackageItineraryRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class PaquetesItinerarioService extends BaseService<"paquetes_itinerario"
   }
 }
 
-export function createPaquetesItinerarioService(
-  repository: PaquetesItinerarioRepository,
+export function createPackageItineraryService(
+  repository: PackageItineraryRepository,
 ) {
-  return new PaquetesItinerarioService(repository)
+  return new PackageItineraryService(repository)
 }

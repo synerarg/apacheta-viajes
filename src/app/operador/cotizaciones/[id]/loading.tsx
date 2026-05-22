@@ -1,7 +1,7 @@
 import { Card, CardContent } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function CotizacionBuilderLoading() {
+export default function QuoteBuilderLoading() {
   return (
     <div className="p-3 sm:p-6 lg:p-8 space-y-5 max-w-7xl mx-auto pb-32 lg:pb-8">
       <header className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">

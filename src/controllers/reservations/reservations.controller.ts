@@ -1,18 +1,18 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createReservasRepository } from "@/repositories/reservas/reservas.repository"
-import { createReservasService, ReservasService } from "@/services/reservas/reservas.service"
+import { createReservationsRepository } from "@/repositories/reservations/reservations.repository"
+import { createReservationsService, ReservationsService } from "@/services/reservations/reservations.service"
 
-export class ReservasController extends BaseIdController<"reservas"> {
-  constructor(service: ReservasService) {
+export class ReservationsController extends BaseIdController<"reservas"> {
+  constructor(service: ReservationsService) {
     super(service)
   }
 }
 
-export async function createServerReservasController() {
+export async function createServerReservationsController() {
   const supabase = await createClient()
 
-  return new ReservasController(
-    createReservasService(createReservasRepository(supabase)),
+  return new ReservationsController(
+    createReservationsService(createReservationsRepository(supabase)),
   )
 }

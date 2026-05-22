@@ -1,13 +1,13 @@
 import Link from "next/link"
 
-import { TrasladoCard } from "@/components/dashboard/traslado-card"
+import { TransferCard } from "@/components/dashboard/transfer-card"
 import { createClient } from "@/lib/supabase/server"
-import { createTrasladosRepository } from "@/repositories/traslados/traslados.repository"
+import { createTransfersRepository } from "@/repositories/transfers/transfers.repository"
 
-export default async function DashboardTrasladosPage() {
+export default async function DashboardTransfersPage() {
   const supabase = await createClient()
-  const trasladosRepo = createTrasladosRepository(supabase)
-  const traslados = await trasladosRepo.findAll()
+  const transfersRepo = createTransfersRepository(supabase)
+  const traslados = await transfersRepo.findAll()
 
   const sorted = [...traslados].sort(
     (a, b) =>
@@ -47,7 +47,7 @@ export default async function DashboardTrasladosPage() {
       ) : (
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {sorted.map((traslado) => (
-            <TrasladoCard key={traslado.id} traslado={traslado} />
+            <TransferCard key={traslado.id} traslado={traslado} />
           ))}
         </div>
       )}

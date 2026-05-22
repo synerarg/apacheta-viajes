@@ -1,35 +1,35 @@
 import {
-  HotelesImagenesNotFoundException,
-  HotelesImagenesServiceException,
-} from "@/exceptions/hoteles-imagenes/hoteles-imagenes.exceptions"
-import { HotelesImagenesRepository } from "@/repositories/hoteles-imagenes/hoteles-imagenes.repository"
+  HotelImagesNotFoundException,
+  HotelImagesServiceException,
+} from "@/exceptions/hotel-images/hotel-images.exceptions"
+import { HotelImagesRepository } from "@/repositories/hotel-images/hotel-images.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  HotelesImagenesRow,
-  HotelesImagenesUpdate,
-} from "@/types/hoteles-imagenes/hoteles-imagenes.types"
+  HotelImagesRow,
+  HotelImagesUpdate,
+} from "@/types/hotel-images/hotel-images.types"
 
-export class HotelesImagenesService extends BaseService<"hoteles_imagenes"> {
-  constructor(repository: HotelesImagenesRepository) {
+export class HotelImagesService extends BaseService<"hoteles_imagenes"> {
+  constructor(repository: HotelImagesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new HotelesImagenesServiceException(operation, cause)
+    return new HotelImagesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new HotelesImagenesNotFoundException(criteria)
+    return new HotelImagesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<HotelesImagenesRow> {
+  async getById(id: string): Promise<HotelImagesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: HotelesImagenesUpdate,
-  ): Promise<HotelesImagenesRow> {
+    payload: HotelImagesUpdate,
+  ): Promise<HotelImagesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class HotelesImagenesService extends BaseService<"hoteles_imagenes"> {
   }
 }
 
-export function createHotelesImagenesService(
-  repository: HotelesImagenesRepository,
+export function createHotelImagesService(
+  repository: HotelImagesRepository,
 ) {
-  return new HotelesImagenesService(repository)
+  return new HotelImagesService(repository)
 }

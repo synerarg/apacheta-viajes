@@ -1,23 +1,23 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createEmisivoDestinosRepository } from "@/repositories/emisivo-destinos/emisivo-destinos.repository"
+import { createOutboundDestinationsRepository } from "@/repositories/outbound-destinations/outbound-destinations.repository"
 import {
-  createEmisivoDestinosService,
-  EmisivoDestinosService,
-} from "@/services/emisivo-destinos/emisivo-destinos.service"
+  createOutboundDestinationsService,
+  OutboundDestinationsService,
+} from "@/services/outbound-destinations/outbound-destinations.service"
 
-export class EmisivoDestinosController extends BaseIdController<"emisivo_destinos"> {
-  constructor(service: EmisivoDestinosService) {
+export class OutboundDestinationsController extends BaseIdController<"emisivo_destinos"> {
+  constructor(service: OutboundDestinationsService) {
     super(service)
   }
 }
 
-export async function createServerEmisivoDestinosController() {
+export async function createServerOutboundDestinationsController() {
   const supabase = await createClient()
 
-  return new EmisivoDestinosController(
-    createEmisivoDestinosService(
-      createEmisivoDestinosRepository(supabase),
+  return new OutboundDestinationsController(
+    createOutboundDestinationsService(
+      createOutboundDestinationsRepository(supabase),
     ),
   )
 }

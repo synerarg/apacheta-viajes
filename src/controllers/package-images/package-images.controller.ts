@@ -1,21 +1,21 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createPaquetesImagenesRepository } from "@/repositories/paquetes-imagenes/paquetes-imagenes.repository"
+import { createPackageImagesRepository } from "@/repositories/package-images/package-images.repository"
 import {
-  createPaquetesImagenesService,
-  PaquetesImagenesService,
-} from "@/services/paquetes-imagenes/paquetes-imagenes.service"
+  createPackageImagesService,
+  PackageImagesService,
+} from "@/services/package-images/package-images.service"
 
-export class PaquetesImagenesController extends BaseIdController<"paquetes_imagenes"> {
-  constructor(service: PaquetesImagenesService) {
+export class PackageImagesController extends BaseIdController<"paquetes_imagenes"> {
+  constructor(service: PackageImagesService) {
     super(service)
   }
 }
 
-export async function createServerPaquetesImagenesController() {
+export async function createServerPackageImagesController() {
   const supabase = await createClient()
 
-  return new PaquetesImagenesController(
-    createPaquetesImagenesService(createPaquetesImagenesRepository(supabase)),
+  return new PackageImagesController(
+    createPackageImagesService(createPackageImagesRepository(supabase)),
   )
 }

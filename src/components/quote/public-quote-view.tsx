@@ -3,7 +3,7 @@ import { EnvelopeSimple, Phone } from "@phosphor-icons/react/dist/ssr"
 
 import { Card, CardContent } from "@/components/ui/card"
 
-export type CotizacionPublicaItem = {
+export type QuotePublicaItem = {
   id: string
   dia_offset: number
   fecha: string | null
@@ -16,7 +16,7 @@ export type CotizacionPublicaItem = {
   orden: number | null
 }
 
-export type CotizacionPublicaData = {
+export type QuotePublicaData = {
   id: string
   token: string
   cliente_nombre: string | null
@@ -28,7 +28,7 @@ export type CotizacionPublicaData = {
   aplica_impuesto: boolean | null
   impuesto_pct: number
   estado: "borrador" | "enviada" | "archivada"
-  items: CotizacionPublicaItem[]
+  items: QuotePublicaItem[]
   operador: {
     nombre: string | null
     email: string | null
@@ -73,10 +73,10 @@ function daysBetween(start: string | null, end: string | null): string[] {
   return out
 }
 
-export function CotizacionPublicaView({ data }: { data: CotizacionPublicaData }) {
+export function QuotePublicaView({ data }: { data: QuotePublicaData }) {
   const days = daysBetween(data.fecha_inicio, data.fecha_fin)
 
-  const itemsByDay = new Map<number, CotizacionPublicaItem[]>()
+  const itemsByDay = new Map<number, QuotePublicaItem[]>()
   for (const it of data.items) {
     const arr = itemsByDay.get(it.dia_offset) ?? []
     arr.push(it)

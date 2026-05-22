@@ -1,4 +1,4 @@
-export interface CotizadorCategoriasRow {
+export interface QuoterCategoriesRow {
   id: string
   nombre: string
   region: string | null
@@ -9,7 +9,7 @@ export interface CotizadorCategoriasRow {
   updated_at: string | null
 }
 
-export interface CotizadorCategoriasInsert {
+export interface QuoterCategoriesInsert {
   id?: string
   nombre: string
   region?: string | null
@@ -20,7 +20,7 @@ export interface CotizadorCategoriasInsert {
   updated_at?: string | null
 }
 
-export interface CotizadorCategoriasUpdate {
+export interface QuoterCategoriesUpdate {
   id?: string
   nombre?: string
   region?: string | null

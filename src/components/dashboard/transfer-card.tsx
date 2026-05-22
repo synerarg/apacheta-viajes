@@ -4,18 +4,18 @@ import { ArrowRight, PencilSimple } from "@phosphor-icons/react/dist/ssr"
 
 import { deleteTraslado } from "@/app/dashboard/traslados/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
-import type { TrasladosRow } from "@/types/traslados/traslados.types"
+import type { TransfersRow } from "@/types/transfers/transfers.types"
 
-interface TrasladoCardProps {
-  traslado: TrasladosRow
+interface TransferCardProps {
+  traslado: TransfersRow
 }
 
-function tipoLabel(tipo: TrasladosRow["tipo_servicio"]) {
+function tipoLabel(tipo: TransfersRow["tipo_servicio"]) {
   if (tipo === "privado") return "Privado"
   return "Regular"
 }
 
-export function TrasladoCard({ traslado }: TrasladoCardProps) {
+export function TransferCard({ traslado }: TransferCardProps) {
   return (
     <div className="group overflow-hidden border border-neutral-200 bg-white">
       <div className="relative h-48 w-full overflow-hidden bg-neutral-100">

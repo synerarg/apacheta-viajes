@@ -1,52 +1,52 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createSolicitudesOperadorRepository } from "@/repositories/solicitudes-operador/solicitudes-operador.repository"
+import { createOperatorRequestsRepository } from "@/repositories/operator-requests/operator-requests.repository"
 import {
-  SolicitudesOperadorService,
-  createSolicitudesOperadorService,
-} from "@/services/solicitudes-operador/solicitudes-operador.service"
+  OperatorRequestsService,
+  createOperatorRequestsService,
+} from "@/services/operator-requests/operator-requests.service"
 
-export class SolicitudesOperadorController extends BaseIdController<
+export class OperatorRequestsController extends BaseIdController<
   "solicitudes_operador",
-  SolicitudesOperadorService
+  OperatorRequestsService
 > {
-  constructor(service: SolicitudesOperadorService) {
+  constructor(service: OperatorRequestsService) {
     super(service)
   }
 
-  listMine(usuarioId: string) {
-    return this.service.listMine(usuarioId)
+  listMine(userId: string) {
+    return this.service.listMine(userId)
   }
 
-  getActiveByUsuarioId(usuarioId: string) {
-    return this.service.getActiveByUsuarioId(usuarioId)
+  getActiveByUserId(userId: string) {
+    return this.service.getActiveByUserId(userId)
   }
 
-  submit(usuarioId: string, payload: Parameters<SolicitudesOperadorService["submit"]>[1]) {
-    return this.service.submit(usuarioId, payload)
+  submit(userId: string, payload: Parameters<OperatorRequestsService["submit"]>[1]) {
+    return this.service.submit(userId, payload)
   }
 
-  cancel(solicitudId: string, usuarioId: string) {
-    return this.service.cancel(solicitudId, usuarioId)
+  cancel(requestId: string, userId: string) {
+    return this.service.cancel(requestId, userId)
   }
 
-  markInReview(solicitudId: string, adminId: string) {
-    return this.service.markInReview(solicitudId, adminId)
+  markInReview(requestId: string, adminId: string) {
+    return this.service.markInReview(requestId, adminId)
   }
 
-  approve(solicitudId: string, adminId: string) {
-    return this.service.approve(solicitudId, adminId)
+  approve(requestId: string, adminId: string) {
+    return this.service.approve(requestId, adminId)
   }
 
-  reject(solicitudId: string, adminId: string, motivo: string) {
-    return this.service.reject(solicitudId, adminId, motivo)
+  reject(requestId: string, adminId: string, motivo: string) {
+    return this.service.reject(requestId, adminId, motivo)
   }
 }
 
-export async function createServerSolicitudesOperadorController() {
+export async function createServerOperatorRequestsController() {
   const supabase = await createClient()
 
-  return new SolicitudesOperadorController(
-    createSolicitudesOperadorService(createSolicitudesOperadorRepository(supabase)),
+  return new OperatorRequestsController(
+    createOperatorRequestsService(createOperatorRequestsRepository(supabase)),
   )
 }

@@ -17,10 +17,10 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-export function SolicitudOperadorCancelarButton({
-  solicitudId,
+export function OperatorRequestCancelButton({
+  requestId,
 }: {
-  solicitudId: string
+  requestId: string
 }) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
@@ -31,7 +31,7 @@ export function SolicitudOperadorCancelarButton({
     startTransition(async () => {
       try {
         const response = await fetch(
-          `/api/solicitudes-operador/${solicitudId}/cancelar`,
+          `/api/solicitudes-operador/${requestId}/cancelar`,
           { method: "PATCH" },
         )
         if (!response.ok) {

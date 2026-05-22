@@ -1,4 +1,4 @@
-import type { ReservaTipo, Moneda } from "@/types/shared/enums"
+import type { ReservationType, Moneda } from "@/types/shared/enums"
 
 type DatabaseJson =
   | string
@@ -9,13 +9,13 @@ type DatabaseJson =
   | DatabaseJson[]
 
 // Re-export legacy alias
-export type OrdenItemTipo = ReservaTipo
+export type OrderItemType = ReservationType
 
-export interface OrdenesItemsRow {
+export interface OrderItemsRow {
   id: string
   orden_id: string
   reserva_id: string
-  tipo: ReservaTipo
+  tipo: ReservationType
   nombre: string
   descripcion_corta: string | null
   imagen_url: string | null
@@ -28,11 +28,11 @@ export interface OrdenesItemsRow {
   updated_at: string | null
 }
 
-export interface OrdenesItemsInsert {
+export interface OrderItemsInsert {
   id?: string
   orden_id: string
   reserva_id: string
-  tipo: ReservaTipo
+  tipo: ReservationType
   nombre: string
   descripcion_corta?: string | null
   imagen_url?: string | null
@@ -45,11 +45,11 @@ export interface OrdenesItemsInsert {
   updated_at?: string | null
 }
 
-export interface OrdenesItemsUpdate {
+export interface OrderItemsUpdate {
   id?: string
   orden_id?: string
   reserva_id?: string
-  tipo?: ReservaTipo
+  tipo?: ReservationType
   nombre?: string
   descripcion_corta?: string | null
   imagen_url?: string | null

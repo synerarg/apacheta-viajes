@@ -4,10 +4,10 @@ import { PencilSimple, Eye } from "@phosphor-icons/react/dist/ssr"
 
 import { deletePaquete } from "@/app/dashboard/paquetes/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
-import type { PaquetesRow } from "@/types/paquetes/paquetes.types"
+import type { PackagesRow } from "@/types/packages/packages.types"
 
 interface PackageCardProps {
-  paquete: PaquetesRow
+  paquete: PackagesRow
 }
 
 export function PackageCard({ paquete }: PackageCardProps) {

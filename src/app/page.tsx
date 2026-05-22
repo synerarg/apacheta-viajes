@@ -8,14 +8,14 @@ import { MetricsSection } from "@/components/landing/metrics-section"
 import { PackagesSection } from "@/components/landing/packages-section"
 import { PartnersSection } from "@/components/landing/partners-section"
 import { QuoteSection } from "@/components/landing/quote-section"
-import { TrasladosSection } from "@/components/landing/traslados-section"
+import { TransfersSection } from "@/components/landing/transfers-section"
 import {
   getEmisivoDestinationsData,
   getFeaturedHotelsData,
   getFeaturedPackagesData,
   getHomeMetricsData,
 } from "@/lib/storefront/storefront.server"
-import { getFeaturedTrasladosData } from "@/lib/storefront/traslados.server"
+import { getFeaturedTransfersData } from "@/lib/storefront/traslados.server"
 
 export default async function Home() {
   const [metrics, packages, hotels, traslados, emisivoDestinations] =
@@ -23,7 +23,7 @@ export default async function Home() {
       getHomeMetricsData(),
       getFeaturedPackagesData(),
       getFeaturedHotelsData(),
-      getFeaturedTrasladosData(),
+      getFeaturedTransfersData(),
       getEmisivoDestinationsData(3),
     ])
 
@@ -35,7 +35,7 @@ export default async function Home() {
       <PackagesSection packages={packages} />
       <ExperiencesSection />
       <HotelsSection hotels={hotels} />
-      <TrasladosSection traslados={traslados} />
+      <TransfersSection traslados={traslados} />
       <PartnersSection destinations={emisivoDestinations} />
       <CtaSection />
       <ContactSection />

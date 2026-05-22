@@ -1,27 +1,27 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createCotizadorServiciosRepository } from "@/repositories/cotizador-servicios/cotizador-servicios.repository"
+import { createQuoterServicesRepository } from "@/repositories/quoter-services/quoter-services.repository"
 import {
-  CotizadorServiciosService,
-  createCotizadorServiciosService,
-} from "@/services/cotizador-servicios/cotizador-servicios.service"
+  QuoterServicesService,
+  createQuoterServicesService,
+} from "@/services/quoter-services/quoter-services.service"
 
-export class CotizadorServiciosController extends BaseIdController<
+export class QuoterServicesController extends BaseIdController<
   "cotizador_servicios",
-  CotizadorServiciosService
+  QuoterServicesService
 > {
-  constructor(service: CotizadorServiciosService) {
+  constructor(service: QuoterServicesService) {
     super(service)
   }
 
-  findActiveByCategoria(categoriaId: string) {
-    return this.service.findActiveByCategoria(categoriaId)
+  findActiveByCategory(categoryId: string) {
+    return this.service.findActiveByCategory(categoryId)
   }
 }
 
-export async function createServerCotizadorServiciosController() {
+export async function createServerQuoterServicesController() {
   const supabase = await createClient()
-  return new CotizadorServiciosController(
-    createCotizadorServiciosService(createCotizadorServiciosRepository(supabase)),
+  return new QuoterServicesController(
+    createQuoterServicesService(createQuoterServicesRepository(supabase)),
   )
 }

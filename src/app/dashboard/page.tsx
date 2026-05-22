@@ -8,26 +8,26 @@ import {
   type RecentItem,
 } from "@/components/dashboard/recent-items-list"
 import { createClient } from "@/lib/supabase/server"
-import { createPaquetesRepository } from "@/repositories/paquetes/paquetes.repository"
-import { createExperienciasRepository } from "@/repositories/experiencias/experiencias.repository"
+import { createPackagesRepository } from "@/repositories/packages/packages.repository"
+import { createExperiencesRepository } from "@/repositories/experiences/experiences.repository"
 
 export default async function DashboardPage() {
   const supabase = await createClient()
 
-  const paquetesRepo = createPaquetesRepository(supabase)
-  const experienciasRepo = createExperienciasRepository(supabase)
+  const packagesRepo = createPackagesRepository(supabase)
+  const experiencesRepo = createExperiencesRepository(supabase)
 
   const [paquetes, experiencias] = await Promise.all([
-    paquetesRepo.findAll(),
-    experienciasRepo.findAll(),
+    packagesRepo.findAll(),
+    experiencesRepo.findAll(),
   ])
 
-  const paquetesActivos = paquetes.filter((p) => p.activo).length
-  const paquetesBorradores = paquetes.length - paquetesActivos
-  const experienciasActivas = experiencias.filter((e) => e.activo).length
-  const experienciasBorradores = experiencias.length - experienciasActivas
+  const packagesActivos = paquetes.filter((p) => p.activo).length
+  const packagesBorradores = paquetes.length - packagesActivos
+  const experiencesActivas = experiencias.filter((e) => e.activo).length
+  const experiencesBorradores = experiencias.length - experiencesActivas
 
-  const recentPaquetes: RecentItem[] = paquetes
+  const recentPackages: RecentItem[] = paquetes
     .sort((a, b) =>
       new Date(b.created_at ?? 0).getTime() -
       new Date(a.created_at ?? 0).getTime(),
@@ -43,7 +43,7 @@ export default async function DashboardPage() {
       editHref: `/dashboard/paquetes/${p.id}/editar`,
     }))
 
-  const recentExperiencias: RecentItem[] = experiencias
+  const recentExperiences: RecentItem[] = experiencias
     .sort((a, b) =>
       new Date(b.created_at ?? 0).getTime() -
       new Date(a.created_at ?? 0).getTime(),
@@ -59,7 +59,7 @@ export default async function DashboardPage() {
       editHref: `/dashboard/experiencias/${e.id}/editar`,
     }))
 
-  const recentItems = [...recentPaquetes, ...recentExperiencias]
+  const recentItems = [...recentPackages, ...recentExperiences]
     .sort((a, b) =>
       new Date(b.created_at ?? 0).getTime() -
       new Date(a.created_at ?? 0).getTime(),
@@ -82,13 +82,13 @@ export default async function DashboardPage() {
         <StatsCard
           icon={<Suitcase className="h-6 w-6" />}
           label="Paquetes de viaje"
-          sublabel={`${paquetesActivos} publicados, ${paquetesBorradores} borradores`}
+          sublabel={`${packagesActivos} publicados, ${packagesBorradores} borradores`}
           value={paquetes.length}
         />
         <StatsCard
           icon={<Star className="h-6 w-6" />}
           label="Experiencias"
-          sublabel={`${experienciasActivas} publicados, ${experienciasBorradores} borradores`}
+          sublabel={`${experiencesActivas} publicados, ${experiencesBorradores} borradores`}
           value={experiencias.length}
         />
       </div>

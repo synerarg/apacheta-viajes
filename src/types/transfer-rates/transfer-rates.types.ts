@@ -1,6 +1,6 @@
 import type { Moneda } from "@/types/shared/enums"
 
-export interface TrasladosTarifasRow {
+export interface TransferRatesRow {
   id: string
   traslado_id: string
   vigencia_label: string
@@ -16,7 +16,7 @@ export interface TrasladosTarifasRow {
   updated_at: string | null
 }
 
-export interface TrasladosTarifasInsert {
+export interface TransferRatesInsert {
   id?: string
   traslado_id: string
   vigencia_label: string
@@ -32,7 +32,7 @@ export interface TrasladosTarifasInsert {
   updated_at?: string | null
 }
 
-export interface TrasladosTarifasUpdate {
+export interface TransferRatesUpdate {
   id?: string
   traslado_id?: string
   vigencia_label?: string

@@ -1,24 +1,24 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
-import { createServerCategoriasExperienciaController } from "@/controllers/categorias-experiencia/categorias-experiencia.controller"
-import { createServerDestinosController } from "@/controllers/destinos/destinos.controller"
-import { createServerExperienciasController } from "@/controllers/experiencias/experiencias.controller"
-import { createServerExperienciasImagenesController } from "@/controllers/experiencias-imagenes/experiencias-imagenes.controller"
+import { createServerExperienceCategoriesController } from "@/controllers/experience-categories/experience-categories.controller"
+import { createServerDestinationsController } from "@/controllers/destinations/destinations.controller"
+import { createServerExperiencesController } from "@/controllers/experiences/experiences.controller"
+import { createServerExperienceImagesController } from "@/controllers/experience-images/experience-images.controller"
 import {
-  ExperienciaView,
-  type ExperienciaViewData,
-} from "@/components/experiencias/experiencia-view"
+  ExperienceView,
+  type ExperienceViewData,
+} from "@/components/experiences/experience-view"
 
 interface Props {
   params: Promise<{ slug: string }>
 }
 
-async function getExperienciaViewData(
+async function getExperienceViewData(
   slug: string,
-): Promise<ExperienciaViewData | null> {
-  const experienciasController = await createServerExperienciasController()
-  const [experiencia] = await experienciasController.list({
+): Promise<ExperienceViewData | null> {
+  const experiencesController = await createServerExperiencesController()
+  const [experiencia] = await experiencesController.list({
     slug,
     activo: true,
   })
@@ -28,25 +28,25 @@ async function getExperienciaViewData(
   }
 
   const [
-    experienciasImagenesController,
-    categoriasExperienciaController,
-    destinosController,
+    experiencesImagenesController,
+    categoriasExperienceController,
+    destinationsController,
   ] = await Promise.all([
-    createServerExperienciasImagenesController(),
-    createServerCategoriasExperienciaController(),
-    createServerDestinosController(),
+    createServerExperienceImagesController(),
+    createServerExperienceCategoriesController(),
+    createServerDestinationsController(),
   ])
   const [imagenes, categoria, destino] = await Promise.all([
-    experienciasImagenesController.list({
+    experiencesImagenesController.list({
       experiencia_id: experiencia.id,
     }),
     experiencia.categoria_id
-      ? categoriasExperienciaController.get({
+      ? categoriasExperienceController.get({
           id: experiencia.categoria_id,
         })
       : Promise.resolve(null),
     experiencia.destino_id
-      ? destinosController.get({
+      ? destinationsController.get({
           id: experiencia.destino_id,
         })
       : Promise.resolve(null),
@@ -80,7 +80,7 @@ async function getExperienciaViewData(
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const experiencia = await getExperienciaViewData(slug)
+  const experiencia = await getExperienceViewData(slug)
 
   if (!experiencia) {
     return {}
@@ -92,11 +92,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function ExperienciaDetailPage({ params }: Props) {
+export default async function ExperienceDetailPage({ params }: Props) {
   const { slug } = await params
-  const experiencia = await getExperienciaViewData(slug)
+  const experiencia = await getExperienceViewData(slug)
 
   if (!experiencia) notFound()
 
-  return <ExperienciaView experiencia={experiencia} />
+  return <ExperienceView experiencia={experiencia} />
 }

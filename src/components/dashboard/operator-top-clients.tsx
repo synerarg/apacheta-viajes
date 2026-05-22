@@ -6,7 +6,7 @@ interface TopCliente {
   ventaEnviadas: number
 }
 
-interface OperadorTopClientesProps {
+interface OperatorTopClientsProps {
   clientes: TopCliente[]
 }
 
@@ -26,7 +26,7 @@ function getInitials(name: string) {
   return initials || "?"
 }
 
-export function OperadorTopClientes({ clientes }: OperadorTopClientesProps) {
+export function OperatorTopClients({ clientes }: OperatorTopClientsProps) {
   if (clientes.length === 0) {
     return (
       <section className="border border-neutral-200 bg-white p-5 space-y-3">
@@ -93,7 +93,7 @@ export function OperadorTopClientes({ clientes }: OperadorTopClientesProps) {
   )
 }
 
-export function buildTopClientes(
+export function buildTopClients(
   cotizaciones: Array<{
     cliente_nombre: string | null
     estado: string

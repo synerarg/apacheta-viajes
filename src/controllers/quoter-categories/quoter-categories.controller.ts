@@ -1,23 +1,23 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createCotizadorCategoriasRepository } from "@/repositories/cotizador-categorias/cotizador-categorias.repository"
+import { createQuoterCategoriesRepository } from "@/repositories/quoter-categories/quoter-categories.repository"
 import {
-  CotizadorCategoriasService,
-  createCotizadorCategoriasService,
-} from "@/services/cotizador-categorias/cotizador-categorias.service"
+  QuoterCategoriesService,
+  createQuoterCategoriesService,
+} from "@/services/quoter-categories/quoter-categories.service"
 
-export class CotizadorCategoriasController extends BaseIdController<
+export class QuoterCategoriesController extends BaseIdController<
   "cotizador_categorias",
-  CotizadorCategoriasService
+  QuoterCategoriesService
 > {
-  constructor(service: CotizadorCategoriasService) {
+  constructor(service: QuoterCategoriesService) {
     super(service)
   }
 }
 
-export async function createServerCotizadorCategoriasController() {
+export async function createServerQuoterCategoriesController() {
   const supabase = await createClient()
-  return new CotizadorCategoriasController(
-    createCotizadorCategoriasService(createCotizadorCategoriasRepository(supabase)),
+  return new QuoterCategoriesController(
+    createQuoterCategoriesService(createQuoterCategoriesRepository(supabase)),
   )
 }

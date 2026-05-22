@@ -6,26 +6,26 @@ import {
 import {
   BankTransferConfigurationException,
   MercadoPagoConfigurationException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import {
   getBankTransferConfig,
   getMercadoPagoConfig,
 } from "@/lib/payments/payments.config"
-import { createExperienciasRepository } from "@/repositories/experiencias/experiencias.repository"
+import { createExperiencesRepository } from "@/repositories/experiences/experiences.repository"
 import { createCheckoutProfilesRepository } from "@/repositories/checkout-profiles/checkout-profiles.repository"
-import { createOrdenesItemsRepository } from "@/repositories/ordenes-items/ordenes-items.repository"
-import { createOrdenesRepository } from "@/repositories/ordenes/ordenes.repository"
-import { createPaquetesRepository } from "@/repositories/paquetes/paquetes.repository"
-import { createPaquetesFechasRepository } from "@/repositories/paquetes-fechas/paquetes-fechas.repository"
-import { createReservasRepository } from "@/repositories/reservas/reservas.repository"
-import { createExperienciasService } from "@/services/experiencias/experiencias.service"
+import { createOrderItemsRepository } from "@/repositories/order-items/order-items.repository"
+import { createOrdersRepository } from "@/repositories/orders/orders.repository"
+import { createPackagesRepository } from "@/repositories/packages/packages.repository"
+import { createPackageDatesRepository } from "@/repositories/package-dates/package-dates.repository"
+import { createReservationsRepository } from "@/repositories/reservations/reservations.repository"
+import { createExperiencesService } from "@/services/experiences/experiences.service"
 import { createCheckoutProfilesService } from "@/services/checkout-profiles/checkout-profiles.service"
-import { createOrdenesItemsService } from "@/services/ordenes-items/ordenes-items.service"
-import { createOrdenesService } from "@/services/ordenes/ordenes.service"
-import { createPaquetesService } from "@/services/paquetes/paquetes.service"
-import { createPaquetesFechasService } from "@/services/paquetes-fechas/paquetes-fechas.service"
-import { createPaymentsService } from "@/services/payments/payments.service"
-import { createReservasService } from "@/services/reservas/reservas.service"
+import { createOrderItemsService } from "@/services/order-items/order-items.service"
+import { createOrdersService } from "@/services/orders/orders.service"
+import { createPackagesService } from "@/services/packages/packages.service"
+import { createPackageDatesService } from "@/services/package-dates/package-dates.service"
+import { createPaymentProcessingService } from "@/services/payment-processing/payment-processing.service"
+import { createReservationsService } from "@/services/reservations/reservations.service"
 import { createTransactionalEmailService } from "@/services/notifications/transactional-email.service"
 import type { CartItem } from "@/types/cart/cart.types"
 import type {
@@ -35,8 +35,8 @@ import type {
   CheckoutUserContext,
 } from "@/types/checkout/checkout.types"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { OrdenMetodoPago } from "@/types/ordenes/ordenes.types"
-import type { ReservasInsert } from "@/types/reservas/reservas.types"
+import type { OrderPaymentMethod } from "@/types/orders/orders.types"
+import type { ReservationsInsert } from "@/types/reservations/reservations.types"
 
 function buildReservationNotes(
   item: CartItem,
@@ -119,7 +119,7 @@ function buildPaymentPayer(input: CheckoutSubmitInput) {
   }
 }
 
-function mapCheckoutPaymentMethod(method: CheckoutSubmitInput["paymentMethod"]): OrdenMetodoPago {
+function mapCheckoutPaymentMethod(method: CheckoutSubmitInput["paymentMethod"]): OrderPaymentMethod {
   if (method === "mercadopago") {
     return "mercadopago_checkout_pro"
   }
@@ -167,12 +167,12 @@ function assertCheckoutPaymentConfigured(
 
 export class CheckoutService {
   private readonly checkoutProfilesService
-  private readonly reservasService
-  private readonly paquetesService
-  private readonly paquetesFechasService
-  private readonly experienciasService
-  private readonly ordenesService
-  private readonly ordenesItemsService
+  private readonly reservationsService
+  private readonly packagesService
+  private readonly packagesFechasService
+  private readonly experiencesService
+  private readonly ordersService
+  private readonly ordersItemsService
   private readonly paymentsService
   private readonly transactionalEmailService
 
@@ -180,19 +180,19 @@ export class CheckoutService {
     this.checkoutProfilesService = createCheckoutProfilesService(
       createCheckoutProfilesRepository(supabase),
     )
-    this.reservasService = createReservasService(createReservasRepository(supabase))
-    this.paquetesFechasService = createPaquetesFechasService(
-      createPaquetesFechasRepository(supabase),
+    this.reservationsService = createReservationsService(createReservationsRepository(supabase))
+    this.packagesFechasService = createPackageDatesService(
+      createPackageDatesRepository(supabase),
     )
-    this.paquetesService = createPaquetesService(createPaquetesRepository(supabase))
-    this.experienciasService = createExperienciasService(
-      createExperienciasRepository(supabase),
+    this.packagesService = createPackagesService(createPackagesRepository(supabase))
+    this.experiencesService = createExperiencesService(
+      createExperiencesRepository(supabase),
     )
-    this.ordenesService = createOrdenesService(createOrdenesRepository(supabase))
-    this.ordenesItemsService = createOrdenesItemsService(
-      createOrdenesItemsRepository(supabase),
+    this.ordersService = createOrdersService(createOrdersRepository(supabase))
+    this.ordersItemsService = createOrderItemsService(
+      createOrderItemsRepository(supabase),
     )
-    this.paymentsService = createPaymentsService(supabase)
+    this.paymentsService = createPaymentProcessingService(supabase)
     this.transactionalEmailService = createTransactionalEmailService(supabase)
   }
 
@@ -209,7 +209,7 @@ export class CheckoutService {
     user: CheckoutUserContext,
   ) {
     if (input.saveProfile) {
-      await this.checkoutProfilesService.upsertByUsuarioId(user.id, {
+      await this.checkoutProfilesService.upsertByUserId(user.id, {
         contact_first_name: input.contact.firstName,
         contact_last_name: input.contact.lastName ?? null,
         contact_email: input.contact.email,
@@ -224,7 +224,7 @@ export class CheckoutService {
       return
     }
 
-    await this.checkoutProfilesService.deleteByUsuarioId(user.id)
+    await this.checkoutProfilesService.deleteByUserId(user.id)
   }
 
   async submitCheckout(
@@ -295,7 +295,7 @@ export class CheckoutService {
 
       const orderReference = buildOrderReference()
       const paymentMethod = mapCheckoutPaymentMethod(normalizedInput.paymentMethod)
-      const order = await this.ordenesService.create({
+      const order = await this.ordersService.create({
         usuario_id: user.id,
         codigo_referencia: orderReference,
         estado: "pendiente",
@@ -357,7 +357,7 @@ export class CheckoutService {
           totalPrice: reservation.precio_total,
         })
 
-        await this.ordenesItemsService.create({
+        await this.ordersItemsService.create({
           orden_id: order.id,
           reserva_id: reservation.id,
           tipo: item.kind,
@@ -370,8 +370,8 @@ export class CheckoutService {
           moneda: item.moneda,
           metadata: {
             cartItemId: item.id,
-            paqueteFechaId: item.paqueteFechaId,
-            experienciaId: item.experienciaId,
+            packageFechaId: item.packageFechaId,
+            experienceId: item.experienceId,
           },
         })
       }
@@ -462,7 +462,7 @@ export class CheckoutService {
         throw new CheckoutAuthenticationException()
       }
 
-      const order = await this.ordenesService.getById(orderId)
+      const order = await this.ordersService.getById(orderId)
 
       if (order.usuario_id !== user.id) {
         throw new CheckoutValidationException(
@@ -509,7 +509,7 @@ export class CheckoutService {
         throw new CheckoutAuthenticationException()
       }
 
-      const profile = await this.checkoutProfilesService.getByUsuarioId(user.id)
+      const profile = await this.checkoutProfilesService.getByUserId(user.id)
 
       if (!profile) {
         return null
@@ -545,27 +545,27 @@ export class CheckoutService {
     user: CheckoutUserContext,
     orderReference: string,
   ) {
-    let reservationPayload: ReservasInsert
+    let reservationPayload: ReservationsInsert
 
     if (item.kind === "paquete") {
-      if (!item.paqueteFechaId) {
+      if (!item.packageFechaId) {
         throw new CheckoutValidationException(
           "El paquete seleccionado no tiene una salida valida.",
         )
       }
 
-      const paqueteFecha = await this.paquetesFechasService.getById(
-        item.paqueteFechaId,
+      const packageFecha = await this.packagesFechasService.getById(
+        item.packageFechaId,
       )
-      const paquete = await this.paquetesService.getById(paqueteFecha.paquete_id)
+      const paquete = await this.packagesService.getById(packageFecha.paquete_id)
 
-      if (paqueteFecha.activo === false) {
+      if (packageFecha.activo === false) {
         throw new CheckoutValidationException(
           "La salida seleccionada ya no esta disponible.",
         )
       }
 
-      if (item.quantity > paqueteFecha.cupo_disponible) {
+      if (item.quantity > packageFecha.cupo_disponible) {
         throw new CheckoutValidationException(
           "La cantidad de pasajeros supera la disponibilidad actual.",
         )
@@ -573,13 +573,13 @@ export class CheckoutService {
 
       reservationPayload = {
         usuario_id: user.id,
-        paquete_fecha_id: paqueteFecha.id,
+        paquete_fecha_id: packageFecha.id,
         tipo: "paquete",
         estado: "pendiente",
         cantidad_pasajeros: item.quantity,
-        precio_unitario: paqueteFecha.precio_por_persona,
-        precio_total: paqueteFecha.precio_por_persona * item.quantity,
-        moneda: paqueteFecha.moneda ?? item.moneda,
+        precio_unitario: packageFecha.precio_por_persona,
+        precio_total: packageFecha.precio_por_persona * item.quantity,
+        moneda: packageFecha.moneda ?? item.moneda,
         notas: buildReservationNotes(
           {
             ...item,
@@ -594,13 +594,13 @@ export class CheckoutService {
         ),
       }
     } else {
-      if (!item.experienciaId) {
+      if (!item.experienceId) {
         throw new CheckoutValidationException(
           "La experiencia seleccionada no es valida.",
         )
       }
 
-      const experiencia = await this.experienciasService.getById(item.experienciaId)
+      const experiencia = await this.experiencesService.getById(item.experienceId)
 
       if (experiencia.activo === false) {
         throw new CheckoutValidationException(
@@ -627,7 +627,7 @@ export class CheckoutService {
       }
     }
 
-    return this.reservasService.create(reservationPayload)
+    return this.reservationsService.create(reservationPayload)
   }
 }
 

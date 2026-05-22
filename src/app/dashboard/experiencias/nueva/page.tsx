@@ -2,7 +2,7 @@ import Link from "next/link"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
 import { createExperiencia } from "@/app/dashboard/experiencias/actions"
-import { ExperienciaForm } from "@/components/dashboard/experiencia-form"
+import { ExperienceForm } from "@/components/dashboard/experience-form"
 import { adminClient } from "@/lib/supabase/admin-client"
 
 async function getCategorias() {
@@ -14,7 +14,7 @@ async function getCategorias() {
   return data ?? []
 }
 
-async function getDestinos() {
+async function getDestinations() {
   const { data } = await adminClient
     .from("destinos")
     .select("*")
@@ -32,10 +32,10 @@ async function getDestacadoCount() {
   return count ?? 0
 }
 
-export default async function NuevaExperienciaPage() {
+export default async function NuevaExperiencePage() {
   const [categorias, destinos, destacadoCount] = await Promise.all([
     getCategorias(),
-    getDestinos(),
+    getDestinations(),
     getDestacadoCount(),
   ])
 
@@ -55,7 +55,7 @@ export default async function NuevaExperienciaPage() {
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <ExperienciaForm
+        <ExperienceForm
           action={createExperiencia}
           categorias={categorias}
           destinos={destinos}

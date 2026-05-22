@@ -4,14 +4,14 @@ import { ArrowSquareOut, CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
 import { deleteExperiencia, updateExperiencia } from "@/app/dashboard/experiencias/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
-import { ExperienciaForm } from "@/components/dashboard/experiencia-form"
+import { ExperienceForm } from "@/components/dashboard/experience-form"
 import { adminClient } from "@/lib/supabase/admin-client"
 
-interface EditarExperienciaPageProps {
+interface EditarExperiencePageProps {
   params: Promise<{ id: string }>
 }
 
-async function getExperienciaWithGallery(id: string) {
+async function getExperienceWithGallery(id: string) {
   const [{ data: experiencia }, { data: imagenes }] = await Promise.all([
     adminClient.from("experiencias").select("*").eq("id", id).single(),
     adminClient
@@ -32,7 +32,7 @@ async function getCategorias() {
   return data ?? []
 }
 
-async function getDestinos() {
+async function getDestinations() {
   const { data } = await adminClient
     .from("destinos")
     .select("*")
@@ -51,12 +51,12 @@ async function getDestacadoCount(excludeId: string) {
   return count ?? 0
 }
 
-export default async function EditarExperienciaPage({ params }: EditarExperienciaPageProps) {
+export default async function EditarExperiencePage({ params }: EditarExperiencePageProps) {
   const { id } = await params
   const [{ experiencia, gallery }, categorias, destinos, destacadoCount] = await Promise.all([
-    getExperienciaWithGallery(id),
+    getExperienceWithGallery(id),
     getCategorias(),
-    getDestinos(),
+    getDestinations(),
     getDestacadoCount(id),
   ])
 
@@ -97,7 +97,7 @@ export default async function EditarExperienciaPage({ params }: EditarExperienci
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <ExperienciaForm
+        <ExperienceForm
           action={updateAction}
           initialData={{
             nombre: experiencia.nombre,

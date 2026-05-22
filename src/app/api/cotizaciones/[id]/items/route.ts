@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
 import {
-  authorizeCotizacion,
+  authorizeQuote,
   ensureEditable,
   isAuthFailure,
-} from "@/lib/cotizaciones/authorize"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
-import { addItemRequestSchema } from "@/lib/cotizaciones/schemas"
+} from "@/lib/quotes/authorize"
+import { handleQuoterError } from "@/lib/quotes/errors"
+import { addItemRequestSchema } from "@/lib/quotes/schemas"
 
 export async function POST(
   request: Request,
@@ -15,7 +15,7 @@ export async function POST(
 ) {
   try {
     const { id } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
     const blocked = ensureEditable(auth.cotizacion)
@@ -23,7 +23,7 @@ export async function POST(
 
     const body = await request.json()
     const parsed = addItemRequestSchema.parse(body)
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
 
     if (parsed.type === "service") {
       const item = await controller.addItem(id, {
@@ -32,7 +32,6 @@ export async function POST(
         fecha: parsed.fecha ?? null,
         adultos: parsed.adultos,
         menores: parsed.menores,
-        comision_pct: parsed.comision_pct,
         precio_adulto_unit: parsed.precio_adulto_unit,
         precio_menor_unit: parsed.precio_menor_unit,
         temporada: parsed.temporada,
@@ -51,6 +50,6 @@ export async function POST(
     })
     return NextResponse.json({ item }, { status: 201 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

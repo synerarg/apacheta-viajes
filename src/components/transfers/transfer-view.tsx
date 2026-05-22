@@ -5,10 +5,10 @@ import { Car, Clock, Info, Luggage, MapPin, Route, Users } from "lucide-react"
 
 import { ImageGallery } from "@/components/product/image-gallery"
 
-export type TrasladoTipoServicio = "regular" | "privado"
-export type TrasladoModalidad = "ida" | "ida_vuelta" | "punto_a_punto"
+export type TransferServiceType = "regular" | "privado"
+export type TransferModality = "ida" | "ida_vuelta" | "punto_a_punto"
 
-export interface TrasladoTarifaRow {
+export interface TransferRateRow {
   id: string
   vigencia_label: string | null
   vigencia_desde: string | null
@@ -19,7 +19,7 @@ export interface TrasladoTarifaRow {
   notas: string | null
 }
 
-export interface TrasladoViewData {
+export interface TransferViewData {
   id: string
   slug: string
   nombre: string
@@ -27,8 +27,8 @@ export interface TrasladoViewData {
   descripcion_corta: string | null
   origen: string
   destino: string
-  tipo_servicio: TrasladoTipoServicio
-  modalidad: TrasladoModalidad
+  tipo_servicio: TransferServiceType
+  modalidad: TransferModality
   vehiculo_tipo: string | null
   capacidad_max: number | null
   base_minima_pax: number
@@ -40,11 +40,11 @@ export interface TrasladoViewData {
   impuestos_adicionales_pct: number | null
   imagen_url: string | null
   galeria: string[]
-  tarifas: TrasladoTarifaRow[]
+  tarifas: TransferRateRow[]
 }
 
-interface TrasladoViewProps {
-  traslado: TrasladoViewData
+interface TransferViewProps {
+  traslado: TransferViewData
 }
 
 const VEHICULO_LABEL: Record<string, string> = {
@@ -55,13 +55,13 @@ const VEHICULO_LABEL: Record<string, string> = {
   bus: "Bus",
 }
 
-const MODALIDAD_LABEL: Record<TrasladoModalidad, string> = {
+const MODALIDAD_LABEL: Record<TransferModality, string> = {
   ida: "Ida",
   ida_vuelta: "Ida y vuelta",
   punto_a_punto: "Punto a punto",
 }
 
-function tipoLabel(tipo: TrasladoTipoServicio) {
+function tipoLabel(tipo: TransferServiceType) {
   return tipo === "regular" ? "Regular" : "Privado"
 }
 
@@ -87,7 +87,7 @@ function formatPrice(value: number | null | undefined, moneda: string) {
   }
 }
 
-export function TrasladoView({ traslado }: TrasladoViewProps) {
+export function TransferView({ traslado }: TransferViewProps) {
   const vehiculoLabel = traslado.vehiculo_tipo
     ? VEHICULO_LABEL[traslado.vehiculo_tipo] ?? traslado.vehiculo_tipo
     : null

@@ -3,13 +3,13 @@ import { headers } from "next/headers"
 import type { Metadata } from "next"
 
 import {
-  CotizacionPublicaView,
-  type CotizacionPublicaData,
-} from "@/components/cotizacion/cotizacion-publica-view"
+  QuotePublicaView,
+  type QuotePublicaData,
+} from "@/components/quote/public-quote-view"
 
 export const dynamic = "force-dynamic"
 
-async function fetchPublic(token: string): Promise<CotizacionPublicaData | null> {
+async function fetchPublic(token: string): Promise<QuotePublicaData | null> {
   const hdrs = await headers()
   const host = hdrs.get("host")
   const proto = hdrs.get("x-forwarded-proto") ?? "http"
@@ -20,7 +20,7 @@ async function fetchPublic(token: string): Promise<CotizacionPublicaData | null>
   const data = await res.json().catch(() => null)
   if (!data) return null
   // accept either { data: ... } or root object
-  const payload = (data?.data ?? data) as CotizacionPublicaData
+  const payload = (data?.data ?? data) as QuotePublicaData
   if (!payload || !payload.id) return null
   return payload
 }
@@ -42,7 +42,7 @@ export async function generateMetadata({
   }
 }
 
-export default async function CotizacionPublicaPage({
+export default async function QuotePublicaPage({
   params,
 }: {
   params: Promise<{ token: string }>
@@ -51,5 +51,5 @@ export default async function CotizacionPublicaPage({
   const data = await fetchPublic(token)
   if (!data) notFound()
 
-  return <CotizacionPublicaView data={data} />
+  return <QuotePublicaView data={data} />
 }

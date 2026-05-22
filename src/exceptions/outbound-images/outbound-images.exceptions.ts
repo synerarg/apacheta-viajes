@@ -2,19 +2,19 @@ import { NotFoundException } from "@/exceptions/base/not-found.exception"
 import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
 
-export class EmisivoImagenesRepositoryException extends RepositoryException {
+export class OutboundImagesRepositoryException extends RepositoryException {
   constructor(operation: string, cause?: unknown) {
     super("emisivo_imagenes", operation, cause)
   }
 }
 
-export class EmisivoImagenesServiceException extends ServiceException {
+export class OutboundImagesServiceException extends ServiceException {
   constructor(operation: string, cause?: unknown) {
     super("emisivo_imagenes", operation, cause)
   }
 }
 
-export class EmisivoImagenesNotFoundException extends NotFoundException {
+export class OutboundImagesNotFoundException extends NotFoundException {
   constructor(criteria: string) {
     super("emisivo_imagenes", criteria)
   }

@@ -1,32 +1,32 @@
 import {
-  CotizadorCategoriasNotFoundException,
-  CotizadorCategoriasServiceException,
-} from "@/exceptions/cotizador-categorias/cotizador-categorias.exceptions"
-import { CotizadorCategoriasRepository } from "@/repositories/cotizador-categorias/cotizador-categorias.repository"
+  QuoterCategoriesNotFoundException,
+  QuoterCategoriesServiceException,
+} from "@/exceptions/quoter-categories/quoter-categories.exceptions"
+import { QuoterCategoriesRepository } from "@/repositories/quoter-categories/quoter-categories.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  CotizadorCategoriasRow,
-  CotizadorCategoriasUpdate,
-} from "@/types/cotizador-categorias/cotizador-categorias.types"
+  QuoterCategoriesRow,
+  QuoterCategoriesUpdate,
+} from "@/types/quoter-categories/quoter-categories.types"
 
-export class CotizadorCategoriasService extends BaseService<"cotizador_categorias"> {
-  constructor(repository: CotizadorCategoriasRepository) {
+export class QuoterCategoriesService extends BaseService<"cotizador_categorias"> {
+  constructor(repository: QuoterCategoriesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new CotizadorCategoriasServiceException(operation, cause)
+    return new QuoterCategoriesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new CotizadorCategoriasNotFoundException(criteria)
+    return new QuoterCategoriesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<CotizadorCategoriasRow> {
+  async getById(id: string): Promise<QuoterCategoriesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
-  async updateById(id: string, payload: CotizadorCategoriasUpdate): Promise<CotizadorCategoriasRow> {
+  async updateById(id: string, payload: QuoterCategoriesUpdate): Promise<QuoterCategoriesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -35,6 +35,6 @@ export class CotizadorCategoriasService extends BaseService<"cotizador_categoria
   }
 }
 
-export function createCotizadorCategoriasService(repository: CotizadorCategoriasRepository) {
-  return new CotizadorCategoriasService(repository)
+export function createQuoterCategoriesService(repository: QuoterCategoriesRepository) {
+  return new QuoterCategoriesService(repository)
 }

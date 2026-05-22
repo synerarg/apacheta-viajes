@@ -2,19 +2,19 @@ import { NotFoundException } from "@/exceptions/base/not-found.exception"
 import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
 
-export class CategoriasExperienciaRepositoryException extends RepositoryException {
+export class ExperienceCategoriesRepositoryException extends RepositoryException {
   constructor(operation: string, cause?: unknown) {
     super("categorias_experiencia", operation, cause)
   }
 }
 
-export class CategoriasExperienciaServiceException extends ServiceException {
+export class ExperienceCategoriesServiceException extends ServiceException {
   constructor(operation: string, cause?: unknown) {
     super("categorias_experiencia", operation, cause)
   }
 }
 
-export class CategoriasExperienciaNotFoundException extends NotFoundException {
+export class ExperienceCategoriesNotFoundException extends NotFoundException {
   constructor(criteria: string) {
     super("categorias_experiencia", criteria)
   }

@@ -13,27 +13,27 @@ import {
 } from "@/components/ui/select"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import type { CotizacionEstado, CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
+import type { QuoteStatus, QuotesRow } from "@/types/quotes/quotes.types"
 
-type OperadorMini = {
+type OperatorMini = {
   id: string
   usuario_id: string | null
   nombre_comercial: string | null
   nombre: string
 }
 
-interface CotizacionesAdminTableProps {
-  cotizaciones: CotizacionesRow[]
-  operadores: OperadorMini[]
+interface QuotesAdminTableProps {
+  cotizaciones: QuotesRow[]
+  operadores: OperatorMini[]
 }
 
-const ESTADO_LABELS: Record<CotizacionEstado, string> = {
+const ESTADO_LABELS: Record<QuoteStatus, string> = {
   borrador: "Borrador",
   enviada: "Enviada",
   archivada: "Archivada",
 }
 
-const ESTADO_STYLES: Record<CotizacionEstado, string> = {
+const ESTADO_STYLES: Record<QuoteStatus, string> = {
   borrador: "bg-neutral-100 text-neutral-700",
   enviada: "bg-emerald-100 text-emerald-800",
   archivada: "bg-blue-100 text-blue-800",
@@ -57,11 +57,11 @@ function formatMoney(value: number) {
   }).format(value)
 }
 
-export function CotizacionesAdminTable({
+export function QuotesAdminTable({
   cotizaciones,
   operadores,
-}: CotizacionesAdminTableProps) {
-  const [operadorFilter, setOperadorFilter] = useState<string>("__all__")
+}: QuotesAdminTableProps) {
+  const [operatorFilter, setOperatorFilter] = useState<string>("__all__")
   const [estadoFilter, setEstadoFilter] = useState<string>("__all__")
   const [desde, setDesde] = useState("")
   const [hasta, setHasta] = useState("")
@@ -69,8 +69,8 @@ export function CotizacionesAdminTable({
   // `cotizaciones.operador_id` apunta a `usuarios.id` (auth), no a la PK
   // de `operadores`. Mapeamos por `usuario_id` con fallback al `id` por si
   // algún operador todavía no tiene cuenta vinculada.
-  const operadorMap = useMemo(() => {
-    const map = new Map<string, OperadorMini>()
+  const operatorMap = useMemo(() => {
+    const map = new Map<string, OperatorMini>()
     operadores.forEach((operador) =>
       map.set(operador.usuario_id ?? operador.id, operador),
     )
@@ -79,7 +79,7 @@ export function CotizacionesAdminTable({
 
   const filtered = useMemo(() => {
     return cotizaciones.filter((cot) => {
-      if (operadorFilter !== "__all__" && cot.operador_id !== operadorFilter) {
+      if (operatorFilter !== "__all__" && cot.operador_id !== operatorFilter) {
         return false
       }
       if (estadoFilter !== "__all__" && cot.estado !== estadoFilter) {
@@ -96,7 +96,7 @@ export function CotizacionesAdminTable({
       }
       return true
     })
-  }, [cotizaciones, operadorFilter, estadoFilter, desde, hasta])
+  }, [cotizaciones, operatorFilter, estadoFilter, desde, hasta])
 
   const totales = useMemo(() => {
     return filtered.reduce(
@@ -116,7 +116,7 @@ export function CotizacionesAdminTable({
       <div className="grid grid-cols-1 gap-3 sm:gap-4 border border-neutral-200 bg-white p-3 sm:p-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="space-y-1.5">
           <Label>Operador</Label>
-          <Select value={operadorFilter} onValueChange={setOperadorFilter}>
+          <Select value={operatorFilter} onValueChange={setOperatorFilter}>
             <SelectTrigger className="w-full">
               <SelectValue />
             </SelectTrigger>
@@ -194,7 +194,7 @@ export function CotizacionesAdminTable({
               </tr>
             ) : (
               filtered.map((cot) => {
-                const operador = operadorMap.get(cot.operador_id)
+                const operador = operatorMap.get(cot.operador_id)
                 return (
                   <tr key={cot.id} className="border-t border-neutral-100">
                     <td className="px-3 py-2">

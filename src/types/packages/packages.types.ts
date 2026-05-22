@@ -1,6 +1,6 @@
-import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+import type { Moneda, MealPlan } from "@/types/shared/enums"
 
-export interface PaquetesRow {
+export interface PackagesRow {
   id: string
   nombre: string
   slug: string
@@ -15,7 +15,7 @@ export interface PaquetesRow {
   incluye_alojamiento: boolean | null
   incluye_traslado: boolean | null
   incluye_comidas: boolean | null
-  regimen: RegimenAlimentario | null
+  regimen: MealPlan | null
   incluye_guia: boolean | null
   incluye_entradas: boolean | null
   destacado: boolean | null
@@ -25,7 +25,7 @@ export interface PaquetesRow {
   updated_at: string | null
 }
 
-export interface PaquetesInsert {
+export interface PackagesInsert {
   id?: string
   nombre: string
   slug: string
@@ -40,7 +40,7 @@ export interface PaquetesInsert {
   incluye_alojamiento?: boolean | null
   incluye_traslado?: boolean | null
   incluye_comidas?: boolean | null
-  regimen?: RegimenAlimentario | null
+  regimen?: MealPlan | null
   incluye_guia?: boolean | null
   incluye_entradas?: boolean | null
   destacado?: boolean | null
@@ -50,7 +50,7 @@ export interface PaquetesInsert {
   updated_at?: string | null
 }
 
-export interface PaquetesUpdate {
+export interface PackagesUpdate {
   id?: string
   nombre?: string
   slug?: string
@@ -65,7 +65,7 @@ export interface PaquetesUpdate {
   incluye_alojamiento?: boolean | null
   incluye_traslado?: boolean | null
   incluye_comidas?: boolean | null
-  regimen?: RegimenAlimentario | null
+  regimen?: MealPlan | null
   incluye_guia?: boolean | null
   incluye_entradas?: boolean | null
   destacado?: boolean | null

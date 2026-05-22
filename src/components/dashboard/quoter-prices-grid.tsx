@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Input } from "@/components/ui/input"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
-import type { CotizadorPreciosRow } from "@/types/cotizador-precios/cotizador-precios.types"
+import type { QuoterPricesRow } from "@/types/quoter-prices/quoter-prices.types"
 
 const TEMPORADAS = [
   "Oct25-Mar26",
@@ -40,9 +40,9 @@ interface PrecioState {
   notas: string
 }
 
-interface CotizadorPreciosGridProps {
-  servicioId: string
-  precios: CotizadorPreciosRow[]
+interface QuoterPricesGridProps {
+  serviceId: string
+  precios: QuoterPricesRow[]
 }
 
 function emptyState(): PrecioState {
@@ -57,7 +57,7 @@ function emptyState(): PrecioState {
   }
 }
 
-function fromRow(row: CotizadorPreciosRow): PrecioState {
+function fromRow(row: QuoterPricesRow): PrecioState {
   return {
     id: row.id,
     precio_adulto: String(row.precio_adulto ?? ""),
@@ -72,10 +72,10 @@ function fromRow(row: CotizadorPreciosRow): PrecioState {
   }
 }
 
-export function CotizadorPreciosGrid({
-  servicioId,
+export function QuoterPricesGrid({
+  serviceId,
   precios,
-}: CotizadorPreciosGridProps) {
+}: QuoterPricesGridProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
   const [savingTemporada, setSavingTemporada] = useState<string | null>(null)
@@ -116,7 +116,7 @@ export function CotizadorPreciosGrid({
     startTransition(async () => {
       try {
         const payload = {
-          servicio_id: servicioId,
+          servicio_id: serviceId,
           temporada,
           precio_adulto: parsedAdulto,
           precio_menor: row.precio_menor ? Number(row.precio_menor) : null,

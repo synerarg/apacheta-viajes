@@ -1,22 +1,22 @@
-import { TrasladosTarifasRepositoryException } from "@/exceptions/traslados-tarifas/traslados-tarifas.exceptions"
+import { TransferRatesRepositoryException } from "@/exceptions/transfer-rates/transfer-rates.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { TrasladosTarifasUpdate } from "@/types/traslados-tarifas/traslados-tarifas.types"
+import type { TransferRatesUpdate } from "@/types/transfer-rates/transfer-rates.types"
 
-export class TrasladosTarifasRepository extends BaseRepository<"traslados_tarifas"> {
+export class TransferRatesRepository extends BaseRepository<"traslados_tarifas"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "traslados_tarifas")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new TrasladosTarifasRepositoryException(operation, cause)
+    return new TransferRatesRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: TrasladosTarifasUpdate) {
+  async updateById(id: string, payload: TransferRatesUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class TrasladosTarifasRepository extends BaseRepository<"traslados_tarifa
   }
 }
 
-export function createTrasladosTarifasRepository(supabase: DatabaseClient) {
-  return new TrasladosTarifasRepository(supabase)
+export function createTransferRatesRepository(supabase: DatabaseClient) {
+  return new TransferRatesRepository(supabase)
 }

@@ -1,4 +1,4 @@
-import { HotelesRepositoryException } from "@/exceptions/hoteles/hoteles.exceptions"
+import { HotelsRepositoryException } from "@/exceptions/hotels/hotels.exceptions"
 import type { DatabaseClient } from "@/types/database/database.types"
 import type {
   HyperGuestBookingIntentsInsert,
@@ -13,7 +13,7 @@ export class HyperGuestRepository {
   constructor(private readonly supabase: DatabaseClient) {}
 
   private createRepositoryException(operation: string, cause?: unknown) {
-    return new HotelesRepositoryException(`hyperguest.${operation}`, cause)
+    return new HotelsRepositoryException(`hyperguest.${operation}`, cause)
   }
 
   async findHotelMappingByPropertyId(

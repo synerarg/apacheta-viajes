@@ -2,20 +2,20 @@
 
 import { useState } from "react"
 import { FilterBar } from "@/components/catalog/filter-bar"
-import { ExperienciaCard } from "@/components/catalog/experiencia-card"
+import { ExperienceCard } from "@/components/catalog/experience-card"
 import type { StorefrontExperienceItem } from "@/types/storefront/storefront.types"
 
-interface CatalogoExperienciasProps {
+interface CatalogExperiencesProps {
   experiencias: StorefrontExperienceItem[]
   categorias: string[]
   initialCategoria?: string
 }
 
-export function CatalogoExperiencias({
+export function CatalogExperiences({
   experiencias,
   categorias,
   initialCategoria = "Todos",
-}: CatalogoExperienciasProps) {
+}: CatalogExperiencesProps) {
   const [activeCategoria, setActiveCategoria] = useState(initialCategoria)
 
   const filtered =
@@ -72,7 +72,7 @@ export function CatalogoExperiencias({
             {/* Mobile: single column */}
             <div className="flex flex-col gap-4 md:hidden">
               {filtered.map((exp) => (
-                <ExperienciaCard
+                <ExperienceCard
                   key={exp.id}
                   experiencia={exp}
                   className="h-[260px]"
@@ -85,7 +85,7 @@ export function CatalogoExperiencias({
               {/* Column 1 */}
               <div className="flex flex-col gap-4">
                 {col1.map((exp, i) => (
-                  <ExperienciaCard
+                  <ExperienceCard
                     key={exp.id}
                     experiencia={exp}
                     className={i === 0 ? "h-[480px]" : "h-[240px]"}
@@ -96,7 +96,7 @@ export function CatalogoExperiencias({
               {/* Column 2 */}
               <div className="flex flex-col gap-4">
                 {col2.map((exp) => (
-                  <ExperienciaCard
+                  <ExperienceCard
                     key={exp.id}
                     experiencia={exp}
                     className="h-[360px]"
@@ -107,7 +107,7 @@ export function CatalogoExperiencias({
               {/* Column 3 */}
               <div className="flex flex-col gap-4">
                 {col3.map((exp, i) => (
-                  <ExperienciaCard
+                  <ExperienceCard
                     key={exp.id}
                     experiencia={exp}
                     className={

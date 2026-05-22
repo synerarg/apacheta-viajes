@@ -1,4 +1,4 @@
-export interface CategoriasExperienciaRow {
+export interface ExperienceCategoriesRow {
   id: string
   nombre: string
   slug: string
@@ -7,7 +7,7 @@ export interface CategoriasExperienciaRow {
   created_at: string | null
 }
 
-export interface CategoriasExperienciaInsert {
+export interface ExperienceCategoriesInsert {
   id?: string
   nombre: string
   slug: string
@@ -16,7 +16,7 @@ export interface CategoriasExperienciaInsert {
   created_at?: string | null
 }
 
-export interface CategoriasExperienciaUpdate {
+export interface ExperienceCategoriesUpdate {
   id?: string
   nombre?: string
   slug?: string

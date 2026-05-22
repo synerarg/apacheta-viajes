@@ -2,9 +2,9 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
-import { CotizadorCategoriaForm } from "@/components/dashboard/cotizador-categoria-form"
-import { DeleteCotizadorItemButton } from "@/components/dashboard/delete-cotizador-item-button"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
+import { QuoterCategoryForm } from "@/components/dashboard/quoter-category-form"
+import { DeleteQuoterItemButton } from "@/components/dashboard/delete-quoter-item-button"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
 
 interface EditarCategoriaPageProps {
   params: Promise<{ id: string }>
@@ -16,7 +16,7 @@ export default async function EditarCategoriaPage({
   params,
 }: EditarCategoriaPageProps) {
   const { id } = await params
-  const controller = await createServerCotizadorCategoriasController()
+  const controller = await createServerQuoterCategoriesController()
 
   let categoria
   try {
@@ -41,7 +41,7 @@ export default async function EditarCategoriaPage({
           <h1 className="font-playfair text-xl sm:text-2xl font-bold text-neutral-900">
             {categoria.nombre}
           </h1>
-          <DeleteCotizadorItemButton
+          <DeleteQuoterItemButton
             endpoint={`/api/dashboard/cotizador-categorias/${categoria.id}`}
             label="Eliminar categoría"
             redirectTo="/dashboard/cotizador/catalogo"
@@ -50,7 +50,7 @@ export default async function EditarCategoriaPage({
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <CotizadorCategoriaForm initialData={categoria} isEdit />
+        <QuoterCategoryForm initialData={categoria} isEdit />
       </div>
     </div>
   )

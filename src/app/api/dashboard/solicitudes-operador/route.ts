@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
-import { SolicitudesOperadorServiceException } from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
-import type { SolicitudOperadorEstado } from "@/types/shared/enums"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
+import { OperatorRequestsServiceException } from "@/exceptions/operator-requests/operator-requests.exceptions"
+import type { OperatorRequestStatus } from "@/types/shared/enums"
 
-const VALID_ESTADOS: ReadonlySet<SolicitudOperadorEstado> = new Set([
+const VALID_ESTADOS: ReadonlySet<OperatorRequestStatus> = new Set([
   "pendiente",
   "en_revision",
   "aprobada",
@@ -16,17 +16,17 @@ export async function GET(request: Request) {
   try {
     const url = new URL(request.url)
     const estadoParam = url.searchParams.get("estado")
-    const controller = await createServerSolicitudesOperadorController()
+    const controller = await createServerOperatorRequestsController()
 
-    if (estadoParam && VALID_ESTADOS.has(estadoParam as SolicitudOperadorEstado)) {
-      const solicitudes = await controller.list({ estado: estadoParam as SolicitudOperadorEstado })
+    if (estadoParam && VALID_ESTADOS.has(estadoParam as OperatorRequestStatus)) {
+      const solicitudes = await controller.list({ estado: estadoParam as OperatorRequestStatus })
       return NextResponse.json({ solicitudes }, { status: 200 })
     }
 
     const solicitudes = await controller.list()
     return NextResponse.json({ solicitudes }, { status: 200 })
   } catch (error) {
-    if (error instanceof SolicitudesOperadorServiceException) {
+    if (error instanceof OperatorRequestsServiceException) {
       console.error("list solicitudes admin failed", error)
       return NextResponse.json({ error: "No se pudo listar solicitudes" }, { status: 500 })
     }

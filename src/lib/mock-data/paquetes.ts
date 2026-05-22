@@ -1,4 +1,4 @@
-export interface PaqueteMock {
+export interface PackageMock {
   id: number
   nombre: string
   slug: string
@@ -27,7 +27,7 @@ export interface ItinerarioDia {
   descripcion: string
 }
 
-export const paquetesMock: PaqueteMock[] = [
+export const packagesMock: PackageMock[] = [
   {
     id: 1,
     nombre: "Vuelta a los Valles Calchaquíes",
@@ -176,7 +176,7 @@ export const paquetesMock: PaqueteMock[] = [
   },
 ]
 
-export const categoriasPaquetes = [
+export const categoriasPackages = [
   "Todos",
   "Circuito",
   "Expedición",

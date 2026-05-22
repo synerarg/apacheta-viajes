@@ -4,10 +4,10 @@ import { ArrowSquareOut, CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
 import { deletePaquete, updatePaquete } from "@/app/dashboard/paquetes/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
-import { PaqueteForm } from "@/components/dashboard/paquete-form"
+import { PackageForm } from "@/components/dashboard/package-form"
 import { adminClient } from "@/lib/supabase/admin-client"
 
-interface EditarPaquetePageProps {
+interface EditarPackagePageProps {
   params: Promise<{ id: string }>
 }
 
@@ -21,7 +21,7 @@ async function getCategorias() {
   return data ?? []
 }
 
-async function getDestinos() {
+async function getDestinations() {
   const { data } = await adminClient
     .from("destinos")
     .select("*")
@@ -31,7 +31,7 @@ async function getDestinos() {
   return data ?? []
 }
 
-async function getPaqueteDetails(id: string) {
+async function getPackageDetails(id: string) {
   const [
     { data: paquete },
     { data: imagenes },
@@ -79,13 +79,13 @@ async function getDestacadoCount(excludeId: string) {
   return count ?? 0
 }
 
-export default async function EditarPaquetePage({ params }: EditarPaquetePageProps) {
+export default async function EditarPackagePage({ params }: EditarPackagePageProps) {
   const { id } = await params
   const [{ paquete, gallery, categoriaIds, fechas, itinerario }, categorias, destinos, destacadoCount] =
     await Promise.all([
-    getPaqueteDetails(id),
+    getPackageDetails(id),
     getCategorias(),
-    getDestinos(),
+    getDestinations(),
     getDestacadoCount(id),
   ])
 
@@ -127,7 +127,7 @@ export default async function EditarPaquetePage({ params }: EditarPaquetePagePro
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <PaqueteForm
+        <PackageForm
           action={updateAction}
           initialData={{
             nombre: paquete.nombre,

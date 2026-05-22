@@ -1,26 +1,45 @@
-import { OperadoresRepositoryException } from "@/exceptions/operadores/operadores.exceptions"
+import { OperatorsRepositoryException } from "@/exceptions/operators/operators.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
-import type { OperadoresUpdate } from "@/types/operadores/operadores.types"
+import type {
+  OperatorWithTier,
+  OperatorsUpdate,
+} from "@/types/operators/operators.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
-export class OperadoresRepository extends BaseRepository<"operadores"> {
+export class OperatorsRepository extends BaseRepository<"operadores"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "operadores")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new OperadoresRepositoryException(operation, cause)
+    return new OperatorsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async findByUsuarioId(usuarioId: string) {
-    return this.findOne({ usuario_id: usuarioId })
+  async findByUserId(userId: string) {
+    return this.findOne({ usuario_id: userId })
   }
 
-  async updateById(id: string, payload: OperadoresUpdate) {
+  async findByUserIdWithTier(
+    userId: string,
+  ): Promise<OperatorWithTier | null> {
+    const { data, error } = await this.supabase
+      .from("operadores")
+      .select("*, tipo_operador:tipos_operador(id, nombre, comision_pct)")
+      .eq("usuario_id", userId)
+      .maybeSingle()
+
+    if (error) {
+      throw this.createRepositoryException("findByUserIdWithTier", error)
+    }
+
+    return (data as OperatorWithTier | null) ?? null
+  }
+
+  async updateById(id: string, payload: OperatorsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -29,6 +48,6 @@ export class OperadoresRepository extends BaseRepository<"operadores"> {
   }
 }
 
-export function createOperadoresRepository(supabase: DatabaseClient) {
-  return new OperadoresRepository(supabase)
+export function createOperatorsRepository(supabase: DatabaseClient) {
+  return new OperatorsRepository(supabase)
 }

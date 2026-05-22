@@ -12,12 +12,12 @@ const EXACT_MESSAGE_MAP: Record<string, string> = {
   "Checkout Pro failed": "No se pudo iniciar el pago con Mercado Pago.",
   "Checkout requires an authenticated user":
     "Necesitas iniciar sesion para continuar.",
-  "Experience checkout items require experienciaId":
+  "Experience checkout items require experienceId":
     "La experiencia seleccionada no es valida.",
   "Invalid checkout payload": "Los datos del checkout no son validos.",
   "No record returned after insert": "No se pudo completar la operacion.",
   "Order not found": "No encontramos la orden solicitada.",
-  "Package checkout items require paqueteFechaId":
+  "Package checkout items require packageFechaId":
     "El paquete seleccionado no tiene una salida valida.",
   "Payment does not belong to the authenticated user":
     "No tenes permiso para acceder a este comprobante.",

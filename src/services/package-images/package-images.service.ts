@@ -1,35 +1,35 @@
 import {
-  PaquetesImagenesNotFoundException,
-  PaquetesImagenesServiceException,
-} from "@/exceptions/paquetes-imagenes/paquetes-imagenes.exceptions"
-import { PaquetesImagenesRepository } from "@/repositories/paquetes-imagenes/paquetes-imagenes.repository"
+  PackageImagesNotFoundException,
+  PackageImagesServiceException,
+} from "@/exceptions/package-images/package-images.exceptions"
+import { PackageImagesRepository } from "@/repositories/package-images/package-images.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  PaquetesImagenesRow,
-  PaquetesImagenesUpdate,
-} from "@/types/paquetes-imagenes/paquetes-imagenes.types"
+  PackageImagesRow,
+  PackageImagesUpdate,
+} from "@/types/package-images/package-images.types"
 
-export class PaquetesImagenesService extends BaseService<"paquetes_imagenes"> {
-  constructor(repository: PaquetesImagenesRepository) {
+export class PackageImagesService extends BaseService<"paquetes_imagenes"> {
+  constructor(repository: PackageImagesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new PaquetesImagenesServiceException(operation, cause)
+    return new PackageImagesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new PaquetesImagenesNotFoundException(criteria)
+    return new PackageImagesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<PaquetesImagenesRow> {
+  async getById(id: string): Promise<PackageImagesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: PaquetesImagenesUpdate,
-  ): Promise<PaquetesImagenesRow> {
+    payload: PackageImagesUpdate,
+  ): Promise<PackageImagesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class PaquetesImagenesService extends BaseService<"paquetes_imagenes"> {
   }
 }
 
-export function createPaquetesImagenesService(
-  repository: PaquetesImagenesRepository,
+export function createPackageImagesService(
+  repository: PackageImagesRepository,
 ) {
-  return new PaquetesImagenesService(repository)
+  return new PackageImagesService(repository)
 }

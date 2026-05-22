@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
+import { createServerPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptValidationException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
@@ -35,7 +35,7 @@ export async function POST(
 
     const body = await request.json()
     const payload = authorizeReceiptUploadSchema.parse(body)
-    const paymentsController = await createServerPaymentsController()
+    const paymentsController = await createServerPaymentProcessingController()
     const result = await paymentsController.authorizeBankTransferReceiptUpload({
       paymentId,
       userId: user.id,

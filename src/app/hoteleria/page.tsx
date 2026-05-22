@@ -1,8 +1,8 @@
 import type { Metadata } from "next"
-import { CatalogoHoteleria } from "@/components/hoteleria/catalogo-hoteleria"
-import type { HotelCardItem } from "@/components/hoteleria/hotel-card"
-import { createServerHotelesController } from "@/controllers/hoteles/hoteles.controller"
-import type { HotelesRow } from "@/types/hoteles/hoteles.types"
+import { CatalogHotels } from "@/components/hotels/catalog-hotels"
+import type { HotelCardItem } from "@/components/hotels/hotel-card"
+import { createServerHotelsController } from "@/controllers/hotels/hotels.controller"
+import type { HotelsRow } from "@/types/hotels/hotels.types"
 
 export const metadata: Metadata = {
   title: "Hotelería | Apacheta Viajes",
@@ -10,7 +10,7 @@ export const metadata: Metadata = {
     "Selección de hoteles boutique, lodges y fincas en el Norte Argentino. Salta, Jujuy, Cafayate, Tilcara y más.",
 }
 
-function toHotelCardItem(hotel: HotelesRow): HotelCardItem {
+function toHotelCardItem(hotel: HotelsRow): HotelCardItem {
   const ubicacion = [hotel.ciudad, hotel.provincia].filter(Boolean).join(", ")
 
   return {
@@ -30,7 +30,7 @@ function toHotelCardItem(hotel: HotelesRow): HotelCardItem {
 }
 
 export default async function HoteleriaPage() {
-  const controller = await createServerHotelesController()
+  const controller = await createServerHotelsController()
   const hoteles = await controller.list({ activo: true })
   const mappedHotels =
     hoteles.length > 0
@@ -39,5 +39,5 @@ export default async function HoteleriaPage() {
           .map(toHotelCardItem)
       : []
 
-  return <CatalogoHoteleria hoteles={mappedHotels} />
+  return <CatalogHotels hoteles={mappedHotels} />
 }

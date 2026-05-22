@@ -12,21 +12,30 @@ import {
 } from "@/components/ui/sheet"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import type { CotizadorCategoriasRow } from "@/types/cotizador-categorias/cotizador-categorias.types"
-import type { CotizadorServiciosRow } from "@/types/cotizador-servicios/cotizador-servicios.types"
+import type { QuoterCategoriesRow } from "@/types/quoter-categories/quoter-categories.types"
+import type { QuoterServicesRow } from "@/types/quoter-services/quoter-services.types"
 
-export function SeleccionarServicioSheet({
+function formatCommission(value: number) {
+  return new Intl.NumberFormat("es-AR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
+export function SelectServiceSheet({
   open,
   onOpenChange,
   categorias,
   servicios,
+  tierComisionPct,
   onPick,
 }: {
   open: boolean
   onOpenChange: (open: boolean) => void
-  categorias: CotizadorCategoriasRow[]
-  servicios: CotizadorServiciosRow[]
-  onPick: (servicio: CotizadorServiciosRow) => void | Promise<void>
+  categorias: QuoterCategoriesRow[]
+  servicios: QuoterServicesRow[]
+  tierComisionPct: number
+  onPick: (servicio: QuoterServicesRow) => void | Promise<void>
 }) {
   const [query, setQuery] = useState("")
   const [picking, setPicking] = useState<string | null>(null)
@@ -42,7 +51,7 @@ export function SeleccionarServicioSheet({
       return false
     })
 
-    const byCat = new Map<string | null, CotizadorServiciosRow[]>()
+    const byCat = new Map<string | null, QuoterServicesRow[]>()
     for (const s of filtered) {
       const key = s.categoria_id
       const arr = byCat.get(key) ?? []
@@ -135,7 +144,7 @@ export function SeleccionarServicioSheet({
                           </p>
                         ) : null}
                         <p className="text-[10px] text-neutral-400 mt-1">
-                          Comisión {s.comision_pct}%
+                          Comisión {formatCommission(tierComisionPct)}%
                           {s.is_special ? " · Especial" : ""}
                           {s.no_price ? " · Sin precio cargado" : ""}
                         </p>

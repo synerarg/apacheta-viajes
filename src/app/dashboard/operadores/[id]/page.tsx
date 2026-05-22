@@ -9,31 +9,31 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import {
-  OperadorActivityChart,
+  OperatorActivityChart,
   buildMonthlyBuckets,
-} from "@/components/dashboard/operador-activity-chart"
-import { OperadorStatsCards } from "@/components/dashboard/operador-stats-cards"
+} from "@/components/dashboard/operator-activity-chart"
+import { OperatorStatsCards } from "@/components/dashboard/operator-stats-cards"
 import {
-  OperadorTopClientes,
-  buildTopClientes,
-} from "@/components/dashboard/operador-top-clientes"
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import { createServerOperadoresController } from "@/controllers/operadores/operadores.controller"
-import type { CotizacionEstado } from "@/types/cotizaciones/cotizaciones.types"
+  OperatorTopClients,
+  buildTopClients,
+} from "@/components/dashboard/operator-top-clients"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import { createServerOperatorsController } from "@/controllers/operators/operators.controller"
+import type { QuoteStatus } from "@/types/quotes/quotes.types"
 
 export const dynamic = "force-dynamic"
 
-interface OperadorDetallePageProps {
+interface OperatorDetallePageProps {
   params: Promise<{ id: string }>
 }
 
-const ESTADO_LABELS: Record<CotizacionEstado, string> = {
+const ESTADO_LABELS: Record<QuoteStatus, string> = {
   borrador: "Borrador",
   enviada: "Enviada",
   archivada: "Archivada",
 }
 
-const ESTADO_STYLES: Record<CotizacionEstado, string> = {
+const ESTADO_STYLES: Record<QuoteStatus, string> = {
   borrador: "bg-neutral-100 text-neutral-700",
   enviada: "bg-emerald-100 text-emerald-800",
   archivada: "bg-blue-100 text-blue-800",
@@ -84,19 +84,19 @@ function formatRelative(iso: string | null) {
   return `hace ${years} año${years === 1 ? "" : "s"}`
 }
 
-export default async function OperadorDetallePage({
+export default async function OperatorDetallePage({
   params,
-}: OperadorDetallePageProps) {
+}: OperatorDetallePageProps) {
   const { id } = await params
 
-  const [operadoresController, cotizacionesController] = await Promise.all([
-    createServerOperadoresController(),
-    createServerCotizacionesController(),
+  const [operatorsController, quotesController] = await Promise.all([
+    createServerOperatorsController(),
+    createServerQuotesController(),
   ])
 
   let operador
   try {
-    operador = await operadoresController.getById(id)
+    operador = await operatorsController.getById(id)
   } catch {
     notFound()
   }
@@ -107,7 +107,7 @@ export default async function OperadorDetallePage({
   // Si el operador no tiene `usuario_id` vinculado, no hay cotizaciones que
   // mostrar.
   const cotizaciones = operador.usuario_id
-    ? await cotizacionesController.list({ operador_id: operador.usuario_id })
+    ? await quotesController.list({ operador_id: operador.usuario_id })
     : []
   const sorted = [...cotizaciones].sort(
     (a, b) =>
@@ -146,7 +146,7 @@ export default async function OperadorDetallePage({
     6,
   )
 
-  const topClientes = buildTopClientes(cotizaciones, 5)
+  const topClientes = buildTopClients(cotizaciones, 5)
 
   const redes = operador.redes_sociales
     ? Object.entries(operador.redes_sociales)
@@ -220,7 +220,7 @@ export default async function OperadorDetallePage({
         </div>
       </header>
 
-      <OperadorStatsCards
+      <OperatorStatsCards
         total={totales.total}
         enviadas={totales.enviadas}
         borradores={totales.borradores}
@@ -274,9 +274,9 @@ export default async function OperadorDetallePage({
 
       <section className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
-          <OperadorActivityChart buckets={monthlyBuckets} />
+          <OperatorActivityChart buckets={monthlyBuckets} />
         </div>
-        <OperadorTopClientes clientes={topClientes} />
+        <OperatorTopClients clientes={topClientes} />
       </section>
 
       {operador.experiencia_descripcion ? (

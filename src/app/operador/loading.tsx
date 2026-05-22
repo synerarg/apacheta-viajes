@@ -4,7 +4,7 @@ import {
 } from "@/components/dashboard/skeletons"
 import { Skeleton } from "@/components/ui/skeleton"
 
-export default function OperadorLoading() {
+export default function OperatorLoading() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <PageHeaderSkeleton withAction />

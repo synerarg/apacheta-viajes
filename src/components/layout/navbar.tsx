@@ -1,11 +1,11 @@
 import { NavbarClient } from "@/components/layout/navbar-client"
 import { createClient } from "@/lib/supabase/server"
-import { createUsuariosRepository } from "@/repositories/usuarios/usuarios.repository"
-import { createUsuariosService } from "@/services/usuarios/usuarios.service"
+import { createUsersRepository } from "@/repositories/users/users.repository"
+import { createUsersService } from "@/services/users/users.service"
 
 export async function Navbar() {
   const supabase = await createClient()
-  const usuariosService = createUsuariosService(createUsuariosRepository(supabase))
+  const usersService = createUsersService(createUsersRepository(supabase))
   const {
     data: { user },
   } = await supabase.auth.getUser()
@@ -14,7 +14,7 @@ export async function Navbar() {
     return <NavbarClient user={null} />
   }
 
-  const profile = await usuariosService.get({ id: user.id })
+  const profile = await usersService.get({ id: user.id })
 
   return (
     <NavbarClient

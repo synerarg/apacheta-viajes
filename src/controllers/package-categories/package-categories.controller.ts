@@ -1,42 +1,42 @@
 import { BaseController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createPaquetesCategoriasRepository } from "@/repositories/paquetes-categorias/paquetes-categorias.repository"
+import { createPackageCategoriesRepository } from "@/repositories/package-categories/package-categories.repository"
 import {
-  createPaquetesCategoriasService,
-  PaquetesCategoriasService,
-} from "@/services/paquetes-categorias/paquetes-categorias.service"
+  createPackageCategoriesService,
+  PackageCategoriesService,
+} from "@/services/package-categories/package-categories.service"
 
-export class PaquetesCategoriasController extends BaseController<
+export class PackageCategoriesController extends BaseController<
   "paquetes_categorias",
-  PaquetesCategoriasService
+  PackageCategoriesService
 > {
-  constructor(service: PaquetesCategoriasService) {
+  constructor(service: PackageCategoriesService) {
     super(service)
   }
 
-  async getByCompositeKey(paqueteId: string, categoriaId: string) {
-    return this.service.getByCompositeKey(paqueteId, categoriaId)
+  async getByCompositeKey(packageId: string, categoryId: string) {
+    return this.service.getByCompositeKey(packageId, categoryId)
   }
 
   async updateByCompositeKey(
-    paqueteId: string,
-    categoriaId: string,
-    payload: Parameters<PaquetesCategoriasService["updateByCompositeKey"]>[2],
+    packageId: string,
+    categoryId: string,
+    payload: Parameters<PackageCategoriesService["updateByCompositeKey"]>[2],
   ) {
-    return this.service.updateByCompositeKey(paqueteId, categoriaId, payload)
+    return this.service.updateByCompositeKey(packageId, categoryId, payload)
   }
 
-  async deleteByCompositeKey(paqueteId: string, categoriaId: string) {
-    return this.service.deleteByCompositeKey(paqueteId, categoriaId)
+  async deleteByCompositeKey(packageId: string, categoryId: string) {
+    return this.service.deleteByCompositeKey(packageId, categoryId)
   }
 }
 
-export async function createServerPaquetesCategoriasController() {
+export async function createServerPackageCategoriesController() {
   const supabase = await createClient()
 
-  return new PaquetesCategoriasController(
-    createPaquetesCategoriasService(
-      createPaquetesCategoriasRepository(supabase),
+  return new PackageCategoriesController(
+    createPackageCategoriesService(
+      createPackageCategoriesRepository(supabase),
     ),
   )
 }

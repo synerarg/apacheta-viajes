@@ -1,25 +1,26 @@
 import {
-  CotizacionesItemsNotFoundException,
-  CotizacionesItemsServiceException,
-  CotizacionesItemsValidationException,
-} from "@/exceptions/cotizaciones-items/cotizaciones-items.exceptions"
-import { calcItemSubtotals } from "@/lib/cotizador/calculations"
+  QuoteItemsNotFoundException,
+  QuoteItemsServiceException,
+  QuoteItemsValidationException,
+} from "@/exceptions/quote-items/quote-items.exceptions"
+import { calcItemSubtotals } from "@/lib/quoter/calculations"
 import {
   addDaysIso,
   daysBetweenInclusive,
   isValidIsoDate,
-} from "@/lib/cotizador/dates"
-import { detectSeason } from "@/lib/cotizador/season"
-import { CotizadorPreciosRepository } from "@/repositories/cotizador-precios/cotizador-precios.repository"
-import { CotizadorServiciosRepository } from "@/repositories/cotizador-servicios/cotizador-servicios.repository"
-import { CotizacionesItemsRepository } from "@/repositories/cotizaciones-items/cotizaciones-items.repository"
+} from "@/lib/quoter/dates"
+import { detectSeason } from "@/lib/quoter/season"
+import { OperatorsRepository } from "@/repositories/operators/operators.repository"
+import { QuoterPricesRepository } from "@/repositories/quoter-prices/quoter-prices.repository"
+import { QuoterServicesRepository } from "@/repositories/quoter-services/quoter-services.repository"
+import { QuoteItemsRepository } from "@/repositories/quote-items/quote-items.repository"
 import { BaseService } from "@/services/base/base.service"
-import type { CotizacionesService } from "@/services/cotizaciones/cotizaciones.service"
+import type { QuotesService } from "@/services/quotes/quotes.service"
 import type {
-  CotizacionesItemsRow,
-  CotizacionesItemsUpdate,
-} from "@/types/cotizaciones-items/cotizaciones-items.types"
-import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
+  QuoteItemsRow,
+  QuoteItemsUpdate,
+} from "@/types/quote-items/quote-items.types"
+import type { QuotesRow } from "@/types/quotes/quotes.types"
 
 export interface AddItemPayload {
   servicio_id: string
@@ -27,7 +28,6 @@ export interface AddItemPayload {
   fecha?: string | null
   adultos: number
   menores: number
-  comision_pct?: number
   precio_adulto_unit?: number
   precio_menor_unit?: number
   temporada?: string
@@ -48,62 +48,69 @@ export interface UpdateItemPayload {
   menores?: number
   precio_adulto_unit?: number
   precio_menor_unit?: number
-  comision_pct?: number
   dia_offset?: number
   fecha?: string | null
   servicio_nombre?: string
   servicio_descripcion?: string | null
 }
 
-export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> {
+export class QuoteItemsService extends BaseService<"cotizaciones_items"> {
   constructor(
-    private readonly itemsRepository: CotizacionesItemsRepository,
-    private readonly serviciosRepository: CotizadorServiciosRepository,
-    private readonly preciosRepository: CotizadorPreciosRepository,
-    private readonly cotizacionesService: CotizacionesService,
+    private readonly itemsRepository: QuoteItemsRepository,
+    private readonly servicesRepository: QuoterServicesRepository,
+    private readonly pricesRepository: QuoterPricesRepository,
+    private readonly quotesService: QuotesService,
+    private readonly operatorsRepository: OperatorsRepository,
   ) {
     super(itemsRepository)
   }
 
+  private async resolveTierCommissionPct(operadorId: string): Promise<number> {
+    const operator = await this.operatorsRepository.findByUserIdWithTier(
+      operadorId,
+    )
+    return Number(operator?.tipo_operador?.comision_pct ?? 0)
+  }
+
   protected createServiceException(operation: string, cause?: unknown) {
-    return new CotizacionesItemsServiceException(operation, cause)
+    return new QuoteItemsServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new CotizacionesItemsNotFoundException(criteria)
+    return new QuoteItemsNotFoundException(criteria)
   }
 
-  async listByCotizacion(cotizacionId: string): Promise<CotizacionesItemsRow[]> {
+  async listByCotizacion(quoteId: string): Promise<QuoteItemsRow[]> {
     try {
-      return await this.itemsRepository.listByCotizacion(cotizacionId)
+      return await this.itemsRepository.listByCotizacion(quoteId)
     } catch (error) {
       this.handleServiceError("listByCotizacion", error)
     }
   }
 
-  async getById(id: string): Promise<CotizacionesItemsRow> {
+  async getById(id: string): Promise<QuoteItemsRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   private async assertDiaOffsetInRange(
-    cotizacionId: string,
+    quoteId: string,
     diaOffset: number,
     fechaIn?: string | null,
-  ): Promise<{ cotizacion: CotizacionesRow; fechaResolved: string | null }> {
-    const cotizacion = await this.cotizacionesService.getById(cotizacionId)
+  ): Promise<{ cotizacion: QuotesRow; fechaResolved: string | null }> {
+    const cotizacion = await this.quotesService.getById(quoteId)
     const totalDias = daysBetweenInclusive(
       cotizacion.fecha_inicio,
       cotizacion.fecha_fin,
     )
 
     if (totalDias === 0) {
-      throw new CotizacionesItemsValidationException(
+      throw new QuoteItemsValidationException(
         "Definí fecha de inicio y fin del viaje antes de cargar servicios.",
       )
     }
 
     if (diaOffset < 0 || diaOffset >= totalDias) {
-      throw new CotizacionesItemsValidationException(
+      throw new QuoteItemsValidationException(
         `El día ${diaOffset + 1} está fuera del rango del viaje (${totalDias} días).`,
       )
     }
@@ -113,7 +120,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
       : null
 
     if (fechaIn && !isValidIsoDate(fechaIn)) {
-      throw new CotizacionesItemsValidationException(
+      throw new QuoteItemsValidationException(
         "Fecha inválida (formato YYYY-MM-DD).",
       )
     }
@@ -130,28 +137,28 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
    * - Snapshot del nombre/descripcion/precios al momento de agregar.
    */
   async addItem(
-    cotizacionId: string,
+    quoteId: string,
     payload: AddItemPayload,
-  ): Promise<CotizacionesItemsRow> {
+  ): Promise<QuoteItemsRow> {
     try {
-      const { fechaResolved } = await this.assertDiaOffsetInRange(
-        cotizacionId,
+      const { cotizacion, fechaResolved } = await this.assertDiaOffsetInRange(
+        quoteId,
         payload.dia_offset,
         payload.fecha,
       )
 
-      const servicio = (await this.serviciosRepository.findById(
+      const servicio = (await this.servicesRepository.findById(
         payload.servicio_id,
       )) as unknown as
-        | { id: string; nombre: string; descripcion: string | null; comision_pct: number }
+        | { id: string; nombre: string; descripcion: string | null }
         | null
       if (!servicio) {
-        throw new CotizacionesItemsValidationException(
+        throw new QuoteItemsValidationException(
           `Servicio ${payload.servicio_id} no encontrado.`,
         )
       }
 
-      const precios = await this.preciosRepository.findByServicio(payload.servicio_id)
+      const precios = await this.pricesRepository.findByService(payload.servicio_id)
 
       // Resolver temporada
       let temporada = payload.temporada
@@ -170,11 +177,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         payload.precio_adulto_unit ?? Number(precio?.precio_adulto ?? 0)
       const precioMenor =
         payload.precio_menor_unit ?? Number(precio?.precio_menor ?? precio?.precio_adulto ?? 0)
-      const comisionPct =
-        payload.comision_pct ??
-        Number(
-          precio?.comision_pct_override ?? servicio.comision_pct ?? 0,
-        )
+      const comisionPct = await this.resolveTierCommissionPct(cotizacion.operador_id)
 
       const totals = calcItemSubtotals({
         adultos: payload.adultos,
@@ -185,7 +188,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
       })
 
       const inserted = await this.create({
-        cotizacion_id: cotizacionId,
+        cotizacion_id: quoteId,
         servicio_id: servicio.id,
         dia_offset: payload.dia_offset,
         fecha: fechaResolved,
@@ -202,7 +205,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         is_special: false,
       })
 
-      await this.cotizacionesService.recalculateTotals(cotizacionId)
+      await this.quotesService.recalculateTotals(quoteId)
       return inserted
     } catch (error) {
       this.handleServiceError("addItem", error)
@@ -214,12 +217,12 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
    * comision_pct=0, is_special=true.
    */
   async addSpecialItem(
-    cotizacionId: string,
+    quoteId: string,
     payload: AddSpecialPayload,
-  ): Promise<CotizacionesItemsRow> {
+  ): Promise<QuoteItemsRow> {
     try {
       const { fechaResolved } = await this.assertDiaOffsetInRange(
-        cotizacionId,
+        quoteId,
         payload.dia_offset,
         payload.fecha,
       )
@@ -234,7 +237,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
       })
 
       const inserted = await this.create({
-        cotizacion_id: cotizacionId,
+        cotizacion_id: quoteId,
         servicio_id: null,
         dia_offset: payload.dia_offset,
         fecha: fechaResolved,
@@ -251,14 +254,14 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         is_special: true,
       })
 
-      await this.cotizacionesService.recalculateTotals(cotizacionId)
+      await this.quotesService.recalculateTotals(quoteId)
       return inserted
     } catch (error) {
       this.handleServiceError("addSpecialItem", error)
     }
   }
 
-  async updateItem(itemId: string, payload: UpdateItemPayload): Promise<CotizacionesItemsRow> {
+  async updateItem(itemId: string, payload: UpdateItemPayload): Promise<QuoteItemsRow> {
     try {
       const current = await this.getById(itemId)
 
@@ -274,7 +277,12 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
       const menores = payload.menores ?? current.menores
       const precioAdulto = payload.precio_adulto_unit ?? Number(current.precio_adulto_unit)
       const precioMenor = payload.precio_menor_unit ?? Number(current.precio_menor_unit ?? 0)
-      const comisionPct = payload.comision_pct ?? Number(current.comision_pct)
+      // Items especiales siempre 0%; servicios normales siguen el tier del operador.
+      let comisionPct = 0
+      if (!current.is_special) {
+        const cotizacion = await this.quotesService.getById(current.cotizacion_id)
+        comisionPct = await this.resolveTierCommissionPct(cotizacion.operador_id)
+      }
 
       const totals = calcItemSubtotals({
         adultos,
@@ -284,7 +292,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
         comisionPct,
       })
 
-      const update: CotizacionesItemsUpdate = {
+      const update: QuoteItemsUpdate = {
         adultos,
         menores,
         precio_adulto_unit: precioAdulto,
@@ -297,7 +305,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
       if (payload.dia_offset !== undefined) update.dia_offset = payload.dia_offset
       if (payload.fecha !== undefined) {
         if (payload.fecha !== null && !isValidIsoDate(payload.fecha)) {
-          throw new CotizacionesItemsValidationException(
+          throw new QuoteItemsValidationException(
             "Fecha del item inválida (formato YYYY-MM-DD).",
           )
         }
@@ -310,7 +318,7 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
 
       const updated = await this.updateByFilters({ id: itemId }, update, `id ${itemId}`)
 
-      await this.cotizacionesService.recalculateTotals(current.cotizacion_id)
+      await this.quotesService.recalculateTotals(current.cotizacion_id)
       return updated
     } catch (error) {
       this.handleServiceError("updateItem", error)
@@ -321,23 +329,25 @@ export class CotizacionesItemsService extends BaseService<"cotizaciones_items"> 
     try {
       const current = await this.getById(itemId)
       await this.deleteByFilters({ id: itemId })
-      await this.cotizacionesService.recalculateTotals(current.cotizacion_id)
+      await this.quotesService.recalculateTotals(current.cotizacion_id)
     } catch (error) {
       this.handleServiceError("removeItem", error)
     }
   }
 }
 
-export function createCotizacionesItemsService(
-  itemsRepository: CotizacionesItemsRepository,
-  serviciosRepository: CotizadorServiciosRepository,
-  preciosRepository: CotizadorPreciosRepository,
-  cotizacionesService: CotizacionesService,
+export function createQuoteItemsService(
+  itemsRepository: QuoteItemsRepository,
+  servicesRepository: QuoterServicesRepository,
+  pricesRepository: QuoterPricesRepository,
+  quotesService: QuotesService,
+  operatorsRepository: OperatorsRepository,
 ) {
-  return new CotizacionesItemsService(
+  return new QuoteItemsService(
     itemsRepository,
-    serviciosRepository,
-    preciosRepository,
-    cotizacionesService,
+    servicesRepository,
+    pricesRepository,
+    quotesService,
+    operatorsRepository,
   )
 }

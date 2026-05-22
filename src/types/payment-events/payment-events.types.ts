@@ -6,7 +6,7 @@ type DatabaseJson =
   | { [key: string]: DatabaseJson | undefined }
   | DatabaseJson[]
 
-export interface PagosEventosRow {
+export interface PaymentEventsRow {
   id: string
   pago_id: string
   tipo: string
@@ -16,7 +16,7 @@ export interface PagosEventosRow {
   created_at: string | null
 }
 
-export interface PagosEventosInsert {
+export interface PaymentEventsInsert {
   id?: string
   pago_id: string
   tipo: string
@@ -26,7 +26,7 @@ export interface PagosEventosInsert {
   created_at?: string | null
 }
 
-export interface PagosEventosUpdate {
+export interface PaymentEventsUpdate {
   id?: string
   pago_id?: string
   tipo?: string

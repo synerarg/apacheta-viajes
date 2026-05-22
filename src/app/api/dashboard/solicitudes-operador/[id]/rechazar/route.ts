@@ -1,14 +1,14 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
 import {
-  SolicitudesOperadorNotFoundException,
-  SolicitudesOperadorServiceException,
-  SolicitudesOperadorValidationException,
-} from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
-import { rejectSolicitudSchema } from "@/lib/solicitudes-operador/schemas"
-import { sendSolicitudOperadorRechazada } from "@/services/notifications/solicitud-operador-email.service"
+  OperatorRequestsNotFoundException,
+  OperatorRequestsServiceException,
+  OperatorRequestsValidationException,
+} from "@/exceptions/operator-requests/operator-requests.exceptions"
+import { rejectRequestSchema } from "@/lib/operator-requests/schemas"
+import { sendOperatorRequestRechazada } from "@/services/notifications/solicitud-operador-email.service"
 import { createClient } from "@/lib/supabase/server"
 
 export async function PATCH(
@@ -27,11 +27,11 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { motivo } = rejectSolicitudSchema.parse(body)
-    const controller = await createServerSolicitudesOperadorController()
+    const { motivo } = rejectRequestSchema.parse(body)
+    const controller = await createServerOperatorRequestsController()
     const solicitud = await controller.reject(id, user.id, motivo)
 
-    sendSolicitudOperadorRechazada(solicitud, {
+    sendOperatorRequestRechazada(solicitud, {
       email: solicitud.email_contacto,
       greetingName: solicitud.nombre_comercial,
     }).catch((err) => console.error("send solicitud rechazada email failed", err))
@@ -41,13 +41,13 @@ export async function PATCH(
     if (error instanceof z.ZodError) {
       return NextResponse.json({ error: "Motivo inválido", details: error.issues }, { status: 400 })
     }
-    if (error instanceof SolicitudesOperadorNotFoundException) {
+    if (error instanceof OperatorRequestsNotFoundException) {
       return NextResponse.json({ error: error.message }, { status: 404 })
     }
-    if (error instanceof SolicitudesOperadorValidationException) {
+    if (error instanceof OperatorRequestsValidationException) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
-    if (error instanceof SolicitudesOperadorServiceException) {
+    if (error instanceof OperatorRequestsServiceException) {
       console.error("reject solicitud failed", error)
       return NextResponse.json({ error: "No se pudo rechazar la solicitud" }, { status: 500 })
     }

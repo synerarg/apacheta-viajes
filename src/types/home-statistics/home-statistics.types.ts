@@ -1,4 +1,4 @@
-export interface EstadisticasHomeRow {
+export interface HomeStatisticsRow {
   id: string
   icono: string | null
   valor: string
@@ -8,7 +8,7 @@ export interface EstadisticasHomeRow {
   created_at: string | null
 }
 
-export interface EstadisticasHomeInsert {
+export interface HomeStatisticsInsert {
   id?: string
   icono?: string | null
   valor: string
@@ -18,7 +18,7 @@ export interface EstadisticasHomeInsert {
   created_at?: string | null
 }
 
-export interface EstadisticasHomeUpdate {
+export interface HomeStatisticsUpdate {
   id?: string
   icono?: string | null
   valor?: string

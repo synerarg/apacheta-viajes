@@ -1,4 +1,4 @@
-export interface CotizadorPreciosRow {
+export interface QuoterPricesRow {
   id: string
   servicio_id: string
   temporada: string
@@ -13,7 +13,7 @@ export interface CotizadorPreciosRow {
   updated_at: string | null
 }
 
-export interface CotizadorPreciosInsert {
+export interface QuoterPricesInsert {
   id?: string
   servicio_id: string
   temporada: string
@@ -28,7 +28,7 @@ export interface CotizadorPreciosInsert {
   updated_at?: string | null
 }
 
-export interface CotizadorPreciosUpdate {
+export interface QuoterPricesUpdate {
   id?: string
   servicio_id?: string
   temporada?: string

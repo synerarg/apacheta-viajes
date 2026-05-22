@@ -15,36 +15,37 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { isoRange } from "@/lib/cotizador/dates"
-import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
-import type { CotizacionesItemsRow } from "@/types/cotizaciones-items/cotizaciones-items.types"
-import type { CotizadorCategoriasRow } from "@/types/cotizador-categorias/cotizador-categorias.types"
-import type { CotizadorServiciosRow } from "@/types/cotizador-servicios/cotizador-servicios.types"
+import { isoRange } from "@/lib/quoter/dates"
+import type { QuotesRow } from "@/types/quotes/quotes.types"
+import type { QuoteItemsRow } from "@/types/quote-items/quote-items.types"
+import type { QuoterCategoriesRow } from "@/types/quoter-categories/quoter-categories.types"
+import type { QuoterServicesRow } from "@/types/quoter-services/quoter-services.types"
 
-import { AgregarEspecialDialog, type EspecialKind } from "./agregar-especial-dialog"
+import { AddSpecialDialog, type EspecialKind } from "./add-special-dialog"
 import {
-  ClienteInfoForm,
-  type ClienteInfoFormHandle,
-} from "./cliente-info-form"
+  ClientInfoForm,
+  type ClientInfoFormHandle,
+} from "./client-info-form"
 import { DateRangeSection } from "./date-range-section"
-import { DiaCard } from "./dia-card"
-import { EliminarCotizacionButton } from "./eliminar-cotizacion-button"
-import { SeleccionarServicioSheet } from "./seleccionar-servicio-sheet"
-import { TotalesPanel } from "./totales-panel"
-import { SalidaActions } from "./salida-actions"
+import { DayCard } from "./day-card"
+import { DeleteQuoteButton } from "./delete-quote-button"
+import { SelectServiceSheet } from "./select-service-sheet"
+import { TotalsPanel } from "./totals-panel"
+import { DepartureActions } from "./departure-actions"
 
 type Props = {
-  cotizacion: CotizacionesRow
-  items: CotizacionesItemsRow[]
-  categorias: CotizadorCategoriasRow[]
-  servicios: CotizadorServiciosRow[]
+  cotizacion: QuotesRow
+  items: QuoteItemsRow[]
+  categorias: QuoterCategoriesRow[]
+  servicios: QuoterServicesRow[]
+  tierComisionPct: number
 }
 
-type CotizacionWithItems = CotizacionesRow & { items?: CotizacionesItemsRow[] }
+type QuoteWithItems = QuotesRow & { items?: QuoteItemsRow[] }
 
-type CotizacionApiResponse = {
-  cotizacion?: CotizacionWithItems
-  data?: CotizacionWithItems
+type QuoteApiResponse = {
+  cotizacion?: QuoteWithItems
+  data?: QuoteWithItems
 }
 
 function formatMoney(v: number) {
@@ -52,7 +53,7 @@ function formatMoney(v: number) {
 }
 
 const ESTADO_BADGE: Record<
-  CotizacionesRow["estado"],
+  QuotesRow["estado"],
   { bg: string; text: string; ring: string; dot: string; label: string }
 > = {
   borrador: {
@@ -79,7 +80,7 @@ const ESTADO_BADGE: Record<
 }
 
 async function readApiResponse(res: Response): Promise<{
-  data: CotizacionWithItems | null
+  data: QuoteWithItems | null
   error: string | null
   status: number
 }> {
@@ -91,7 +92,7 @@ async function readApiResponse(res: Response): Promise<{
       status: res.status,
     }
   }
-  let parsed: CotizacionApiResponse & { error?: string; message?: string } = {}
+  let parsed: QuoteApiResponse & { error?: string; message?: string } = {}
   try {
     parsed = (await res.json()) as typeof parsed
   } catch {
@@ -108,15 +109,16 @@ async function readApiResponse(res: Response): Promise<{
   return { data: cot, error: null, status: res.status }
 }
 
-export function CotizadorBuilder({
+export function QuoteBuilder({
   cotizacion: initialCotizacion,
   items: initialItems,
   categorias,
   servicios,
+  tierComisionPct,
 }: Props) {
   const router = useRouter()
-  const [cotizacion, setCotizacion] = useState<CotizacionesRow>(initialCotizacion)
-  const [items, setItems] = useState<CotizacionesItemsRow[]>(initialItems)
+  const [cotizacion, setCotizacion] = useState<QuotesRow>(initialCotizacion)
+  const [items, setItems] = useState<QuoteItemsRow[]>(initialItems)
   const [pickerOpen, setPickerOpen] = useState(false)
   const [pickerDia, setPickerDia] = useState<{ offset: number; fecha: string | null } | null>(null)
   const [especialOpen, setEspecialOpen] = useState(false)
@@ -128,7 +130,7 @@ export function CotizadorBuilder({
   const [publicUrl, setPublicUrl] = useState<string | null>(null)
   const [mobileTotalsOpen, setMobileTotalsOpen] = useState(false)
 
-  const clienteFormRef = useRef<ClienteInfoFormHandle | null>(null)
+  const clienteFormRef = useRef<ClientInfoFormHandle | null>(null)
 
   const readonly = cotizacion.estado !== "borrador"
   const estadoBadge =
@@ -146,7 +148,7 @@ export function CotizadorBuilder({
   )
 
   const itemsByDay = useMemo(() => {
-    const map = new Map<number, CotizacionesItemsRow[]>()
+    const map = new Map<number, QuoteItemsRow[]>()
     for (const it of items) {
       const arr = map.get(it.dia_offset) ?? []
       arr.push(it)
@@ -163,10 +165,10 @@ export function CotizadorBuilder({
     return map
   }, [items])
 
-  const applyResponse = useCallback((data: CotizacionWithItems | null) => {
+  const applyResponse = useCallback((data: QuoteWithItems | null) => {
     if (!data) return
     const { items: itms, ...header } = data
-    setCotizacion(header as CotizacionesRow)
+    setCotizacion(header as QuotesRow)
     if (Array.isArray(itms)) setItems(itms)
   }, [])
 
@@ -193,12 +195,12 @@ export function CotizadorBuilder({
     // Optimistic update: aplicar el patch al state local inmediatamente
     // para que la UI (especialmente la grilla de días) responda al instante.
     const previous = cotizacion
-    const optimistic = { ...previous } as CotizacionesRow & Record<string, unknown>
+    const optimistic = { ...previous } as QuotesRow & Record<string, unknown>
     for (const [key, value] of Object.entries(patch)) {
       if (value === undefined) continue
       ;(optimistic as Record<string, unknown>)[key] = value
     }
-    setCotizacion(optimistic as CotizacionesRow)
+    setCotizacion(optimistic as QuotesRow)
 
     const requestId = ++pendingHeaderRef.current
     setIsMutating(true)
@@ -316,7 +318,7 @@ export function CotizadorBuilder({
     setPickerOpen(true)
   }
 
-  async function handlePickServicio(servicio: CotizadorServiciosRow) {
+  async function handlePickServicio(servicio: QuoterServicesRow) {
     if (!pickerDia) return
     await createItem({
       type: "service",
@@ -666,7 +668,7 @@ export function CotizadorBuilder({
                 <h2 className="font-semibold text-sm text-neutral-900">
                   Datos del cliente
                 </h2>
-                <ClienteInfoForm
+                <ClientInfoForm
                   ref={clienteFormRef}
                   initial={{
                     cliente_nombre: cotizacion.cliente_nombre,
@@ -714,7 +716,7 @@ export function CotizadorBuilder({
                   </span>
                 </div>
                 {days.map((fecha, i) => (
-                  <DiaCard
+                  <DayCard
                     key={`${i}-${fecha}`}
                     diaOffset={i}
                     fecha={fecha}
@@ -736,7 +738,7 @@ export function CotizadorBuilder({
                 <h2 className="font-semibold text-sm text-neutral-900">
                   Totales
                 </h2>
-                <TotalesPanel
+                <TotalsPanel
                   items={items}
                   days={days}
                   totalComision={cotizacion.total_comision}
@@ -805,8 +807,8 @@ export function CotizadorBuilder({
                     </p>
                   ) : null}
                   <div className="pt-3 border-t border-neutral-100">
-                    <EliminarCotizacionButton
-                      cotizacionId={cotizacion.id}
+                    <DeleteQuoteButton
+                      quoteId={cotizacion.id}
                       clienteNombre={cotizacion.cliente_nombre}
                       redirectTo="/operador"
                       disabled={isSending || isMutating}
@@ -820,7 +822,7 @@ export function CotizadorBuilder({
                   <h2 className="font-semibold text-sm text-neutral-900">
                     Compartir
                   </h2>
-                  <SalidaActions
+                  <DepartureActions
                     text={itineraryText}
                     publicUrl={resolvedPublicUrl}
                     clienteTelefono={cotizacion.cliente_telefono}
@@ -860,8 +862,8 @@ export function CotizadorBuilder({
                     )}
                   </div>
                   <div className="pt-3 border-t border-neutral-100">
-                    <EliminarCotizacionButton
-                      cotizacionId={cotizacion.id}
+                    <DeleteQuoteButton
+                      quoteId={cotizacion.id}
                       clienteNombre={cotizacion.cliente_nombre}
                       redirectTo="/operador"
                       disabled={isMutating}
@@ -873,7 +875,7 @@ export function CotizadorBuilder({
           </aside>
         </div>
 
-        <SeleccionarServicioSheet
+        <SelectServiceSheet
           open={pickerOpen}
           onOpenChange={(o) => {
             setPickerOpen(o)
@@ -881,10 +883,11 @@ export function CotizadorBuilder({
           }}
           categorias={categorias}
           servicios={servicios}
+          tierComisionPct={tierComisionPct}
           onPick={handlePickServicio}
         />
 
-        <AgregarEspecialDialog
+        <AddSpecialDialog
           open={especialOpen}
           onOpenChange={(o) => {
             setEspecialOpen(o)
@@ -929,7 +932,7 @@ export function CotizadorBuilder({
 
           {mobileTotalsOpen ? (
             <div className="px-4 pb-4 space-y-4 overflow-y-auto max-h-[calc(80vh-72px)]">
-              <TotalesPanel
+              <TotalsPanel
                 items={items}
                 days={days}
                 totalComision={cotizacion.total_comision}
@@ -980,7 +983,7 @@ export function CotizadorBuilder({
                   </>
                 ) : (
                   <>
-                    <SalidaActions
+                    <DepartureActions
                       text={itineraryText}
                       publicUrl={resolvedPublicUrl}
                       clienteEmail={cotizacion.cliente_email}

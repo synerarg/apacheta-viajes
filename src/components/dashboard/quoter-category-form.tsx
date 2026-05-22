@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
-import type { CotizadorCategoriasRow } from "@/types/cotizador-categorias/cotizador-categorias.types"
+import type { QuoterCategoriesRow } from "@/types/quoter-categories/quoter-categories.types"
 
 const TIPOS: { value: string; label: string }[] = [
   { value: "traslado", label: "Traslado" },
@@ -26,17 +26,17 @@ const TIPOS: { value: string; label: string }[] = [
   { value: "tren", label: "Tren" },
 ]
 
-interface CotizadorCategoriaFormProps {
-  initialData?: Partial<CotizadorCategoriasRow>
+interface QuoterCategoryFormProps {
+  initialData?: Partial<QuoterCategoriesRow>
   isEdit?: boolean
 }
 
 type FieldErrors = Partial<Record<"nombre" | "region" | "tipo" | "orden", string>>
 
-export function CotizadorCategoriaForm({
+export function QuoterCategoryForm({
   initialData,
   isEdit = false,
-}: CotizadorCategoriaFormProps) {
+}: QuoterCategoryFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 

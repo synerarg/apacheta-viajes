@@ -18,12 +18,12 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { CategoriasExperienciaRow } from "@/types/categorias-experiencia/categorias-experiencia.types"
-import type { DestinosRow } from "@/types/destinos/destinos.types"
-import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+import type { ExperienceCategoriesRow } from "@/types/experience-categories/experience-categories.types"
+import type { DestinationsRow } from "@/types/destinations/destinations.types"
+import type { Moneda, MealPlan } from "@/types/shared/enums"
 
 const REGIMEN_NONE = "__none__"
-const REGIMEN_OPTIONS: Array<{ value: RegimenAlimentario; label: string }> = [
+const REGIMEN_OPTIONS: Array<{ value: MealPlan; label: string }> = [
   { value: "desayuno", label: "Desayuno" },
   { value: "media_pension", label: "Media pensión" },
   { value: "pension_completa", label: "Pensión completa" },
@@ -53,7 +53,7 @@ interface PackageItineraryDraft {
   descripcion: string
 }
 
-interface PaqueteFormProps {
+interface PackageFormProps {
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>
   initialData?: {
     nombre?: string
@@ -70,7 +70,7 @@ interface PaqueteFormProps {
     orden?: number | null
     incluye_alojamiento?: boolean | null
     incluye_traslado?: boolean | null
-    regimen?: RegimenAlimentario | null
+    regimen?: MealPlan | null
     incluye_guia?: boolean | null
     incluye_entradas?: boolean | null
     categoria_ids?: string[]
@@ -95,8 +95,8 @@ interface PaqueteFormProps {
     }>
     gallery?: string[]
   }
-  categorias: CategoriasExperienciaRow[]
-  destinos: DestinosRow[]
+  categorias: ExperienceCategoriesRow[]
+  destinos: DestinationsRow[]
   canToggleDestacado: boolean
   isEdit?: boolean
 }
@@ -158,14 +158,14 @@ function serializeItineraryDraft(item: PackageItineraryDraft) {
   }
 }
 
-export function PaqueteForm({
+export function PackageForm({
   action,
   initialData,
   categorias,
   destinos,
   canToggleDestacado,
   isEdit = false,
-}: PaqueteFormProps) {
+}: PackageFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState)
   const [descripcionCorta, setDescripcionCorta] = useState(
     initialData?.descripcion_corta ?? "",
@@ -176,7 +176,7 @@ export function PaqueteForm({
     initialData?.activo === false ? "false" : "true",
   )
   const [moneda, setMoneda] = useState<Moneda>(initialData?.moneda ?? "ARS")
-  const [destinoId, setDestinoId] = useState(initialData?.destino_id ?? "__none__")
+  const [destinationId, setDestinationId] = useState(initialData?.destino_id ?? "__none__")
   const [selectedCategoryIds, setSelectedCategoryIds] = useState<string[]>(
     initialData?.categoria_ids ?? [],
   )
@@ -403,9 +403,9 @@ export function PaqueteForm({
               <input
                 type="hidden"
                 name="destino_id"
-                value={destinoId === "__none__" ? "" : destinoId}
+                value={destinationId === "__none__" ? "" : destinationId}
               />
-              <Select value={destinoId} onValueChange={setDestinoId}>
+              <Select value={destinationId} onValueChange={setDestinationId}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Sin destino" />
                 </SelectTrigger>

@@ -1,6 +1,6 @@
 import type { Moneda } from "@/types/shared/enums"
 
-export interface PaquetesFechasRow {
+export interface PackageDatesRow {
   id: string
   paquete_id: string
   fecha_inicio: string
@@ -17,7 +17,7 @@ export interface PaquetesFechasRow {
   updated_at: string | null
 }
 
-export interface PaquetesFechasInsert {
+export interface PackageDatesInsert {
   id?: string
   paquete_id: string
   fecha_inicio: string
@@ -34,7 +34,7 @@ export interface PaquetesFechasInsert {
   updated_at?: string | null
 }
 
-export interface PaquetesFechasUpdate {
+export interface PackageDatesUpdate {
   id?: string
   paquete_id?: string
   fecha_inicio?: string

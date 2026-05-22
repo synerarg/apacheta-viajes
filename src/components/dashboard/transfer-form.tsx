@@ -18,15 +18,15 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import type { DestinosRow } from "@/types/destinos/destinos.types"
+import type { DestinationsRow } from "@/types/destinations/destinations.types"
 import type { Moneda } from "@/types/shared/enums"
 import type {
-  TrasladoModalidad,
-  TrasladoTipoServicio,
-  TrasladoVehiculoTipo,
-} from "@/types/traslados/traslados.types"
+  TransferModality,
+  TransferServiceType,
+  TransferVehicleType,
+} from "@/types/transfers/transfers.types"
 
-interface TrasladoFormProps {
+interface TransferFormProps {
   action: (prevState: ActionState, formData: FormData) => Promise<ActionState>
   initialData?: {
     nombre?: string
@@ -34,9 +34,9 @@ interface TrasladoFormProps {
     descripcion_corta?: string | null
     origen?: string | null
     destino?: string | null
-    tipo_servicio?: TrasladoTipoServicio | null
-    modalidad?: TrasladoModalidad | null
-    vehiculo_tipo?: TrasladoVehiculoTipo | null
+    tipo_servicio?: TransferServiceType | null
+    modalidad?: TransferModality | null
+    vehiculo_tipo?: TransferVehicleType | null
     capacidad_max?: number | null
     base_minima_pax?: number | null
     precio_desde?: number | null
@@ -52,7 +52,7 @@ interface TrasladoFormProps {
     orden?: number | null
     gallery?: string[]
   }
-  destinos: DestinosRow[]
+  destinos: DestinationsRow[]
   isEdit?: boolean
 }
 
@@ -69,18 +69,18 @@ const MONEDAS: Moneda[] = [
   "UYU",
 ]
 
-const TIPO_SERVICIO_OPTIONS: { value: TrasladoTipoServicio; label: string }[] = [
+const TIPO_SERVICIO_OPTIONS: { value: TransferServiceType; label: string }[] = [
   { value: "regular", label: "Regular" },
   { value: "privado", label: "Privado" },
 ]
 
-const MODALIDAD_OPTIONS: { value: TrasladoModalidad; label: string }[] = [
+const MODALIDAD_OPTIONS: { value: TransferModality; label: string }[] = [
   { value: "ida", label: "Solo ida" },
   { value: "ida_vuelta", label: "Ida y vuelta" },
   { value: "punto_a_punto", label: "Punto a punto" },
 ]
 
-const VEHICULO_OPTIONS: { value: TrasladoVehiculoTipo; label: string }[] = [
+const VEHICULO_OPTIONS: { value: TransferVehicleType; label: string }[] = [
   { value: "auto", label: "Auto" },
   { value: "combi", label: "Combi" },
   { value: "minibus", label: "Minibus" },
@@ -97,22 +97,22 @@ const SUGERENCIAS_LUGARES = [
   "Cafayate",
 ]
 
-export function TrasladoForm({
+export function TransferForm({
   action,
   initialData,
   destinos,
   isEdit = false,
-}: TrasladoFormProps) {
+}: TransferFormProps) {
   const [state, formAction, isPending] = useActionState(action, initialState)
 
   const [selectedDestino, setSelectedDestino] = useState<string>(
     initialData?.destino_id ?? "__none__",
   )
   const [moneda, setMoneda] = useState<Moneda>(initialData?.moneda ?? "ARS")
-  const [tipoServicio, setTipoServicio] = useState<TrasladoTipoServicio>(
+  const [tipoServicio, setTipoServicio] = useState<TransferServiceType>(
     initialData?.tipo_servicio ?? "regular",
   )
-  const [modalidad, setModalidad] = useState<TrasladoModalidad>(
+  const [modalidad, setModalidad] = useState<TransferModality>(
     initialData?.modalidad ?? "ida",
   )
   const [vehiculoTipo, setVehiculoTipo] = useState<string>(
@@ -356,7 +356,7 @@ export function TrasladoForm({
               <Select
                 value={tipoServicio}
                 onValueChange={(value) =>
-                  setTipoServicio(value as TrasladoTipoServicio)
+                  setTipoServicio(value as TransferServiceType)
                 }
               >
                 <SelectTrigger className="w-full">
@@ -378,7 +378,7 @@ export function TrasladoForm({
               <Select
                 value={modalidad}
                 onValueChange={(value) =>
-                  setModalidad(value as TrasladoModalidad)
+                  setModalidad(value as TransferModality)
                 }
               >
                 <SelectTrigger className="w-full">

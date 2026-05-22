@@ -1,29 +1,29 @@
 import {
-  PaquetesNotFoundException,
-  PaquetesServiceException,
-} from "@/exceptions/paquetes/paquetes.exceptions"
-import { PaquetesRepository } from "@/repositories/paquetes/paquetes.repository"
+  PackagesNotFoundException,
+  PackagesServiceException,
+} from "@/exceptions/packages/packages.exceptions"
+import { PackagesRepository } from "@/repositories/packages/packages.repository"
 import { BaseService } from "@/services/base/base.service"
-import type { PaquetesRow, PaquetesUpdate } from "@/types/paquetes/paquetes.types"
+import type { PackagesRow, PackagesUpdate } from "@/types/packages/packages.types"
 
-export class PaquetesService extends BaseService<"paquetes"> {
-  constructor(repository: PaquetesRepository) {
+export class PackagesService extends BaseService<"paquetes"> {
+  constructor(repository: PackagesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new PaquetesServiceException(operation, cause)
+    return new PackagesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new PaquetesNotFoundException(criteria)
+    return new PackagesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<PaquetesRow> {
+  async getById(id: string): Promise<PackagesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
-  async updateById(id: string, payload: PaquetesUpdate): Promise<PaquetesRow> {
+  async updateById(id: string, payload: PackagesUpdate): Promise<PackagesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -32,6 +32,6 @@ export class PaquetesService extends BaseService<"paquetes"> {
   }
 }
 
-export function createPaquetesService(repository: PaquetesRepository) {
-  return new PaquetesService(repository)
+export function createPackagesService(repository: PackagesRepository) {
+  return new PackagesService(repository)
 }

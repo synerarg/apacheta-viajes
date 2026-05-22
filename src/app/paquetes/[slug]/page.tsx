@@ -1,14 +1,14 @@
 import { notFound } from "next/navigation"
 import type { Metadata } from "next"
 
-import { createServerCategoriasExperienciaController } from "@/controllers/categorias-experiencia/categorias-experiencia.controller"
-import { createServerDestinosController } from "@/controllers/destinos/destinos.controller"
-import { createServerPaquetesCategoriasController } from "@/controllers/paquetes-categorias/paquetes-categorias.controller"
-import { createServerPaquetesController } from "@/controllers/paquetes/paquetes.controller"
-import { createServerPaquetesFechasController } from "@/controllers/paquetes-fechas/paquetes-fechas.controller"
-import { createServerPaquetesImagenesController } from "@/controllers/paquetes-imagenes/paquetes-imagenes.controller"
-import { createServerPaquetesItinerarioController } from "@/controllers/paquetes-itinerario/paquetes-itinerario.controller"
-import { PaqueteView, type PaqueteViewData } from "@/components/paquetes/paquete-view"
+import { createServerExperienceCategoriesController } from "@/controllers/experience-categories/experience-categories.controller"
+import { createServerDestinationsController } from "@/controllers/destinations/destinations.controller"
+import { createServerPackageCategoriesController } from "@/controllers/package-categories/package-categories.controller"
+import { createServerPackagesController } from "@/controllers/packages/packages.controller"
+import { createServerPackageDatesController } from "@/controllers/package-dates/package-dates.controller"
+import { createServerPackageImagesController } from "@/controllers/package-images/package-images.controller"
+import { createServerPackageItineraryController } from "@/controllers/package-itinerary/package-itinerary.controller"
+import { PackageView, type PackageViewData } from "@/components/packages/package-view"
 
 interface Props {
   params: Promise<{ slug: string }>
@@ -27,9 +27,9 @@ function formatDateRange(startDate: string, endDate: string) {
   return `${formatDateLabel(startDate)} — ${formatDateLabel(endDate)}`
 }
 
-async function getPaqueteViewData(slug: string): Promise<PaqueteViewData | null> {
-  const paquetesController = await createServerPaquetesController()
-  const [paquete] = await paquetesController.list({
+async function getPackageViewData(slug: string): Promise<PackageViewData | null> {
+  const packagesController = await createServerPackagesController()
+  const [paquete] = await packagesController.list({
     slug,
     activo: true,
   })
@@ -39,37 +39,37 @@ async function getPaqueteViewData(slug: string): Promise<PaqueteViewData | null>
   }
 
   const [
-    paquetesFechasController,
-    paquetesItinerarioController,
-    paquetesImagenesController,
-    paquetesCategoriasController,
-    categoriasExperienciaController,
-    destinosController,
+    packagesFechasController,
+    packagesItinerarioController,
+    packagesImagenesController,
+    packagesCategoriasController,
+    categoriasExperienceController,
+    destinationsController,
   ] = await Promise.all([
-    createServerPaquetesFechasController(),
-    createServerPaquetesItinerarioController(),
-    createServerPaquetesImagenesController(),
-    createServerPaquetesCategoriasController(),
-    createServerCategoriasExperienciaController(),
-    createServerDestinosController(),
+    createServerPackageDatesController(),
+    createServerPackageItineraryController(),
+    createServerPackageImagesController(),
+    createServerPackageCategoriesController(),
+    createServerExperienceCategoriesController(),
+    createServerDestinationsController(),
   ])
   const [fechas, itinerario, imagenes, categoriasRelacionadas, destino] =
     await Promise.all([
-      paquetesFechasController.list({
+      packagesFechasController.list({
         paquete_id: paquete.id,
         activo: true,
       }),
-      paquetesItinerarioController.list({
+      packagesItinerarioController.list({
         paquete_id: paquete.id,
       }),
-      paquetesImagenesController.list({
+      packagesImagenesController.list({
         paquete_id: paquete.id,
       }),
-      paquetesCategoriasController.list({
+      packagesCategoriasController.list({
         paquete_id: paquete.id,
       }),
       paquete.destino_id
-        ? destinosController.get({
+        ? destinationsController.get({
             id: paquete.destino_id,
           })
         : Promise.resolve(null),
@@ -78,7 +78,7 @@ async function getPaqueteViewData(slug: string): Promise<PaqueteViewData | null>
   const categoryIds = categoriasRelacionadas.map((item) => item.categoria_id)
   const categorias = await Promise.all(
     categoryIds.map((categoryId) =>
-      categoriasExperienciaController.get({
+      categoriasExperienceController.get({
         id: categoryId,
       }),
     ),
@@ -130,13 +130,13 @@ async function getPaqueteViewData(slug: string): Promise<PaqueteViewData | null>
       : "Salta & Jujuy, Argentina",
     latitud: Number(destino?.latitud ?? -24.7859),
     longitud: Number(destino?.longitud ?? -65.4117),
-    paqueteFechaId: fechaPrincipal?.id ?? null,
+    packageFechaId: fechaPrincipal?.id ?? null,
   }
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
-  const paquete = await getPaqueteViewData(slug)
+  const paquete = await getPackageViewData(slug)
 
   if (!paquete) {
     return {}
@@ -148,11 +148,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function PaqueteDetailPage({ params }: Props) {
+export default async function PackageDetailPage({ params }: Props) {
   const { slug } = await params
-  const paquete = await getPaqueteViewData(slug)
+  const paquete = await getPackageViewData(slug)
 
   if (!paquete) notFound()
 
-  return <PaqueteView paquete={paquete} />
+  return <PackageView paquete={paquete} />
 }

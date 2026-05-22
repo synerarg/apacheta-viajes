@@ -1,23 +1,23 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createSolicitudesContactoRepository } from "@/repositories/solicitudes-contacto/solicitudes-contacto.repository"
+import { createContactRequestsRepository } from "@/repositories/contact-requests/contact-requests.repository"
 import {
-  createSolicitudesContactoService,
-  SolicitudesContactoService,
-} from "@/services/solicitudes-contacto/solicitudes-contacto.service"
+  createContactRequestsService,
+  ContactRequestsService,
+} from "@/services/contact-requests/contact-requests.service"
 
-export class SolicitudesContactoController extends BaseIdController<"solicitudes_contacto"> {
-  constructor(service: SolicitudesContactoService) {
+export class ContactRequestsController extends BaseIdController<"solicitudes_contacto"> {
+  constructor(service: ContactRequestsService) {
     super(service)
   }
 }
 
-export async function createServerSolicitudesContactoController() {
+export async function createServerContactRequestsController() {
   const supabase = await createClient()
 
-  return new SolicitudesContactoController(
-    createSolicitudesContactoService(
-      createSolicitudesContactoRepository(supabase),
+  return new ContactRequestsController(
+    createContactRequestsService(
+      createContactRequestsRepository(supabase),
     ),
   )
 }

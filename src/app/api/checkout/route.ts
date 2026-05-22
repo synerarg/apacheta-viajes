@@ -20,8 +20,8 @@ const cartItemSchema = z.object({
   quantity: z.number().int().positive(),
   image: z.string(),
   moneda: z.enum(["ARS", "USD", "EUR", "BRL", "MXN", "CLP", "COP", "PEN", "UYU"]),
-  paqueteFechaId: z.string().uuid().nullable(),
-  experienciaId: z.string().uuid().nullable(),
+  packageFechaId: z.string().uuid().nullable(),
+  experienceId: z.string().uuid().nullable(),
   incluyeAlojamiento: z.boolean().optional(),
   incluyeTraslado: z.boolean().optional(),
 })

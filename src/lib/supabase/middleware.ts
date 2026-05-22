@@ -54,8 +54,8 @@ export async function updateSession(request: NextRequest) {
   const adminRoutes = ["/dashboard", "/api/dashboard"]
   const needsAdmin = adminRoutes.some((route) => pathname.startsWith(route))
 
-  const operadorRoutes = ["/operador", "/api/operador"]
-  const needsOperador = operadorRoutes.some((route) =>
+  const operatorRoutes = ["/operador", "/api/operador"]
+  const needsOperador = operatorRoutes.some((route) =>
     pathname.startsWith(route),
   )
 

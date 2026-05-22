@@ -7,14 +7,14 @@ import {
   updateTraslado,
 } from "@/app/dashboard/traslados/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
-import { TrasladoForm } from "@/components/dashboard/traslado-form"
+import { TransferForm } from "@/components/dashboard/transfer-form"
 import { adminClient } from "@/lib/supabase/admin-client"
 
-interface EditarTrasladoPageProps {
+interface EditarTransferPageProps {
   params: Promise<{ id: string }>
 }
 
-async function getTrasladoData(id: string) {
+async function getTransferData(id: string) {
   const [{ data: traslado }, { data: imagenes }] = await Promise.all([
     adminClient.from("traslados").select("*").eq("id", id).single(),
     adminClient
@@ -30,7 +30,7 @@ async function getTrasladoData(id: string) {
   }
 }
 
-async function getDestinos() {
+async function getDestinations() {
   const { data } = await adminClient
     .from("destinos")
     .select("*")
@@ -40,13 +40,13 @@ async function getDestinos() {
   return data ?? []
 }
 
-export default async function EditarTrasladoPage({
+export default async function EditarTransferPage({
   params,
-}: EditarTrasladoPageProps) {
+}: EditarTransferPageProps) {
   const { id } = await params
   const [{ traslado, gallery }, destinos] = await Promise.all([
-    getTrasladoData(id),
-    getDestinos(),
+    getTransferData(id),
+    getDestinations(),
   ])
 
   if (!traslado) notFound()
@@ -79,7 +79,7 @@ export default async function EditarTrasladoPage({
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <TrasladoForm
+        <TransferForm
           action={updateAction}
           initialData={{
             nombre: traslado.nombre,

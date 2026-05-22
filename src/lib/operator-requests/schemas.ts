@@ -7,7 +7,7 @@ const optionalString = z
     return trimmed.length > 0 ? trimmed : undefined
   }, z.string().min(1).optional())
 
-export const submitSolicitudOperadorSchema = z.object({
+export const submitOperatorRequestSchema = z.object({
   nombre_comercial: z.string().trim().min(2).max(120),
   documento: optionalString,
   telefono_contacto: z.string().trim().min(6).max(40),
@@ -26,10 +26,13 @@ export const submitSolicitudOperadorSchema = z.object({
   zona_operacion: optionalString,
   motivacion: optionalString,
   documentacion_urls: z.array(z.string().url()).optional().nullable(),
+  tipo_operador_id: z
+    .string({ message: "Elegí un tipo de operador" })
+    .uuid("Tipo de operador inválido"),
 })
 
-export type SubmitSolicitudOperadorInput = z.infer<typeof submitSolicitudOperadorSchema>
+export type SubmitOperatorRequestInput = z.infer<typeof submitOperatorRequestSchema>
 
-export const rejectSolicitudSchema = z.object({
+export const rejectRequestSchema = z.object({
   motivo: z.string().trim().min(3).max(1000),
 })

@@ -1,9 +1,9 @@
-import type { SolicitudOperadorEstado } from "@/types/shared/enums"
+import type { OperatorRequestStatus } from "@/types/shared/enums"
 
-export interface SolicitudesOperadorRow {
+export interface OperatorRequestsRow {
   id: string
   usuario_id: string
-  estado: SolicitudOperadorEstado
+  estado: OperatorRequestStatus
   nombre_comercial: string
   documento: string | null
   telefono_contacto: string
@@ -14,6 +14,7 @@ export interface SolicitudesOperadorRow {
   zona_operacion: string | null
   motivacion: string | null
   documentacion_urls: string[] | null
+  tipo_operador_id: string | null
   revisado_por: string | null
   revisado_at: string | null
   motivo_rechazo: string | null
@@ -22,10 +23,10 @@ export interface SolicitudesOperadorRow {
   updated_at: string
 }
 
-export interface SolicitudesOperadorInsert {
+export interface OperatorRequestsInsert {
   id?: string
   usuario_id: string
-  estado?: SolicitudOperadorEstado
+  estado?: OperatorRequestStatus
   nombre_comercial: string
   documento?: string | null
   telefono_contacto: string
@@ -36,6 +37,7 @@ export interface SolicitudesOperadorInsert {
   zona_operacion?: string | null
   motivacion?: string | null
   documentacion_urls?: string[] | null
+  tipo_operador_id?: string | null
   revisado_por?: string | null
   revisado_at?: string | null
   motivo_rechazo?: string | null
@@ -44,10 +46,10 @@ export interface SolicitudesOperadorInsert {
   updated_at?: string
 }
 
-export interface SolicitudesOperadorUpdate {
+export interface OperatorRequestsUpdate {
   id?: string
   usuario_id?: string
-  estado?: SolicitudOperadorEstado
+  estado?: OperatorRequestStatus
   nombre_comercial?: string
   documento?: string | null
   telefono_contacto?: string
@@ -58,6 +60,7 @@ export interface SolicitudesOperadorUpdate {
   zona_operacion?: string | null
   motivacion?: string | null
   documentacion_urls?: string[] | null
+  tipo_operador_id?: string | null
   revisado_por?: string | null
   revisado_at?: string | null
   motivo_rechazo?: string | null

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { createAdminPaymentsController } from "@/controllers/payments/payments.controller"
+import { createAdminPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
 
@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     await requireAdminSession()
     const body = await request.json()
     const payload = confirmBankTransferSchema.parse(body)
-    const paymentsController = createAdminPaymentsController()
+    const paymentsController = createAdminPaymentProcessingController()
     const result = await paymentsController.confirmBankTransfer(payload)
 
     return NextResponse.json(result, { status: 200 })

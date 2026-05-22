@@ -14,7 +14,7 @@ import {
   pixelBasedPreset,
 } from "@react-email/components"
 
-export interface SolicitudOperadorEmailProps {
+export interface OperatorRequestEmailProps {
   previewText: string
   eyebrow: string
   title: string
@@ -29,7 +29,7 @@ export interface SolicitudOperadorEmailProps {
 
 const SITE_URL = "https://apacheta-viajes.vercel.app"
 
-export function SolicitudOperadorEmail({
+export function OperatorRequestEmail({
   previewText,
   eyebrow,
   title,
@@ -40,7 +40,7 @@ export function SolicitudOperadorEmail({
   actionLabel,
   actionUrl,
   supportEmail,
-}: SolicitudOperadorEmailProps) {
+}: OperatorRequestEmailProps) {
   return (
     <Html lang="es">
       <Tailwind
@@ -165,4 +165,4 @@ export function SolicitudOperadorEmail({
   )
 }
 
-export default SolicitudOperadorEmail
+export default OperatorRequestEmail

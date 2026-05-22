@@ -1,7 +1,7 @@
 import {
   BankTransferConfigurationException,
   MercadoPagoConfigurationException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 
 function getEnvironmentVariable(name: string) {
   return process.env[name]?.trim()

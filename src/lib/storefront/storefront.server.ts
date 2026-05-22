@@ -1,11 +1,11 @@
-import { createServerCategoriasExperienciaController } from "@/controllers/categorias-experiencia/categorias-experiencia.controller"
-import { createServerEmisivoDestinosController } from "@/controllers/emisivo-destinos/emisivo-destinos.controller"
-import { createServerEstadisticasHomeController } from "@/controllers/estadisticas-home/estadisticas-home.controller"
-import { createServerExperienciasController } from "@/controllers/experiencias/experiencias.controller"
-import { createServerHotelesController } from "@/controllers/hoteles/hoteles.controller"
-import { createServerPaquetesCategoriasController } from "@/controllers/paquetes-categorias/paquetes-categorias.controller"
-import { createServerPaquetesController } from "@/controllers/paquetes/paquetes.controller"
-import { createServerPaquetesFechasController } from "@/controllers/paquetes-fechas/paquetes-fechas.controller"
+import { createServerExperienceCategoriesController } from "@/controllers/experience-categories/experience-categories.controller"
+import { createServerOutboundDestinationsController } from "@/controllers/outbound-destinations/outbound-destinations.controller"
+import { createServerHomeStatisticsController } from "@/controllers/home-statistics/home-statistics.controller"
+import { createServerExperiencesController } from "@/controllers/experiences/experiences.controller"
+import { createServerHotelsController } from "@/controllers/hotels/hotels.controller"
+import { createServerPackageCategoriesController } from "@/controllers/package-categories/package-categories.controller"
+import { createServerPackagesController } from "@/controllers/packages/packages.controller"
+import { createServerPackageDatesController } from "@/controllers/package-dates/package-dates.controller"
 import type {
   StorefrontEmisivoDestinationItem,
   StorefrontExperienceCategoryItem,
@@ -42,13 +42,13 @@ function withFallbackImage(image: string | null | undefined, fallbackImage: stri
 }
 
 async function getPackageCategoryMaps() {
-  const [paquetesCategoriasController, categoriasController] = await Promise.all([
-    createServerPaquetesCategoriasController(),
-    createServerCategoriasExperienciaController(),
+  const [packagesCategoriasController, categoriesController] = await Promise.all([
+    createServerPackageCategoriesController(),
+    createServerExperienceCategoriesController(),
   ])
   const [relations, categories] = await Promise.all([
-    paquetesCategoriasController.list(),
-    categoriasController.list({
+    packagesCategoriasController.list(),
+    categoriesController.list({
       activo: true,
     }),
   ])
@@ -72,16 +72,16 @@ async function getPackageCategoryMaps() {
 }
 
 export async function getPackagesCatalogData() {
-  const [paquetesController, paquetesFechasController] = await Promise.all([
-    createServerPaquetesController(),
-    createServerPaquetesFechasController(),
+  const [packagesController, packagesFechasController] = await Promise.all([
+    createServerPackagesController(),
+    createServerPackageDatesController(),
   ])
   const [{ categoryNameByPackageId }, paquetes, fechas] = await Promise.all([
     getPackageCategoryMaps(),
-    paquetesController.list({
+    packagesController.list({
       activo: true,
     }),
-    paquetesFechasController.list({
+    packagesFechasController.list({
       activo: true,
     }),
   ])
@@ -125,15 +125,15 @@ export async function getPackagesCatalogData() {
 }
 
 export async function getExperiencesCatalogData() {
-  const [experienciasController, categoriasController] = await Promise.all([
-    createServerExperienciasController(),
-    createServerCategoriasExperienciaController(),
+  const [experiencesController, categoriesController] = await Promise.all([
+    createServerExperiencesController(),
+    createServerExperienceCategoriesController(),
   ])
   const [experiencias, categorias] = await Promise.all([
-    experienciasController.list({
+    experiencesController.list({
       activo: true,
     }),
-    categoriasController.list({
+    categoriesController.list({
       activo: true,
     }),
   ])
@@ -173,7 +173,7 @@ export async function getExperiencesCatalogData() {
 }
 
 export async function getHomeMetricsData(): Promise<StorefrontMetricItem[]> {
-  const estadisticasController = await createServerEstadisticasHomeController()
+  const estadisticasController = await createServerHomeStatisticsController()
   const stats = await estadisticasController.list({
     activo: true,
   })
@@ -213,8 +213,8 @@ export async function getFeaturedExperienceCategoriesData(
 }
 
 export async function getFeaturedHotelsData(limit = 3): Promise<StorefrontHotelItem[]> {
-  const hotelesController = await createServerHotelesController()
-  const hoteles = await hotelesController.list({
+  const hotelsController = await createServerHotelsController()
+  const hoteles = await hotelsController.list({
     activo: true,
   })
 
@@ -236,8 +236,8 @@ export async function getFeaturedHotelsData(limit = 3): Promise<StorefrontHotelI
 export async function getEmisivoDestinationsData(
   limit?: number,
 ): Promise<StorefrontEmisivoDestinationItem[]> {
-  const emisivoDestinosController = await createServerEmisivoDestinosController()
-  const destinos = await emisivoDestinosController.list({
+  const emisivoDestinationsController = await createServerOutboundDestinationsController()
+  const destinos = await emisivoDestinationsController.list({
     activo: true,
   })
   const items = sortByNullableOrder(destinos).map((destino) => ({

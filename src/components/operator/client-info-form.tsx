@@ -5,24 +5,24 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { useDebouncedCallback } from "./use-debounced-callback"
 
-export type ClienteInfo = {
+export type ClientInfo = {
   cliente_nombre: string | null
   cliente_email: string | null
   cliente_telefono: string | null
 }
 
-export type ClienteInfoFormHandle = {
+export type ClientInfoFormHandle = {
   flush: () => void
 }
 
 type Props = {
-  initial: ClienteInfo
+  initial: ClientInfo
   readonly?: boolean
-  onPatch: (patch: Partial<ClienteInfo>) => Promise<void>
+  onPatch: (patch: Partial<ClientInfo>) => Promise<void>
 }
 
-export const ClienteInfoForm = forwardRef<ClienteInfoFormHandle, Props>(
-  function ClienteInfoForm({ initial, readonly, onPatch }, ref) {
+export const ClientInfoForm = forwardRef<ClientInfoFormHandle, Props>(
+  function ClientInfoForm({ initial, readonly, onPatch }, ref) {
     const [nombre, setNombre] = useState(initial.cliente_nombre ?? "")
     const [email, setEmail] = useState(initial.cliente_email ?? "")
     const [telefono, setTelefono] = useState(initial.cliente_telefono ?? "")
@@ -40,7 +40,7 @@ export const ClienteInfoForm = forwardRef<ClienteInfoFormHandle, Props>(
     }, [initial.cliente_nombre, initial.cliente_email, initial.cliente_telefono])
 
     const debouncedSave = useDebouncedCallback(
-      (patch: Partial<ClienteInfo>) => {
+      (patch: Partial<ClientInfo>) => {
         dirtyRef.current = false
         onPatch(patch).catch(() => {
           dirtyRef.current = false

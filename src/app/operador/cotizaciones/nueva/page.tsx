@@ -1,11 +1,11 @@
-import { NuevaCotizacionClient } from "@/components/operador/nueva-cotizacion-client"
+import { NewQuoteClient } from "@/components/operator/new-quote-client"
 
 export const dynamic = "force-dynamic"
 
-export default function NuevaCotizacionPage() {
+export default function NuevaQuotePage() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
-      <NuevaCotizacionClient />
+      <NewQuoteClient />
     </div>
   )
 }

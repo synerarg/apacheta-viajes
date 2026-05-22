@@ -1,21 +1,21 @@
 import { CurrencyDollar, FileText, HandCoins, UsersThree } from "@phosphor-icons/react/dist/ssr"
 import Link from "next/link"
 
-import { CotizacionesEnviadasRecientes } from "@/components/dashboard/cotizaciones-enviadas-recientes"
+import { RecentSentQuotes } from "@/components/dashboard/recent-sent-quotes"
 import { KpiCard } from "@/components/dashboard/kpi-card"
-import { OperadorActivityCard } from "@/components/dashboard/operador-activity-card"
+import { OperatorActivityCard } from "@/components/dashboard/operator-activity-card"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import { createServerOperadoresController } from "@/controllers/operadores/operadores.controller"
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
-import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
-import type { OperadoresRow } from "@/types/operadores/operadores.types"
-import type { SolicitudesOperadorRow } from "@/types/solicitudes-operador/solicitudes-operador.types"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import { createServerOperatorsController } from "@/controllers/operators/operators.controller"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
+import type { QuotesRow } from "@/types/quotes/quotes.types"
+import type { OperatorsRow } from "@/types/operators/operators.types"
+import type { OperatorRequestsRow } from "@/types/operator-requests/operator-requests.types"
 
 export const dynamic = "force-dynamic"
 
-const statusStyles: Record<SolicitudesOperadorRow["estado"], string> = {
+const statusStyles: Record<OperatorRequestsRow["estado"], string> = {
   pendiente: "bg-amber-100 text-amber-800",
   en_revision: "bg-blue-100 text-blue-800",
   aprobada: "bg-emerald-100 text-emerald-800",
@@ -23,7 +23,7 @@ const statusStyles: Record<SolicitudesOperadorRow["estado"], string> = {
   cancelada: "bg-neutral-200 text-neutral-700",
 }
 
-const statusLabels: Record<SolicitudesOperadorRow["estado"], string> = {
+const statusLabels: Record<OperatorRequestsRow["estado"], string> = {
   pendiente: "Pendiente",
   en_revision: "En revisión",
   aprobada: "Aprobada",
@@ -94,8 +94,8 @@ function computeTrend(current: number, previous: number) {
   }
 }
 
-type OperadorAggregate = {
-  operador: OperadoresRow
+type OperatorAggregate = {
+  operador: OperatorsRow
   enviadas: number
   borradores: number
   totalVenta: number
@@ -105,11 +105,11 @@ type OperadorAggregate = {
 // `cotizaciones.operador_id` referencia `usuarios.id` (auth user id), NO
 // `operadores.id`. Por eso hay que indexar agregados por `usuario_id` y
 // hacer un fallback al `id` por si algún operador no tiene `usuario_id`.
-function buildOperadorAggregates(
-  operadores: OperadoresRow[],
-  cotizaciones: CotizacionesRow[],
-): Map<string, OperadorAggregate> {
-  const map = new Map<string, OperadorAggregate>()
+function buildOperatorAggregates(
+  operadores: OperatorsRow[],
+  cotizaciones: QuotesRow[],
+): Map<string, OperatorAggregate> {
+  const map = new Map<string, OperatorAggregate>()
 
   for (const operador of operadores) {
     const key = operador.usuario_id ?? operador.id
@@ -146,16 +146,16 @@ function buildOperadorAggregates(
   return map
 }
 
-export default async function DashboardOperadoresPage() {
-  const operadoresController = await createServerOperadoresController()
-  const solicitudesController = await createServerSolicitudesOperadorController()
-  const cotizacionesController = await createServerCotizacionesController()
+export default async function DashboardOperatorsPage() {
+  const operatorsController = await createServerOperatorsController()
+  const requestsController = await createServerOperatorRequestsController()
+  const quotesController = await createServerQuotesController()
 
   const [operadores, pendientes, enRevision, cotizaciones] = await Promise.all([
-    operadoresController.list(),
-    solicitudesController.list({ estado: "pendiente" }),
-    solicitudesController.list({ estado: "en_revision" }),
-    cotizacionesController.listAll(),
+    operatorsController.list(),
+    requestsController.list({ estado: "pendiente" }),
+    requestsController.list({ estado: "en_revision" }),
+    quotesController.listAll(),
   ])
 
   const activos = operadores.filter((o) => o.activo !== false)
@@ -169,7 +169,7 @@ export default async function DashboardOperadoresPage() {
   const last30Start = now - 30 * DAY_MS
   const prev30Start = now - 60 * DAY_MS
 
-  const operadoresNuevos30 = operadores.filter((o) => {
+  const operatorsNuevos30 = operadores.filter((o) => {
     if (!o.created_at) return false
     const t = new Date(o.created_at).getTime()
     return t >= last30Start
@@ -213,15 +213,15 @@ export default async function DashboardOperadoresPage() {
   // El map se indexa por `usuario_id` (lo que `cotizaciones.operador_id`
   // realmente apunta) con fallback a `id`. Las cotizaciones almacenan el
   // auth user id en `operador_id`, no la PK de la tabla `operadores`.
-  const operadoresMap = new Map(
+  const operatorsMap = new Map(
     operadores.map((o) => [o.usuario_id ?? o.id, o]),
   )
-  const aggregates = buildOperadorAggregates(operadores, cotizaciones)
+  const aggregates = buildOperatorAggregates(operadores, cotizaciones)
 
   // Activos ordenados por última actividad (con actividad primero, luego sin)
   const activosConData = activos
     .map((o) => aggregates.get(o.usuario_id ?? o.id))
-    .filter((agg): agg is OperadorAggregate => Boolean(agg))
+    .filter((agg): agg is OperatorAggregate => Boolean(agg))
 
   const activosConActividad = activosConData
     .filter((agg) => agg.lastActivityIso !== null)
@@ -253,14 +253,14 @@ export default async function DashboardOperadoresPage() {
           label="Operadores activos"
           value={String(activos.length)}
           trend={
-            operadoresNuevos30 > 0
+            operatorsNuevos30 > 0
               ? {
-                  label: `+${operadoresNuevos30} nuevos (30 días)`,
+                  label: `+${operatorsNuevos30} nuevos (30 días)`,
                   direction: "up",
                 }
               : undefined
           }
-          helper={operadoresNuevos30 === 0 ? "Sin altas en 30 días" : undefined}
+          helper={operatorsNuevos30 === 0 ? "Sin altas en 30 días" : undefined}
         />
         <KpiCard
           icon={<FileText size={22} weight="duotone" />}
@@ -383,9 +383,9 @@ export default async function DashboardOperadoresPage() {
             </Button>
           ) : null}
         </div>
-        <CotizacionesEnviadasRecientes
+        <RecentSentQuotes
           cotizaciones={ultimasEnviadas}
-          operadoresMap={operadoresMap}
+          operatorsMap={operatorsMap}
           formatCurrency={formatCurrency}
           formatRelative={formatRelative}
         />
@@ -411,7 +411,7 @@ export default async function DashboardOperadoresPage() {
             {activosConActividad.length > 0 ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {activosConActividad.map((agg) => (
-                  <OperadorActivityCard
+                  <OperatorActivityCard
                     key={agg.operador.id}
                     operador={agg.operador}
                     enviadasCount={agg.enviadas}
@@ -440,7 +440,7 @@ export default async function DashboardOperadoresPage() {
                 </p>
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
                   {activosSinActividad.map((agg) => (
-                    <OperadorActivityCard
+                    <OperatorActivityCard
                       key={agg.operador.id}
                       operador={agg.operador}
                       enviadasCount={agg.enviadas}

@@ -9,23 +9,23 @@ import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
 import type { Moneda } from "@/types/shared/enums"
 import type {
-  TrasladoModalidad,
-  TrasladoTipoServicio,
-  TrasladoVehiculoTipo,
-} from "@/types/traslados/traslados.types"
+  TransferModality,
+  TransferServiceType,
+  TransferVehicleType,
+} from "@/types/transfers/transfers.types"
 
 export interface ActionState {
   error?: string
   fieldErrors?: Record<string, string>
 }
 
-const TIPO_SERVICIO_VALUES: TrasladoTipoServicio[] = ["regular", "privado"]
-const MODALIDAD_VALUES: TrasladoModalidad[] = [
+const TIPO_SERVICIO_VALUES: TransferServiceType[] = ["regular", "privado"]
+const MODALIDAD_VALUES: TransferModality[] = [
   "ida",
   "ida_vuelta",
   "punto_a_punto",
 ]
-const VEHICULO_VALUES: TrasladoVehiculoTipo[] = [
+const VEHICULO_VALUES: TransferVehicleType[] = [
   "auto",
   "combi",
   "minibus",
@@ -82,21 +82,21 @@ function parseJsonField<TValue>(
 
 function parseTipoServicio(
   value: FormDataEntryValue | null,
-): TrasladoTipoServicio {
+): TransferServiceType {
   if (typeof value === "string") {
     const trimmed = value.trim()
-    if (TIPO_SERVICIO_VALUES.includes(trimmed as TrasladoTipoServicio)) {
-      return trimmed as TrasladoTipoServicio
+    if (TIPO_SERVICIO_VALUES.includes(trimmed as TransferServiceType)) {
+      return trimmed as TransferServiceType
     }
   }
   return "regular"
 }
 
-function parseModalidad(value: FormDataEntryValue | null): TrasladoModalidad {
+function parseModalidad(value: FormDataEntryValue | null): TransferModality {
   if (typeof value === "string") {
     const trimmed = value.trim()
-    if (MODALIDAD_VALUES.includes(trimmed as TrasladoModalidad)) {
-      return trimmed as TrasladoModalidad
+    if (MODALIDAD_VALUES.includes(trimmed as TransferModality)) {
+      return trimmed as TransferModality
     }
   }
   return "ida"
@@ -104,12 +104,12 @@ function parseModalidad(value: FormDataEntryValue | null): TrasladoModalidad {
 
 function parseVehiculoTipo(
   value: FormDataEntryValue | null,
-): TrasladoVehiculoTipo | null {
+): TransferVehicleType | null {
   if (typeof value !== "string") return null
   const trimmed = value.trim()
   if (trimmed.length === 0) return null
-  return VEHICULO_VALUES.includes(trimmed as TrasladoVehiculoTipo)
-    ? (trimmed as TrasladoVehiculoTipo)
+  return VEHICULO_VALUES.includes(trimmed as TransferVehicleType)
+    ? (trimmed as TransferVehicleType)
     : null
 }
 
@@ -130,11 +130,11 @@ async function buildUniqueSlug(
   return `${slug}-${Date.now()}`
 }
 
-async function syncGallery(trasladoId: string, gallery: string[]) {
+async function syncGallery(transferId: string, gallery: string[]) {
   await adminClient
     .from("traslados_imagenes")
     .delete()
-    .eq("traslado_id", trasladoId)
+    .eq("traslado_id", transferId)
 
   if (gallery.length === 0) {
     return
@@ -142,14 +142,14 @@ async function syncGallery(trasladoId: string, gallery: string[]) {
 
   await adminClient.from("traslados_imagenes").insert(
     gallery.map((url, index) => ({
-      traslado_id: trasladoId,
+      traslado_id: transferId,
       url,
       orden: index,
     })),
   )
 }
 
-function buildTrasladoPayload(formData: FormData) {
+function buildTransferPayload(formData: FormData) {
   return {
     nombre: parseNullableString(formData.get("nombre")),
     descripcion: parseNullableString(formData.get("descripcion")),
@@ -187,7 +187,7 @@ export async function createTraslado(
 ): Promise<ActionState> {
   try {
     await requireAdminSession()
-    const input = buildTrasladoPayload(formData)
+    const input = buildTransferPayload(formData)
 
     const fieldErrors: Record<string, string> = {}
     if (!input.nombre) fieldErrors.nombre = "El nombre es requerido"
@@ -260,7 +260,7 @@ export async function updateTraslado(
 ): Promise<ActionState> {
   try {
     await requireAdminSession()
-    const input = buildTrasladoPayload(formData)
+    const input = buildTransferPayload(formData)
 
     const fieldErrors: Record<string, string> = {}
     if (!input.nombre) fieldErrors.nombre = "El nombre es requerido"

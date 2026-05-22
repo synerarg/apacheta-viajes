@@ -1,6 +1,6 @@
-export type CotizacionEstado = "borrador" | "enviada" | "archivada"
+export type QuoteStatus = "borrador" | "enviada" | "archivada"
 
-export interface CotizacionesRow {
+export interface QuotesRow {
   id: string
   token: string
   operador_id: string
@@ -16,14 +16,14 @@ export interface CotizacionesRow {
   total_neto: number
   total_impuesto: number
   total_final: number
-  estado: CotizacionEstado
+  estado: QuoteStatus
   notas_internas: string | null
   recomendaciones: string[] | null
   created_at: string
   updated_at: string
 }
 
-export interface CotizacionesInsert {
+export interface QuotesInsert {
   id?: string
   token?: string
   operador_id: string
@@ -39,14 +39,14 @@ export interface CotizacionesInsert {
   total_neto?: number
   total_impuesto?: number
   total_final?: number
-  estado?: CotizacionEstado
+  estado?: QuoteStatus
   notas_internas?: string | null
   recomendaciones?: string[] | null
   created_at?: string
   updated_at?: string
 }
 
-export interface CotizacionesUpdate {
+export interface QuotesUpdate {
   id?: string
   token?: string
   operador_id?: string
@@ -62,7 +62,7 @@ export interface CotizacionesUpdate {
   total_neto?: number
   total_impuesto?: number
   total_final?: number
-  estado?: CotizacionEstado
+  estado?: QuoteStatus
   notas_internas?: string | null
   recomendaciones?: string[] | null
   created_at?: string

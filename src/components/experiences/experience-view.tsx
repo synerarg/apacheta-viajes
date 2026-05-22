@@ -1,11 +1,11 @@
 import Image from "next/image"
 import { MapPin } from "lucide-react"
 import { ImageGallery } from "@/components/product/image-gallery"
-import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
-import { UbicacionMap } from "@/components/product/ubicacion-map"
+import { SidebarQuoteCart } from "@/components/product/sidebar-quote-cart"
+import { LocationMap } from "@/components/product/location-map"
 import type { Moneda } from "@/types/shared/enums"
 
-export interface ExperienciaViewData {
+export interface ExperienceViewData {
   id: string
   nombre: string
   descripcion: string
@@ -24,11 +24,11 @@ export interface ExperienciaViewData {
   galeria?: string[]
 }
 
-interface ExperienciaViewProps {
-  experiencia: ExperienciaViewData
+interface ExperienceViewProps {
+  experiencia: ExperienceViewData
 }
 
-export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
+export function ExperienceView({ experiencia }: ExperienceViewProps) {
   const duracion =
     experiencia.duracion_horas >= 24
       ? `${Math.floor(experiencia.duracion_horas / 24)} días`
@@ -118,7 +118,7 @@ export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
                   {experiencia.ubicacion}
                 </span>
               </div>
-              <UbicacionMap
+              <LocationMap
                 nombre={experiencia.nombre}
                 latitud={experiencia.latitud}
                 longitud={experiencia.longitud}
@@ -129,7 +129,7 @@ export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
           {/* Right Sidebar */}
           <div className="lg:w-[380px] flex-shrink-0">
             <div className="sticky top-28">
-              <SidebarCotizacionCart
+              <SidebarQuoteCart
                 precio={experiencia.precio}
                 moneda={experiencia.moneda}
                 fecha={experiencia.fecha_salida}
@@ -146,8 +146,8 @@ export function ExperienciaView({ experiencia }: ExperienciaViewProps) {
                   quantity: 1,
                   image: experiencia.imagen_url,
                   moneda: experiencia.moneda,
-                  paqueteFechaId: null,
-                  experienciaId: experiencia.id,
+                  packageFechaId: null,
+                  experienceId: experiencia.id,
                 }}
               />
             </div>

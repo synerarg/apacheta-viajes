@@ -7,21 +7,21 @@ import { isRedirectError } from "next/dist/client/components/redirect-error"
 import { requireAdminSession } from "@/lib/dashboard/admin-auth"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
-import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+import type { Moneda, MealPlan } from "@/types/shared/enums"
 
-const REGIMEN_VALUES: RegimenAlimentario[] = [
+const REGIMEN_VALUES: MealPlan[] = [
   "desayuno",
   "media_pension",
   "pension_completa",
   "all_inclusive",
 ]
 
-function parseRegimen(value: FormDataEntryValue | null): RegimenAlimentario | null {
+function parseRegimen(value: FormDataEntryValue | null): MealPlan | null {
   if (typeof value !== "string") return null
   const trimmed = value.trim()
   if (trimmed.length === 0) return null
-  return REGIMEN_VALUES.includes(trimmed as RegimenAlimentario)
-    ? (trimmed as RegimenAlimentario)
+  return REGIMEN_VALUES.includes(trimmed as MealPlan)
+    ? (trimmed as MealPlan)
     : null
 }
 
@@ -149,23 +149,23 @@ async function checkDestacadoLimit(excludeId?: string): Promise<boolean> {
   return (count ?? 0) >= 3
 }
 
-async function syncPackageCategories(paqueteId: string, categoriaIds: string[]) {
-  await adminClient.from("paquetes_categorias").delete().eq("paquete_id", paqueteId)
+async function syncPackageCategories(packageId: string, categoriaIds: string[]) {
+  await adminClient.from("paquetes_categorias").delete().eq("paquete_id", packageId)
 
   if (categoriaIds.length === 0) {
     return
   }
 
   await adminClient.from("paquetes_categorias").insert(
-    categoriaIds.map((categoriaId) => ({
-      paquete_id: paqueteId,
-      categoria_id: categoriaId,
+    categoriaIds.map((categoryId) => ({
+      paquete_id: packageId,
+      categoria_id: categoryId,
     })),
   )
 }
 
-async function syncPackageGallery(paqueteId: string, gallery: string[]) {
-  await adminClient.from("paquetes_imagenes").delete().eq("paquete_id", paqueteId)
+async function syncPackageGallery(packageId: string, gallery: string[]) {
+  await adminClient.from("paquetes_imagenes").delete().eq("paquete_id", packageId)
 
   if (gallery.length === 0) {
     return
@@ -173,7 +173,7 @@ async function syncPackageGallery(paqueteId: string, gallery: string[]) {
 
   await adminClient.from("paquetes_imagenes").insert(
     gallery.map((url, index) => ({
-      paquete_id: paqueteId,
+      paquete_id: packageId,
       url,
       orden: index,
     })),
@@ -181,13 +181,13 @@ async function syncPackageGallery(paqueteId: string, gallery: string[]) {
 }
 
 async function syncPackageItinerary(
-  paqueteId: string,
+  packageId: string,
   itinerary: ReturnType<typeof normalizePackageItinerary>,
 ) {
   const { data: existingItems } = await adminClient
     .from("paquetes_itinerario")
     .select("id")
-    .eq("paquete_id", paqueteId)
+    .eq("paquete_id", packageId)
 
   const existingIds = new Set((existingItems ?? []).map((item) => item.id))
   const submittedIds = new Set(itinerary.map((item) => item.id).filter(Boolean))
@@ -202,12 +202,12 @@ async function syncPackageItinerary(
           descripcion: item.descripcion,
         })
         .eq("id", item.id)
-        .eq("paquete_id", paqueteId)
+        .eq("paquete_id", packageId)
       continue
     }
 
     await adminClient.from("paquetes_itinerario").insert({
-      paquete_id: paqueteId,
+      paquete_id: packageId,
       dia_numero: item.dia_numero,
       titulo: item.titulo,
       descripcion: item.descripcion,
@@ -222,13 +222,13 @@ async function syncPackageItinerary(
 }
 
 async function syncPackageDates(
-  paqueteId: string,
+  packageId: string,
   dates: ReturnType<typeof normalizePackageDates>,
 ) {
   const { data: existingDates } = await adminClient
     .from("paquetes_fechas")
     .select("id")
-    .eq("paquete_id", paqueteId)
+    .eq("paquete_id", packageId)
 
   const existingIds = new Set((existingDates ?? []).map((date) => date.id))
   const submittedIds = new Set(dates.map((date) => date.id).filter(Boolean))
@@ -268,12 +268,12 @@ async function syncPackageDates(
         .from("paquetes_fechas")
         .update(payload)
         .eq("id", date.id)
-        .eq("paquete_id", paqueteId)
+        .eq("paquete_id", packageId)
       continue
     }
 
     await adminClient.from("paquetes_fechas").insert({
-      paquete_id: paqueteId,
+      paquete_id: packageId,
       ...payload,
     })
   }

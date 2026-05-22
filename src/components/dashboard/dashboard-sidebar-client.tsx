@@ -17,6 +17,7 @@ import {
   UsersFour,
   UserPlus,
   Calculator,
+  Tag,
 } from "@phosphor-icons/react"
 
 import { createClient } from "@/lib/supabase/client"
@@ -59,6 +60,12 @@ const navItems = [
     href: "/dashboard/operadores/solicitudes",
     label: "Solicitudes",
     icon: UserPlus,
+    exact: false,
+  },
+  {
+    href: "/dashboard/operadores/tipos",
+    label: "Tipos de operador",
+    icon: Tag,
     exact: false,
   },
 ]

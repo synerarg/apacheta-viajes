@@ -4,15 +4,15 @@ import { ArrowRight } from "lucide-react"
 
 import type { StorefrontExperienceItem } from "@/types/storefront/storefront.types"
 
-interface ExperienciaCardProps {
+interface ExperienceCardProps {
   experiencia: StorefrontExperienceItem
   className?: string
 }
 
-export function ExperienciaCard({
+export function ExperienceCard({
   experiencia,
   className = "",
-}: ExperienciaCardProps) {
+}: ExperienceCardProps) {
   return (
     <Link
       href={`/experiencias/${experiencia.slug}`}

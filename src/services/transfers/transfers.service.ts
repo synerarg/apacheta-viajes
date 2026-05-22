@@ -1,35 +1,35 @@
 import {
-  TrasladosNotFoundException,
-  TrasladosServiceException,
-} from "@/exceptions/traslados/traslados.exceptions"
-import { TrasladosRepository } from "@/repositories/traslados/traslados.repository"
+  TransfersNotFoundException,
+  TransfersServiceException,
+} from "@/exceptions/transfers/transfers.exceptions"
+import { TransfersRepository } from "@/repositories/transfers/transfers.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  TrasladosRow,
-  TrasladosUpdate,
-} from "@/types/traslados/traslados.types"
+  TransfersRow,
+  TransfersUpdate,
+} from "@/types/transfers/transfers.types"
 
-export class TrasladosService extends BaseService<"traslados"> {
-  constructor(repository: TrasladosRepository) {
+export class TransfersService extends BaseService<"traslados"> {
+  constructor(repository: TransfersRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new TrasladosServiceException(operation, cause)
+    return new TransfersServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new TrasladosNotFoundException(criteria)
+    return new TransfersNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<TrasladosRow> {
+  async getById(id: string): Promise<TransfersRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: TrasladosUpdate,
-  ): Promise<TrasladosRow> {
+    payload: TransfersUpdate,
+  ): Promise<TransfersRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,6 +38,6 @@ export class TrasladosService extends BaseService<"traslados"> {
   }
 }
 
-export function createTrasladosService(repository: TrasladosRepository) {
-  return new TrasladosService(repository)
+export function createTransfersService(repository: TransfersRepository) {
+  return new TransfersService(repository)
 }

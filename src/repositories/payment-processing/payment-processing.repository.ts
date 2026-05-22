@@ -1,25 +1,25 @@
 import {
   OrderPaymentNotFoundException,
   PaymentRecordNotFoundException,
-  PaymentsRepositoryException,
+  PaymentProcessingRepositoryException,
   ReservationPaymentNotFoundException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import { getBankTransferConfig } from "@/lib/payments/payments.config"
-import { createOrdenesItemsRepository } from "@/repositories/ordenes-items/ordenes-items.repository"
-import { createOrdenesRepository } from "@/repositories/ordenes/ordenes.repository"
-import { createPagosEventosRepository } from "@/repositories/pagos-eventos/pagos-eventos.repository"
-import { createPagosRepository } from "@/repositories/pagos/pagos.repository"
-import { createReservasRepository } from "@/repositories/reservas/reservas.repository"
-import { createUsuariosRepository } from "@/repositories/usuarios/usuarios.repository"
+import { createOrderItemsRepository } from "@/repositories/order-items/order-items.repository"
+import { createOrdersRepository } from "@/repositories/orders/orders.repository"
+import { createPaymentEventsRepository } from "@/repositories/payment-events/payment-events.repository"
+import { createPaymentsRepository } from "@/repositories/payments/payments.repository"
+import { createReservationsRepository } from "@/repositories/reservations/reservations.repository"
+import { createUsersRepository } from "@/repositories/users/users.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { OrdenesUpdate } from "@/types/ordenes/ordenes.types"
+import type { OrdersUpdate } from "@/types/orders/orders.types"
 import type {
   OrderPaymentContext,
   ReservationPaymentContext,
-} from "@/types/payments/payments.types"
-import type { PagosEventosInsert } from "@/types/pagos-eventos/pagos-eventos.types"
-import type { PagosInsert, PagosRow, PagosUpdate } from "@/types/pagos/pagos.types"
-import type { ReservaEstado } from "@/types/reservas/reservas.types"
+} from "@/types/payment-processing/payment-processing.types"
+import type { PaymentEventsInsert } from "@/types/payment-events/payment-events.types"
+import type { PaymentsInsert, PaymentsRow, PaymentsUpdate } from "@/types/payments/payments.types"
+import type { ReservationStatus } from "@/types/reservations/reservations.types"
 
 function mergeReservationNotes(currentNotes: string | null, nextNote: string) {
   return [currentNotes?.trim(), nextNote.trim()].filter(Boolean).join("\n\n")
@@ -37,7 +37,7 @@ function buildReceiptStoragePath(
   return `${orderId}/${paymentId}/${Date.now()}-${sanitizeReceiptFileName(fileName)}`
 }
 
-function resolveLatestPayment(payments: PagosRow[]) {
+function resolveLatestPayment(payments: PaymentsRow[]) {
   return [...payments].sort((left, right) => {
     const leftDate = left.created_at ? Date.parse(left.created_at) : 0
     const rightDate = right.created_at ? Date.parse(right.created_at) : 0
@@ -77,28 +77,28 @@ async function resolveReceiptSignedUrl(
   return signedUrl.data.signedUrl
 }
 
-export class PaymentsRepository {
-  private readonly reservasRepository
-  private readonly usuariosRepository
-  private readonly ordenesRepository
-  private readonly ordenesItemsRepository
-  private readonly pagosRepository
-  private readonly pagosEventosRepository
+export class PaymentProcessingRepository {
+  private readonly reservationsRepository
+  private readonly usersRepository
+  private readonly ordersRepository
+  private readonly ordersItemsRepository
+  private readonly paymentsRepository
+  private readonly paymentsEventosRepository
 
   constructor(private readonly supabase: DatabaseClient) {
-    this.reservasRepository = createReservasRepository(supabase)
-    this.usuariosRepository = createUsuariosRepository(supabase)
-    this.ordenesRepository = createOrdenesRepository(supabase)
-    this.ordenesItemsRepository = createOrdenesItemsRepository(supabase)
-    this.pagosRepository = createPagosRepository(supabase)
-    this.pagosEventosRepository = createPagosEventosRepository(supabase)
+    this.reservationsRepository = createReservationsRepository(supabase)
+    this.usersRepository = createUsersRepository(supabase)
+    this.ordersRepository = createOrdersRepository(supabase)
+    this.ordersItemsRepository = createOrderItemsRepository(supabase)
+    this.paymentsRepository = createPaymentsRepository(supabase)
+    this.paymentsEventosRepository = createPaymentEventsRepository(supabase)
   }
 
   async getReservationContext(
     reservationId: string,
   ): Promise<ReservationPaymentContext> {
     try {
-      const reservation = await this.reservasRepository.findById(reservationId)
+      const reservation = await this.reservationsRepository.findById(reservationId)
 
       if (!reservation) {
         throw new ReservationPaymentNotFoundException(
@@ -106,7 +106,7 @@ export class PaymentsRepository {
         )
       }
 
-      const user = await this.usuariosRepository.findById(reservation.usuario_id)
+      const user = await this.usersRepository.findById(reservation.usuario_id)
 
       return {
         reservation,
@@ -117,13 +117,13 @@ export class PaymentsRepository {
         throw error
       }
 
-      throw new PaymentsRepositoryException("getReservationContext", error)
+      throw new PaymentProcessingRepositoryException("getReservationContext", error)
     }
   }
 
   async getPaymentById(paymentId: string) {
     try {
-      const payment = await this.pagosRepository.findById(paymentId)
+      const payment = await this.paymentsRepository.findById(paymentId)
 
       if (!payment) {
         throw new PaymentRecordNotFoundException(`paymentId ${paymentId}`)
@@ -135,14 +135,14 @@ export class PaymentsRepository {
         throw error
       }
 
-      throw new PaymentsRepositoryException("getPaymentById", error)
+      throw new PaymentProcessingRepositoryException("getPaymentById", error)
     }
   }
 
   async getPaymentByExternalReference(externalReference: string) {
     try {
       const payment =
-        await this.pagosRepository.findByExternalReference(externalReference)
+        await this.paymentsRepository.findByExternalReference(externalReference)
 
       if (!payment) {
         throw new PaymentRecordNotFoundException(
@@ -156,7 +156,7 @@ export class PaymentsRepository {
         throw error
       }
 
-      throw new PaymentsRepositoryException(
+      throw new PaymentProcessingRepositoryException(
         "getPaymentByExternalReference",
         error,
       )
@@ -165,11 +165,11 @@ export class PaymentsRepository {
 
   async listExpiredOpenBankTransfers(referenceDate: string) {
     try {
-      return await this.pagosRepository.listExpiredOpenBankTransfers(
+      return await this.paymentsRepository.listExpiredOpenBankTransfers(
         referenceDate,
       )
     } catch (error) {
-      throw new PaymentsRepositoryException(
+      throw new PaymentProcessingRepositoryException(
         "listExpiredOpenBankTransfers",
         error,
       )
@@ -178,21 +178,21 @@ export class PaymentsRepository {
 
   async getOrderContext(orderId: string): Promise<OrderPaymentContext> {
     try {
-      const order = await this.ordenesRepository.findById(orderId)
+      const order = await this.ordersRepository.findById(orderId)
 
       if (!order) {
         throw new OrderPaymentNotFoundException(`orderId ${orderId}`)
       }
 
       const [items, payments, user] = await Promise.all([
-        this.ordenesItemsRepository.listByOrdenId(order.id),
-        this.pagosRepository.listByOrdenId(order.id),
-        this.usuariosRepository.findById(order.usuario_id),
+        this.ordersItemsRepository.listByOrderId(order.id),
+        this.paymentsRepository.listByOrderId(order.id),
+        this.usersRepository.findById(order.usuario_id),
       ])
 
       const reservations = (
         await Promise.all(
-          items.map((item) => this.reservasRepository.findById(item.reserva_id)),
+          items.map((item) => this.reservationsRepository.findById(item.reserva_id)),
         )
       ).filter((reservation) => reservation !== null)
 
@@ -208,21 +208,21 @@ export class PaymentsRepository {
         throw error
       }
 
-      throw new PaymentsRepositoryException("getOrderContext", error)
+      throw new PaymentProcessingRepositoryException("getOrderContext", error)
     }
   }
 
-  async createPayment(payload: PagosInsert) {
+  async createPayment(payload: PaymentsInsert) {
     try {
-      return await this.pagosRepository.create(payload)
+      return await this.paymentsRepository.create(payload)
     } catch (error) {
-      throw new PaymentsRepositoryException("createPayment", error)
+      throw new PaymentProcessingRepositoryException("createPayment", error)
     }
   }
 
-  async updatePaymentById(paymentId: string, payload: PagosUpdate) {
+  async updatePaymentById(paymentId: string, payload: PaymentsUpdate) {
     try {
-      const payment = await this.pagosRepository.updateById(paymentId, payload)
+      const payment = await this.paymentsRepository.updateById(paymentId, payload)
 
       if (!payment) {
         throw new PaymentRecordNotFoundException(`paymentId ${paymentId}`)
@@ -234,32 +234,32 @@ export class PaymentsRepository {
         throw error
       }
 
-      throw new PaymentsRepositoryException("updatePaymentById", error)
+      throw new PaymentProcessingRepositoryException("updatePaymentById", error)
     }
   }
 
-  async createPaymentEvent(payload: PagosEventosInsert) {
+  async createPaymentEvent(payload: PaymentEventsInsert) {
     try {
-      return await this.pagosEventosRepository.create(payload)
+      return await this.paymentsEventosRepository.create(payload)
     } catch (error) {
-      throw new PaymentsRepositoryException("createPaymentEvent", error)
+      throw new PaymentProcessingRepositoryException("createPaymentEvent", error)
     }
   }
 
   async listPaymentEvents(paymentId: string) {
     try {
-      return await this.pagosEventosRepository.listByPagoId(paymentId)
+      return await this.paymentsEventosRepository.listByPaymentId(paymentId)
     } catch (error) {
-      throw new PaymentsRepositoryException("listPaymentEvents", error)
+      throw new PaymentProcessingRepositoryException("listPaymentEvents", error)
     }
   }
 
   async updateOrderById(
     orderId: string,
-    payload: OrdenesUpdate,
+    payload: OrdersUpdate,
   ) {
     try {
-      const order = await this.ordenesRepository.updateById(orderId, payload)
+      const order = await this.ordersRepository.updateById(orderId, payload)
 
       if (!order) {
         throw new OrderPaymentNotFoundException(`orderId ${orderId}`)
@@ -271,7 +271,7 @@ export class PaymentsRepository {
         throw error
       }
 
-      throw new PaymentsRepositoryException("updateOrderById", error)
+      throw new PaymentProcessingRepositoryException("updateOrderById", error)
     }
   }
 
@@ -279,24 +279,24 @@ export class PaymentsRepository {
     try {
       const { reservation } = await this.getReservationContext(reservationId)
 
-      return await this.reservasRepository.updateById(reservationId, {
+      return await this.reservationsRepository.updateById(reservationId, {
         notas: mergeReservationNotes(reservation.notas, note),
         updated_at: new Date().toISOString(),
       })
     } catch (error) {
-      throw new PaymentsRepositoryException("appendReservationNote", error)
+      throw new PaymentProcessingRepositoryException("appendReservationNote", error)
     }
   }
 
   async updateReservationStatus(
     reservationId: string,
-    estado: ReservaEstado,
+    estado: ReservationStatus,
     note?: string,
   ) {
     try {
       const { reservation } = await this.getReservationContext(reservationId)
 
-      return await this.reservasRepository.updateById(reservationId, {
+      return await this.reservationsRepository.updateById(reservationId, {
         estado,
         notas: note
           ? mergeReservationNotes(reservation.notas, note)
@@ -304,13 +304,13 @@ export class PaymentsRepository {
         updated_at: new Date().toISOString(),
       })
     } catch (error) {
-      throw new PaymentsRepositoryException("updateReservationStatus", error)
+      throw new PaymentProcessingRepositoryException("updateReservationStatus", error)
     }
   }
 
   async updateOrderReservationsStatus(
     orderId: string,
-    estado: ReservaEstado,
+    estado: ReservationStatus,
     note: string,
   ) {
     try {
@@ -318,7 +318,7 @@ export class PaymentsRepository {
 
       await Promise.all(
         reservations.map((reservation) =>
-          this.reservasRepository.updateById(reservation.id, {
+          this.reservationsRepository.updateById(reservation.id, {
             estado,
             notas: mergeReservationNotes(reservation.notas, note),
             updated_at: new Date().toISOString(),
@@ -326,7 +326,7 @@ export class PaymentsRepository {
         ),
       )
     } catch (error) {
-      throw new PaymentsRepositoryException(
+      throw new PaymentProcessingRepositoryException(
         "updateOrderReservationsStatus",
         error,
       )
@@ -363,7 +363,7 @@ export class PaymentsRepository {
         receiptStoragePath: storagePath,
       }
     } catch (error) {
-      throw new PaymentsRepositoryException("uploadBankTransferReceipt", error)
+      throw new PaymentProcessingRepositoryException("uploadBankTransferReceipt", error)
     }
   }
 
@@ -397,7 +397,7 @@ export class PaymentsRepository {
         token: signedUpload.data.token,
       }
     } catch (error) {
-      throw new PaymentsRepositoryException(
+      throw new PaymentProcessingRepositoryException(
         "createBankTransferReceiptSignedUploadUrl",
         error,
       )
@@ -419,27 +419,27 @@ export class PaymentsRepository {
         throw new Error("No se pudo validar el comprobante cargado.")
       }
     } catch (error) {
-      throw new PaymentsRepositoryException("assertReceiptObjectExists", error)
+      throw new PaymentProcessingRepositoryException("assertReceiptObjectExists", error)
     }
   }
 
   async listUserOrderContexts(userId: string): Promise<OrderPaymentContext[]> {
     try {
       const [orders, user] = await Promise.all([
-        this.ordenesRepository.listByUsuarioId(userId),
-        this.usuariosRepository.findById(userId),
+        this.ordersRepository.listByUserId(userId),
+        this.usersRepository.findById(userId),
       ])
 
       return Promise.all(
         sortByNewest(orders).map(async (order) => {
           const [items, payments] = await Promise.all([
-            this.ordenesItemsRepository.listByOrdenId(order.id),
-            this.pagosRepository.listByOrdenId(order.id),
+            this.ordersItemsRepository.listByOrderId(order.id),
+            this.paymentsRepository.listByOrderId(order.id),
           ])
           const reservations = (
             await Promise.all(
               items.map((item) =>
-                this.reservasRepository.findById(item.reserva_id),
+                this.reservationsRepository.findById(item.reserva_id),
               ),
             )
           ).filter((reservation) => reservation !== null)
@@ -454,15 +454,15 @@ export class PaymentsRepository {
         }),
       )
     } catch (error) {
-      throw new PaymentsRepositoryException("listUserOrderContexts", error)
+      throw new PaymentProcessingRepositoryException("listUserOrderContexts", error)
     }
   }
 
   async getUserProfile(userId: string) {
     try {
-      return await this.usuariosRepository.findById(userId)
+      return await this.usersRepository.findById(userId)
     } catch (error) {
-      throw new PaymentsRepositoryException("getUserProfile", error)
+      throw new PaymentProcessingRepositoryException("getUserProfile", error)
     }
   }
 
@@ -470,11 +470,11 @@ export class PaymentsRepository {
     try {
       return await resolveReceiptSignedUrl(this.supabase, storagePath)
     } catch (error) {
-      throw new PaymentsRepositoryException("createReceiptSignedUrl", error)
+      throw new PaymentProcessingRepositoryException("createReceiptSignedUrl", error)
     }
   }
 }
 
-export function createPaymentsRepository(supabase: DatabaseClient) {
-  return new PaymentsRepository(supabase)
+export function createPaymentProcessingRepository(supabase: DatabaseClient) {
+  return new PaymentProcessingRepository(supabase)
 }

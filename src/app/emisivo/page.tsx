@@ -1,7 +1,7 @@
 import type { StorefrontEmisivoDestinationItem } from "@/types/storefront/storefront.types"
-import { HeroSection } from "@/components/emisivo/hero-section"
-import { DestinationsSection } from "@/components/emisivo/destinations-section"
-import { CtaSection } from "@/components/emisivo/cta-section"
+import { HeroSection } from "@/components/outbound/hero-section"
+import { DestinationsSection } from "@/components/outbound/destinations-section"
+import { CtaSection } from "@/components/outbound/cta-section"
 import { getEmisivoDestinationsData } from "@/lib/storefront/storefront.server"
 
 const FALLBACK_DESTINATIONS: StorefrontEmisivoDestinationItem[] = [

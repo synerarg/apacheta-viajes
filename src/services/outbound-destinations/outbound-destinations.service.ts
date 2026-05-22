@@ -1,35 +1,35 @@
 import {
-  EmisivoDestinosNotFoundException,
-  EmisivoDestinosServiceException,
-} from "@/exceptions/emisivo-destinos/emisivo-destinos.exceptions"
-import { EmisivoDestinosRepository } from "@/repositories/emisivo-destinos/emisivo-destinos.repository"
+  OutboundDestinationsNotFoundException,
+  OutboundDestinationsServiceException,
+} from "@/exceptions/outbound-destinations/outbound-destinations.exceptions"
+import { OutboundDestinationsRepository } from "@/repositories/outbound-destinations/outbound-destinations.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  EmisivoDestinosRow,
-  EmisivoDestinosUpdate,
-} from "@/types/emisivo-destinos/emisivo-destinos.types"
+  OutboundDestinationsRow,
+  OutboundDestinationsUpdate,
+} from "@/types/outbound-destinations/outbound-destinations.types"
 
-export class EmisivoDestinosService extends BaseService<"emisivo_destinos"> {
-  constructor(repository: EmisivoDestinosRepository) {
+export class OutboundDestinationsService extends BaseService<"emisivo_destinos"> {
+  constructor(repository: OutboundDestinationsRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new EmisivoDestinosServiceException(operation, cause)
+    return new OutboundDestinationsServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new EmisivoDestinosNotFoundException(criteria)
+    return new OutboundDestinationsNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<EmisivoDestinosRow> {
+  async getById(id: string): Promise<OutboundDestinationsRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: EmisivoDestinosUpdate,
-  ): Promise<EmisivoDestinosRow> {
+    payload: OutboundDestinationsUpdate,
+  ): Promise<OutboundDestinationsRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class EmisivoDestinosService extends BaseService<"emisivo_destinos"> {
   }
 }
 
-export function createEmisivoDestinosService(
-  repository: EmisivoDestinosRepository,
+export function createOutboundDestinationsService(
+  repository: OutboundDestinationsRepository,
 ) {
-  return new EmisivoDestinosService(repository)
+  return new OutboundDestinationsService(repository)
 }

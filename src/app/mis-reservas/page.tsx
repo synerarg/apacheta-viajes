@@ -4,7 +4,7 @@ import { OrdersView } from "@/components/account/orders-view"
 import { createServerCheckoutController } from "@/controllers/checkout/checkout.controller"
 import { createClient } from "@/lib/supabase/server"
 
-export default async function MisReservasPage({
+export default async function MisReservationsPage({
   searchParams,
 }: {
   searchParams: Promise<{ order?: string }>

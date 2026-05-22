@@ -5,7 +5,7 @@ import {
   PaperPlaneTilt,
 } from "@phosphor-icons/react/dist/ssr"
 
-interface OperadorStatsCardsProps {
+interface OperatorStatsCardsProps {
   total: number
   enviadas: number
   borradores: number
@@ -51,14 +51,14 @@ function Card({ icon, label, value, sub }: CardProps) {
   )
 }
 
-export function OperadorStatsCards({
+export function OperatorStatsCards({
   total,
   enviadas,
   borradores,
   archivadas,
   ventaEnviadas,
   comisionEnviadas,
-}: OperadorStatsCardsProps) {
+}: OperatorStatsCardsProps) {
   const hasData = total > 0
   const ticketPromedio =
     enviadas > 0 ? ventaEnviadas / enviadas : 0

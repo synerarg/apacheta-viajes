@@ -2,12 +2,12 @@ import Link from "next/link"
 
 import { ExperienceCard } from "@/components/dashboard/experience-card"
 import { createClient } from "@/lib/supabase/server"
-import { createExperienciasRepository } from "@/repositories/experiencias/experiencias.repository"
+import { createExperiencesRepository } from "@/repositories/experiences/experiences.repository"
 
-export default async function DashboardExperienciasPage() {
+export default async function DashboardExperiencesPage() {
   const supabase = await createClient()
-  const experienciasRepo = createExperienciasRepository(supabase)
-  const experiencias = await experienciasRepo.findAll()
+  const experiencesRepo = createExperiencesRepository(supabase)
+  const experiencias = await experiencesRepo.findAll()
 
   const sorted = [...experiencias].sort(
     (a, b) =>

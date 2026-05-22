@@ -8,24 +8,24 @@ import {
 import { ArrowRight } from "lucide-react"
 
 import { StatsCard } from "@/components/dashboard/stats-card"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
-import { createServerCotizadorServiciosController } from "@/controllers/cotizador-servicios/cotizador-servicios.controller"
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
+import { createServerQuoterServicesController } from "@/controllers/quoter-services/quoter-services.controller"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
 
 export const dynamic = "force-dynamic"
 
 export default async function DashboardCotizadorPage() {
-  const [categoriasController, serviciosController, cotizacionesController] =
+  const [categoriesController, servicesController, quotesController] =
     await Promise.all([
-      createServerCotizadorCategoriasController(),
-      createServerCotizadorServiciosController(),
-      createServerCotizacionesController(),
+      createServerQuoterCategoriesController(),
+      createServerQuoterServicesController(),
+      createServerQuotesController(),
     ])
 
   const [categorias, servicios, cotizaciones] = await Promise.all([
-    categoriasController.list(),
-    serviciosController.list(),
-    cotizacionesController.list(),
+    categoriesController.list(),
+    servicesController.list(),
+    quotesController.list(),
   ])
 
   const categoriasActivas = categorias.filter((c) => c.activo !== false).length

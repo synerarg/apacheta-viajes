@@ -1,35 +1,35 @@
 import {
-  CategoriasExperienciaNotFoundException,
-  CategoriasExperienciaServiceException,
-} from "@/exceptions/categorias-experiencia/categorias-experiencia.exceptions"
-import { CategoriasExperienciaRepository } from "@/repositories/categorias-experiencia/categorias-experiencia.repository"
+  ExperienceCategoriesNotFoundException,
+  ExperienceCategoriesServiceException,
+} from "@/exceptions/experience-categories/experience-categories.exceptions"
+import { ExperienceCategoriesRepository } from "@/repositories/experience-categories/experience-categories.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  CategoriasExperienciaRow,
-  CategoriasExperienciaUpdate,
-} from "@/types/categorias-experiencia/categorias-experiencia.types"
+  ExperienceCategoriesRow,
+  ExperienceCategoriesUpdate,
+} from "@/types/experience-categories/experience-categories.types"
 
-export class CategoriasExperienciaService extends BaseService<"categorias_experiencia"> {
-  constructor(repository: CategoriasExperienciaRepository) {
+export class ExperienceCategoriesService extends BaseService<"categorias_experiencia"> {
+  constructor(repository: ExperienceCategoriesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new CategoriasExperienciaServiceException(operation, cause)
+    return new ExperienceCategoriesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new CategoriasExperienciaNotFoundException(criteria)
+    return new ExperienceCategoriesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<CategoriasExperienciaRow> {
+  async getById(id: string): Promise<ExperienceCategoriesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: CategoriasExperienciaUpdate,
-  ): Promise<CategoriasExperienciaRow> {
+    payload: ExperienceCategoriesUpdate,
+  ): Promise<ExperienceCategoriesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class CategoriasExperienciaService extends BaseService<"categorias_experi
   }
 }
 
-export function createCategoriasExperienciaService(
-  repository: CategoriasExperienciaRepository,
+export function createExperienceCategoriesService(
+  repository: ExperienceCategoriesRepository,
 ) {
-  return new CategoriasExperienciaService(repository)
+  return new ExperienceCategoriesService(repository)
 }

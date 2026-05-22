@@ -1,14 +1,14 @@
-export interface PaquetesCategoriasRow {
+export interface PackageCategoriesRow {
   paquete_id: string
   categoria_id: string
 }
 
-export interface PaquetesCategoriasInsert {
+export interface PackageCategoriesInsert {
   paquete_id: string
   categoria_id: string
 }
 
-export interface PaquetesCategoriasUpdate {
+export interface PackageCategoriesUpdate {
   paquete_id?: string
   categoria_id?: string
 }

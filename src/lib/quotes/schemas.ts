@@ -10,7 +10,7 @@ const optionalString = z.preprocess((value) => {
 // solo se actualizan las claves enviadas (partial update).
 // El email se guarda como texto libre para que el operador pueda completarlo
 // progresivamente sin que el server rechace estados intermedios.
-export const cotizacionHeaderSchema = z
+export const quoteHeaderSchema = z
   .object({
     cliente_nombre: optionalString,
     cliente_email: optionalString,
@@ -40,7 +40,7 @@ export const cotizacionHeaderSchema = z
     },
   )
 
-export type CotizacionHeaderInput = z.infer<typeof cotizacionHeaderSchema>
+export type QuoteHeaderInput = z.infer<typeof quoteHeaderSchema>
 
 // Item normal (referencia a servicio del catálogo)
 export const addItemSchema = z.object({
@@ -145,6 +145,6 @@ export const upsertPrecioSchema = z.object({
   notas: optionalString,
 })
 
-export type UpsertCategoriaInput = z.infer<typeof upsertCategoriaSchema>
-export type UpsertServicioInput = z.infer<typeof upsertServicioSchema>
-export type UpsertPrecioInput = z.infer<typeof upsertPrecioSchema>
+export type UpsertCategoryInput = z.infer<typeof upsertCategoriaSchema>
+export type UpsertServiceInput = z.infer<typeof upsertServicioSchema>
+export type UpsertPriceInput = z.infer<typeof upsertPrecioSchema>

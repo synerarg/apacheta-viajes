@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
 import {
-  SolicitudesOperadorServiceException,
-  SolicitudesOperadorValidationException,
-} from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
-import { submitSolicitudOperadorSchema } from "@/lib/solicitudes-operador/schemas"
-import { sendSolicitudOperadorRecibida } from "@/services/notifications/solicitud-operador-email.service"
+  OperatorRequestsServiceException,
+  OperatorRequestsValidationException,
+} from "@/exceptions/operator-requests/operator-requests.exceptions"
+import { submitOperatorRequestSchema } from "@/lib/operator-requests/schemas"
+import { sendOperatorRequestRecibida } from "@/services/notifications/solicitud-operador-email.service"
 import { createClient } from "@/lib/supabase/server"
 
 export async function POST(request: Request) {
@@ -22,11 +22,11 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
-    const payload = submitSolicitudOperadorSchema.parse(body)
-    const controller = await createServerSolicitudesOperadorController()
+    const payload = submitOperatorRequestSchema.parse(body)
+    const controller = await createServerOperatorRequestsController()
     const solicitud = await controller.submit(user.id, payload)
 
-    sendSolicitudOperadorRecibida(solicitud, {
+    sendOperatorRequestRecibida(solicitud, {
       email: solicitud.email_contacto,
       greetingName: solicitud.nombre_comercial,
     }).catch((err) => console.error("send solicitud recibida email failed", err))
@@ -48,7 +48,7 @@ export async function GET() {
       return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     }
 
-    const controller = await createServerSolicitudesOperadorController()
+    const controller = await createServerOperatorRequestsController()
     const solicitudes = await controller.listMine(user.id)
 
     return NextResponse.json({ solicitudes }, { status: 200 })
@@ -61,10 +61,10 @@ function handleError(error: unknown) {
   if (error instanceof z.ZodError) {
     return NextResponse.json({ error: "Datos inválidos", details: error.issues }, { status: 400 })
   }
-  if (error instanceof SolicitudesOperadorValidationException) {
+  if (error instanceof OperatorRequestsValidationException) {
     return NextResponse.json({ error: error.message }, { status: 400 })
   }
-  if (error instanceof SolicitudesOperadorServiceException) {
+  if (error instanceof OperatorRequestsServiceException) {
     console.error("solicitudes-operador failed", error)
     return NextResponse.json({ error: "No se pudo procesar la solicitud" }, { status: 500 })
   }

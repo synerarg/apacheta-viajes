@@ -12,8 +12,8 @@ export interface CartItem {
   quantity: number
   image: string
   moneda: Moneda
-  paqueteFechaId: string | null
-  experienciaId: string | null
+  packageFechaId: string | null
+  experienceId: string | null
   incluyeAlojamiento?: boolean
   incluyeTraslado?: boolean
 }

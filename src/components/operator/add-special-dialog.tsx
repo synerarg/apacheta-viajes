@@ -16,7 +16,7 @@ import {
 
 export type EspecialKind = "equipaje" | "guia"
 
-export function AgregarEspecialDialog({
+export function AddSpecialDialog({
   open,
   onOpenChange,
   kind,

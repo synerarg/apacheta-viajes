@@ -1,39 +1,40 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createCotizadorPreciosRepository } from "@/repositories/cotizador-precios/cotizador-precios.repository"
-import { createCotizadorServiciosRepository } from "@/repositories/cotizador-servicios/cotizador-servicios.repository"
-import { createCotizacionesItemsRepository } from "@/repositories/cotizaciones-items/cotizaciones-items.repository"
-import { createCotizacionesRepository } from "@/repositories/cotizaciones/cotizaciones.repository"
+import { createOperatorsRepository } from "@/repositories/operators/operators.repository"
+import { createQuoterPricesRepository } from "@/repositories/quoter-prices/quoter-prices.repository"
+import { createQuoterServicesRepository } from "@/repositories/quoter-services/quoter-services.repository"
+import { createQuoteItemsRepository } from "@/repositories/quote-items/quote-items.repository"
+import { createQuotesRepository } from "@/repositories/quotes/quotes.repository"
 import {
-  CotizacionesItemsService,
-  createCotizacionesItemsService,
-} from "@/services/cotizaciones-items/cotizaciones-items.service"
+  QuoteItemsService,
+  createQuoteItemsService,
+} from "@/services/quote-items/quote-items.service"
 import {
-  CotizacionesService,
-  createCotizacionesService,
-  type CotizacionHeaderPayload,
-} from "@/services/cotizaciones/cotizaciones.service"
-export class CotizacionesController extends BaseIdController<"cotizaciones", CotizacionesService> {
+  QuotesService,
+  createQuotesService,
+  type QuoteHeaderPayload,
+} from "@/services/quotes/quotes.service"
+export class QuotesController extends BaseIdController<"cotizaciones", QuotesService> {
   constructor(
-    service: CotizacionesService,
-    readonly itemsService: CotizacionesItemsService,
+    service: QuotesService,
+    readonly itemsService: QuoteItemsService,
   ) {
     super(service)
   }
 
-  listMine(operadorId: string) {
-    return this.service.listByOperador(operadorId)
+  listMine(operatorId: string) {
+    return this.service.listByOperador(operatorId)
   }
 
   listAll() {
     return this.service.listAll()
   }
 
-  createDraft(operadorId: string, payload: CotizacionHeaderPayload) {
-    return this.service.createDraft(operadorId, payload)
+  createDraft(operatorId: string, payload: QuoteHeaderPayload) {
+    return this.service.createDraft(operatorId, payload)
   }
 
-  updateHeader(id: string, payload: CotizacionHeaderPayload) {
+  updateHeader(id: string, payload: QuoteHeaderPayload) {
     return this.service.updateHeader(id, payload)
   }
 
@@ -61,18 +62,18 @@ export class CotizacionesController extends BaseIdController<"cotizaciones", Cot
     return this.service.recalculateTotals(id)
   }
 
-  addItem(cotizacionId: string, payload: Parameters<CotizacionesItemsService["addItem"]>[1]) {
-    return this.itemsService.addItem(cotizacionId, payload)
+  addItem(quoteId: string, payload: Parameters<QuoteItemsService["addItem"]>[1]) {
+    return this.itemsService.addItem(quoteId, payload)
   }
 
   addSpecialItem(
-    cotizacionId: string,
-    payload: Parameters<CotizacionesItemsService["addSpecialItem"]>[1],
+    quoteId: string,
+    payload: Parameters<QuoteItemsService["addSpecialItem"]>[1],
   ) {
-    return this.itemsService.addSpecialItem(cotizacionId, payload)
+    return this.itemsService.addSpecialItem(quoteId, payload)
   }
 
-  updateItem(itemId: string, payload: Parameters<CotizacionesItemsService["updateItem"]>[1]) {
+  updateItem(itemId: string, payload: Parameters<QuoteItemsService["updateItem"]>[1]) {
     return this.itemsService.updateItem(itemId, payload)
   }
 
@@ -81,21 +82,23 @@ export class CotizacionesController extends BaseIdController<"cotizaciones", Cot
   }
 }
 
-export async function createServerCotizacionesController() {
+export async function createServerQuotesController() {
   const supabase = await createClient()
 
-  const cotizacionesRepo = createCotizacionesRepository(supabase)
-  const itemsRepo = createCotizacionesItemsRepository(supabase)
-  const serviciosRepo = createCotizadorServiciosRepository(supabase)
-  const preciosRepo = createCotizadorPreciosRepository(supabase)
+  const quotesRepo = createQuotesRepository(supabase)
+  const itemsRepo = createQuoteItemsRepository(supabase)
+  const serviciosRepo = createQuoterServicesRepository(supabase)
+  const preciosRepo = createQuoterPricesRepository(supabase)
+  const operatorsRepo = createOperatorsRepository(supabase)
 
-  const cotizacionesSvc = createCotizacionesService(cotizacionesRepo, itemsRepo)
-  const itemsSvc = createCotizacionesItemsService(
+  const quotesSvc = createQuotesService(quotesRepo, itemsRepo)
+  const itemsSvc = createQuoteItemsService(
     itemsRepo,
     serviciosRepo,
     preciosRepo,
-    cotizacionesSvc,
+    quotesSvc,
+    operatorsRepo,
   )
 
-  return new CotizacionesController(cotizacionesSvc, itemsSvc)
+  return new QuotesController(quotesSvc, itemsSvc)
 }

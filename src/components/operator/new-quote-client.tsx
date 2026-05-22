@@ -18,7 +18,7 @@ function plusDaysISO(days: number) {
   return d.toISOString().slice(0, 10)
 }
 
-export function NuevaCotizacionClient() {
+export function NewQuoteClient() {
   const router = useRouter()
   const [error, setError] = useState<string | null>(null)
   const [retrying, setRetrying] = useState(false)

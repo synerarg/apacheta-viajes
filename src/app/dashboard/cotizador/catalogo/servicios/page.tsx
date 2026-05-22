@@ -1,9 +1,9 @@
 import Link from "next/link"
 import { CaretLeft, CurrencyDollar, Pencil } from "@phosphor-icons/react/dist/ssr"
 
-import { DeleteCotizadorItemButton } from "@/components/dashboard/delete-cotizador-item-button"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
-import { createServerCotizadorServiciosController } from "@/controllers/cotizador-servicios/cotizador-servicios.controller"
+import { DeleteQuoterItemButton } from "@/components/dashboard/delete-quoter-item-button"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
+import { createServerQuoterServicesController } from "@/controllers/quoter-services/quoter-services.controller"
 
 export const dynamic = "force-dynamic"
 
@@ -11,19 +11,19 @@ interface ServiciosPageProps {
   searchParams: Promise<{ categoria?: string }>
 }
 
-export default async function CotizadorServiciosPage({
+export default async function QuoterServicesPage({
   searchParams,
 }: ServiciosPageProps) {
   const { categoria: categoriaFilter } = await searchParams
 
-  const [categoriasController, serviciosController] = await Promise.all([
-    createServerCotizadorCategoriasController(),
-    createServerCotizadorServiciosController(),
+  const [categoriesController, servicesController] = await Promise.all([
+    createServerQuoterCategoriesController(),
+    createServerQuoterServicesController(),
   ])
 
   const [categorias, servicios] = await Promise.all([
-    categoriasController.list(),
-    serviciosController.list(),
+    categoriesController.list(),
+    servicesController.list(),
   ])
 
   const categoriasMap = new Map(categorias.map((c) => [c.id, c]))
@@ -33,9 +33,9 @@ export default async function CotizadorServiciosPage({
     : servicios
 
   const sorted = [...filtered].sort((a, b) => {
-    const ordenA = a.orden ?? 0
-    const ordenB = b.orden ?? 0
-    if (ordenA !== ordenB) return ordenA - ordenB
+    const orderA = a.orden ?? 0
+    const orderB = b.orden ?? 0
+    if (orderA !== orderB) return orderA - orderB
     return a.nombre.localeCompare(b.nombre)
   })
 
@@ -185,7 +185,7 @@ export default async function CotizadorServiciosPage({
                         >
                           <Pencil className="h-4 w-4" />
                         </Link>
-                        <DeleteCotizadorItemButton
+                        <DeleteQuoterItemButton
                           endpoint={`/api/dashboard/cotizador-servicios/${servicio.id}`}
                           label="Eliminar servicio"
                         />

@@ -3,25 +3,25 @@ import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
 import { ValidationException } from "@/exceptions/base/validation.exception"
 
-export class SolicitudesOperadorRepositoryException extends RepositoryException {
+export class OperatorRequestsRepositoryException extends RepositoryException {
   constructor(operation: string, cause?: unknown) {
     super("solicitudes_operador", operation, cause)
   }
 }
 
-export class SolicitudesOperadorServiceException extends ServiceException {
+export class OperatorRequestsServiceException extends ServiceException {
   constructor(operation: string, cause?: unknown) {
     super("solicitudes_operador", operation, cause)
   }
 }
 
-export class SolicitudesOperadorNotFoundException extends NotFoundException {
+export class OperatorRequestsNotFoundException extends NotFoundException {
   constructor(criteria: string) {
     super("solicitudes_operador", criteria)
   }
 }
 
-export class SolicitudesOperadorValidationException extends ValidationException {
+export class OperatorRequestsValidationException extends ValidationException {
   constructor(message: string, details?: Record<string, unknown>) {
     super("solicitudes_operador", message, details)
   }

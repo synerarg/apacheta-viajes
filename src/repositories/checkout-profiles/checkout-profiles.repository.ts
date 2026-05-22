@@ -12,19 +12,19 @@ export class CheckoutProfilesRepository extends BaseRepository<"checkout_profile
     return new CheckoutProfilesRepositoryException(operation, cause)
   }
 
-  async findByUsuarioId(usuarioId: string) {
-    return this.findOne({ usuario_id: usuarioId })
+  async findByUserId(userId: string) {
+    return this.findOne({ usuario_id: userId })
   }
 
-  async deleteByUsuarioId(usuarioId: string) {
-    return this.delete({ usuario_id: usuarioId })
+  async deleteByUserId(userId: string) {
+    return this.delete({ usuario_id: userId })
   }
 
-  async upsertByUsuarioId(usuarioId: string, payload: CheckoutProfilesUpdate) {
-    const existing = await this.findByUsuarioId(usuarioId)
+  async upsertByUserId(userId: string, payload: CheckoutProfilesUpdate) {
+    const existing = await this.findByUserId(userId)
 
     if (existing) {
-      return this.update({ usuario_id: usuarioId }, payload)
+      return this.update({ usuario_id: userId }, payload)
     }
 
     const createPayload: Omit<CheckoutProfilesInsert, "usuario_id"> = {
@@ -42,7 +42,7 @@ export class CheckoutProfilesRepository extends BaseRepository<"checkout_profile
     }
 
     return this.create({
-      usuario_id: usuarioId,
+      usuario_id: userId,
       ...createPayload,
     })
   }

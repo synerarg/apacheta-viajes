@@ -1,35 +1,35 @@
 import {
-  EmisivoImagenesNotFoundException,
-  EmisivoImagenesServiceException,
-} from "@/exceptions/emisivo-imagenes/emisivo-imagenes.exceptions"
-import { EmisivoImagenesRepository } from "@/repositories/emisivo-imagenes/emisivo-imagenes.repository"
+  OutboundImagesNotFoundException,
+  OutboundImagesServiceException,
+} from "@/exceptions/outbound-images/outbound-images.exceptions"
+import { OutboundImagesRepository } from "@/repositories/outbound-images/outbound-images.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  EmisivoImagenesRow,
-  EmisivoImagenesUpdate,
-} from "@/types/emisivo-imagenes/emisivo-imagenes.types"
+  OutboundImagesRow,
+  OutboundImagesUpdate,
+} from "@/types/outbound-images/outbound-images.types"
 
-export class EmisivoImagenesService extends BaseService<"emisivo_imagenes"> {
-  constructor(repository: EmisivoImagenesRepository) {
+export class OutboundImagesService extends BaseService<"emisivo_imagenes"> {
+  constructor(repository: OutboundImagesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new EmisivoImagenesServiceException(operation, cause)
+    return new OutboundImagesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new EmisivoImagenesNotFoundException(criteria)
+    return new OutboundImagesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<EmisivoImagenesRow> {
+  async getById(id: string): Promise<OutboundImagesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: EmisivoImagenesUpdate,
-  ): Promise<EmisivoImagenesRow> {
+    payload: OutboundImagesUpdate,
+  ): Promise<OutboundImagesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class EmisivoImagenesService extends BaseService<"emisivo_imagenes"> {
   }
 }
 
-export function createEmisivoImagenesService(
-  repository: EmisivoImagenesRepository,
+export function createOutboundImagesService(
+  repository: OutboundImagesRepository,
 ) {
-  return new EmisivoImagenesService(repository)
+  return new OutboundImagesService(repository)
 }

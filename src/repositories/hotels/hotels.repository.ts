@@ -1,22 +1,22 @@
-import { HotelesRepositoryException } from "@/exceptions/hoteles/hoteles.exceptions"
+import { HotelsRepositoryException } from "@/exceptions/hotels/hotels.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { HotelesUpdate } from "@/types/hoteles/hoteles.types"
+import type { HotelsUpdate } from "@/types/hotels/hotels.types"
 
-export class HotelesRepository extends BaseRepository<"hoteles"> {
+export class HotelsRepository extends BaseRepository<"hoteles"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "hoteles")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new HotelesRepositoryException(operation, cause)
+    return new HotelsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: HotelesUpdate) {
+  async updateById(id: string, payload: HotelsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class HotelesRepository extends BaseRepository<"hoteles"> {
   }
 }
 
-export function createHotelesRepository(supabase: DatabaseClient) {
-  return new HotelesRepository(supabase)
+export function createHotelsRepository(supabase: DatabaseClient) {
+  return new HotelsRepository(supabase)
 }

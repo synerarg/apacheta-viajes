@@ -1,4 +1,4 @@
-export interface HotelesRow {
+export interface HotelsRow {
   id: string
   nombre: string
   slug: string
@@ -18,7 +18,7 @@ export interface HotelesRow {
   updated_at: string | null
 }
 
-export interface HotelesInsert {
+export interface HotelsInsert {
   id?: string
   nombre: string
   slug: string
@@ -38,7 +38,7 @@ export interface HotelesInsert {
   updated_at?: string | null
 }
 
-export interface HotelesUpdate {
+export interface HotelsUpdate {
   id?: string
   nombre?: string
   slug?: string

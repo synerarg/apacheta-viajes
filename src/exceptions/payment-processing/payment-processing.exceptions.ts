@@ -4,13 +4,13 @@ import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
 import { ValidationException } from "@/exceptions/base/validation.exception"
 
-export class PaymentsRepositoryException extends RepositoryException {
+export class PaymentProcessingRepositoryException extends RepositoryException {
   constructor(operation: string, cause?: unknown) {
     super("payments", operation, cause)
   }
 }
 
-export class PaymentsServiceException extends ServiceException {
+export class PaymentProcessingServiceException extends ServiceException {
   constructor(operation: string, cause?: unknown) {
     super("payments", operation, cause)
   }

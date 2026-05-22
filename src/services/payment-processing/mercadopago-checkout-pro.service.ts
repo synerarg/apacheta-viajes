@@ -3,13 +3,13 @@ import {
   createCheckoutProPreference,
   getMercadoPagoPayment,
 } from "@/lib/mercadopago/client"
-import type { PaymentsRepository } from "@/repositories/payments/payments.repository"
+import type { PaymentProcessingRepository } from "@/repositories/payment-processing/payment-processing.repository"
 import type { TransactionalEmailService } from "@/services/notifications/transactional-email.service"
 import type {
   CreateMercadoPagoCheckoutProInput,
   MercadoPagoCheckoutProResult,
   MercadoPagoWebhookResult,
-} from "@/types/payments/payments.types"
+} from "@/types/payment-processing/payment-processing.types"
 
 function resolvePaymentStatusFromMercadoPago(status?: string | null) {
   if (status === "approved") {
@@ -53,7 +53,7 @@ function buildWebhookIdempotencyToken(paymentId: string, status: string) {
 
 export class MercadoPagoCheckoutProService {
   constructor(
-    private readonly paymentsRepository: PaymentsRepository,
+    private readonly paymentsRepository: PaymentProcessingRepository,
     private readonly transactionalEmailService?: TransactionalEmailService,
   ) {}
 

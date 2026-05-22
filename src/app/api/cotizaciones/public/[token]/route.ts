@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import { handleQuoterError } from "@/lib/quotes/errors"
 
 // Endpoint público: NO requiere auth, devuelve la cotización solo si estado='enviada'.
 // La vista pública no debe exponer total_neto/total_comision/subtotal_neto/subtotal_comision/comision_pct.
@@ -12,7 +12,7 @@ export async function GET(
 ) {
   try {
     const { token } = await context.params
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     const cotizacion = await controller.getByToken(token)
     if (!cotizacion) {
       return NextResponse.json({ error: "Cotización no encontrada" }, { status: 404 })
@@ -50,6 +50,6 @@ export async function GET(
 
     return NextResponse.json({ cotizacion: publicCotizacion }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

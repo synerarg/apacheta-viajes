@@ -3,7 +3,7 @@ import {
   PageHeaderSkeleton,
 } from "@/components/dashboard/skeletons"
 
-export default function NuevoPaqueteLoading() {
+export default function NuevoPackageLoading() {
   return (
     <div className="p-4 sm:p-6 lg:p-8 max-w-3xl">
       <PageHeaderSkeleton />

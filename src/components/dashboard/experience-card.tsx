@@ -4,10 +4,10 @@ import { PencilSimple, Eye } from "@phosphor-icons/react/dist/ssr"
 
 import { deleteExperiencia } from "@/app/dashboard/experiencias/actions"
 import { DeleteItemButton } from "@/components/dashboard/delete-item-button"
-import type { ExperienciasRow } from "@/types/experiencias/experiencias.types"
+import type { ExperiencesRow } from "@/types/experiences/experiences.types"
 
 interface ExperienceCardProps {
-  experiencia: ExperienciasRow
+  experiencia: ExperiencesRow
 }
 
 export function ExperienceCard({ experiencia }: ExperienceCardProps) {

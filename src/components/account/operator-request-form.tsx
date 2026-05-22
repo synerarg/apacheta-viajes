@@ -9,12 +9,21 @@ import {
   CheckCircleIcon,
   PhoneIcon,
   SparkleIcon,
+  TagIcon,
 } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
+import type { OperatorTypesRow } from "@/types/operator-types/operator-types.types"
 
 type FormState = {
   nombre_comercial: string
@@ -25,6 +34,7 @@ type FormState = {
   experiencia_descripcion: string
   zona_operacion: string
   motivacion: string
+  tipo_operador_id: string
 }
 
 const initialState: FormState = {
@@ -36,6 +46,7 @@ const initialState: FormState = {
   experiencia_descripcion: "",
   zona_operacion: "",
   motivacion: "",
+  tipo_operador_id: "",
 }
 
 function FieldHint({ children }: { children: React.ReactNode }) {
@@ -64,12 +75,14 @@ function SectionHeader({
   )
 }
 
-export function SolicitudOperadorForm({
+export function OperatorRequestForm({
   defaultEmail,
   defaultName,
+  tipos,
 }: {
   defaultEmail?: string | null
   defaultName?: string | null
+  tipos: OperatorTypesRow[]
 }) {
   const router = useRouter()
   const [pending, startTransition] = useTransition()
@@ -87,6 +100,7 @@ export function SolicitudOperadorForm({
     experiencia_descripcion: false,
     zona_operacion: false,
     motivacion: false,
+    tipo_operador_id: false,
   })
 
   const emailValid = useMemo(
@@ -98,8 +112,10 @@ export function SolicitudOperadorForm({
     [state.telefono_contacto],
   )
   const nombreValid = state.nombre_comercial.trim().length >= 2
+  const tipoValid = state.tipo_operador_id.length > 0
 
-  const canSubmit = nombreValid && emailValid && phoneValid && !pending
+  const canSubmit =
+    nombreValid && emailValid && phoneValid && tipoValid && !pending
 
   function update<K extends keyof FormState>(key: K, value: FormState[K]) {
     setState((prev) => ({ ...prev, [key]: value }))
@@ -121,6 +137,7 @@ export function SolicitudOperadorForm({
         experiencia_descripcion: true,
         zona_operacion: true,
         motivacion: true,
+        tipo_operador_id: true,
       })
       toast.error("Revisá los campos obligatorios.")
       return
@@ -145,7 +162,7 @@ export function SolicitudOperadorForm({
           throw new Error(data?.error ?? "No se pudo enviar la solicitud")
         }
 
-        toast.success("Solicitud enviada. Te avisamos por email cuando esté revisada.")
+        toast.success("Solicitud enviada. Te contactamos cuando esté revisada.")
         router.refresh()
       } catch (error) {
         toast.error(error instanceof Error ? error.message : "Error desconocido")
@@ -216,7 +233,65 @@ export function SolicitudOperadorForm({
         </div>
       </section>
 
-      {/* Sección 2: contacto */}
+      {/* Sección 2: tipo de operador */}
+      <section className="space-y-4 pt-6 border-t border-neutral-100">
+        <SectionHeader
+          icon={TagIcon}
+          title="Tipo de operador"
+          subtitle="Elegí la categoría para la que te postulás. Cada una tiene una comisión asociada."
+        />
+        <div className="space-y-1.5">
+          <Label htmlFor="tipo_operador_id">
+            Tipo <span className="text-rose-600">*</span>
+          </Label>
+          {tipos.length === 0 ? (
+            <p className="text-sm text-rose-600">
+              Todavía no hay tipos de operador disponibles. Comunicate con el equipo
+              de Apacheta antes de enviar la solicitud.
+            </p>
+          ) : (
+            <Select
+              value={state.tipo_operador_id}
+              onValueChange={(value) => {
+                update("tipo_operador_id", value)
+                markTouched("tipo_operador_id")
+              }}
+            >
+              <SelectTrigger
+                id="tipo_operador_id"
+                aria-invalid={touched.tipo_operador_id && !tipoValid}
+                className={`w-full ${
+                  touched.tipo_operador_id && !tipoValid
+                    ? "border-rose-300 focus-visible:ring-rose-300"
+                    : ""
+                }`}
+              >
+                <SelectValue placeholder="Elegí un tipo de operador" />
+              </SelectTrigger>
+              <SelectContent>
+                {tipos.map((tipo) => (
+                  <SelectItem key={tipo.id} value={tipo.id}>
+                    {tipo.nombre}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
+          {touched.tipo_operador_id && !tipoValid ? (
+            <FieldHint>
+              <span className="text-rose-600">
+                Elegí el tipo para el que querés postularte.
+              </span>
+            </FieldHint>
+          ) : (
+            <FieldHint>
+              El equipo de Apacheta puede ajustarlo al aprobar tu alta.
+            </FieldHint>
+          )}
+        </div>
+      </section>
+
+      {/* Sección 3: contacto */}
       <section className="space-y-4 pt-6 border-t border-neutral-100">
         <SectionHeader
           icon={PhoneIcon}
@@ -279,7 +354,7 @@ export function SolicitudOperadorForm({
                 </span>
               </FieldHint>
             ) : (
-              <FieldHint>Acá te llega la confirmación de tu alta.</FieldHint>
+              <FieldHint>Lo usamos para comunicarnos con vos.</FieldHint>
             )}
           </div>
           <div className="space-y-1.5 sm:col-span-2">
@@ -297,7 +372,7 @@ export function SolicitudOperadorForm({
         </div>
       </section>
 
-      {/* Sección 3: experiencia */}
+      {/* Sección 4: experiencia */}
       <section className="space-y-4 pt-6 border-t border-neutral-100">
         <SectionHeader
           icon={SparkleIcon}
@@ -348,7 +423,7 @@ export function SolicitudOperadorForm({
         <Button
           type="submit"
           size="lg"
-          disabled={pending}
+          disabled={pending || tipos.length === 0}
           className="w-full sm:w-auto"
         >
           {pending ? "Enviando..." : "Enviar solicitud"}

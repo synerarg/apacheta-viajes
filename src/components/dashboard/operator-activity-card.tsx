@@ -1,10 +1,10 @@
 import Link from "next/link"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import type { OperadoresRow } from "@/types/operadores/operadores.types"
+import type { OperatorsRow } from "@/types/operators/operators.types"
 
-interface OperadorActivityCardProps {
-  operador: OperadoresRow
+interface OperatorActivityCardProps {
+  operador: OperatorsRow
   enviadasCount: number
   borradorCount: number
   totalVenta: number
@@ -14,7 +14,7 @@ interface OperadorActivityCardProps {
   muted?: boolean
 }
 
-export function OperadorActivityCard({
+export function OperatorActivityCard({
   operador,
   enviadasCount,
   borradorCount,
@@ -23,7 +23,7 @@ export function OperadorActivityCard({
   formatCurrency,
   formatRelative,
   muted = false,
-}: OperadorActivityCardProps) {
+}: OperatorActivityCardProps) {
   const isInactive = operador.activo === false
   const hasActivity = enviadasCount > 0 || borradorCount > 0
 

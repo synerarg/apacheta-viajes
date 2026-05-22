@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizadorServiciosController } from "@/controllers/cotizador-servicios/cotizador-servicios.controller"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
-import { upsertServicioSchema } from "@/lib/cotizaciones/schemas"
+import { createServerQuoterServicesController } from "@/controllers/quoter-services/quoter-services.controller"
+import { handleQuoterError } from "@/lib/quotes/errors"
+import { upsertServicioSchema } from "@/lib/quotes/schemas"
 
 export async function GET(_req: Request, context: { params: Promise<{ id: string }> }) {
   try {
     const { id } = await context.params
-    const controller = await createServerCotizadorServiciosController()
+    const controller = await createServerQuoterServicesController()
     const servicio = await controller.getById(id)
     return NextResponse.json({ servicio }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -23,11 +23,11 @@ export async function PATCH(
     const { id } = await context.params
     const body = await request.json()
     const payload = upsertServicioSchema.partial().parse(body)
-    const controller = await createServerCotizadorServiciosController()
+    const controller = await createServerQuoterServicesController()
     const servicio = await controller.updateById(id, payload as never)
     return NextResponse.json({ servicio }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -37,10 +37,10 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params
-    const controller = await createServerCotizadorServiciosController()
+    const controller = await createServerQuoterServicesController()
     await controller.deleteById(id)
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

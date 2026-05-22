@@ -1,30 +1,30 @@
-import { PagosEventosRepositoryException } from "@/exceptions/pagos-eventos/pagos-eventos.exceptions"
+import { PaymentEventsRepositoryException } from "@/exceptions/payment-events/payment-events.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { PagosEventosUpdate } from "@/types/pagos-eventos/pagos-eventos.types"
+import type { PaymentEventsUpdate } from "@/types/payment-events/payment-events.types"
 
-export class PagosEventosRepository extends BaseRepository<"pagos_eventos"> {
+export class PaymentEventsRepository extends BaseRepository<"pagos_eventos"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "pagos_eventos")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new PagosEventosRepositoryException(operation, cause)
+    return new PaymentEventsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async listByPagoId(pagoId: string) {
-    return this.findMany({ pago_id: pagoId })
+  async listByPaymentId(paymentId: string) {
+    return this.findMany({ pago_id: paymentId })
   }
 
-  async updateById(id: string, payload: PagosEventosUpdate) {
+  async updateById(id: string, payload: PaymentEventsUpdate) {
     return this.update({ id }, payload)
   }
 }
 
-export function createPagosEventosRepository(supabase: DatabaseClient) {
-  return new PagosEventosRepository(supabase)
+export function createPaymentEventsRepository(supabase: DatabaseClient) {
+  return new PaymentEventsRepository(supabase)
 }

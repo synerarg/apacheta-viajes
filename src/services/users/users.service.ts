@@ -1,29 +1,29 @@
 import {
-  UsuariosNotFoundException,
-  UsuariosServiceException,
-} from "@/exceptions/usuarios/usuarios.exceptions"
-import { UsuariosRepository } from "@/repositories/usuarios/usuarios.repository"
+  UsersNotFoundException,
+  UsersServiceException,
+} from "@/exceptions/users/users.exceptions"
+import { UsersRepository } from "@/repositories/users/users.repository"
 import { BaseService } from "@/services/base/base.service"
-import type { UsuariosRow, UsuariosUpdate } from "@/types/usuarios/usuarios.types"
+import type { UsersRow, UsersUpdate } from "@/types/users/users.types"
 
-export class UsuariosService extends BaseService<"usuarios"> {
-  constructor(repository: UsuariosRepository) {
+export class UsersService extends BaseService<"usuarios"> {
+  constructor(repository: UsersRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new UsuariosServiceException(operation, cause)
+    return new UsersServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new UsuariosNotFoundException(criteria)
+    return new UsersNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<UsuariosRow> {
+  async getById(id: string): Promise<UsersRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
-  async updateById(id: string, payload: UsuariosUpdate): Promise<UsuariosRow> {
+  async updateById(id: string, payload: UsersUpdate): Promise<UsersRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -32,6 +32,6 @@ export class UsuariosService extends BaseService<"usuarios"> {
   }
 }
 
-export function createUsuariosService(repository: UsuariosRepository) {
-  return new UsuariosService(repository)
+export function createUsersService(repository: UsersRepository) {
+  return new UsersService(repository)
 }

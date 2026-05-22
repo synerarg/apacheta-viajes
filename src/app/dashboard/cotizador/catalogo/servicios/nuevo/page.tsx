@@ -1,13 +1,13 @@
 import Link from "next/link"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
-import { CotizadorServicioForm } from "@/components/dashboard/cotizador-servicio-form"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
+import { QuoterServiceForm } from "@/components/dashboard/quoter-service-form"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
 
 export const dynamic = "force-dynamic"
 
 export default async function NuevoServicioPage() {
-  const controller = await createServerCotizadorCategoriasController()
+  const controller = await createServerQuoterCategoriesController()
   const categorias = await controller.list()
 
   return (
@@ -26,7 +26,7 @@ export default async function NuevoServicioPage() {
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <CotizadorServicioForm categorias={categorias} />
+        <QuoterServiceForm categorias={categorias} />
       </div>
     </div>
   )

@@ -3,7 +3,7 @@ import type {
   BankTransferPaymentResult,
   CheckoutOrderSummary,
   CheckoutPaymentSummary,
-} from "@/types/payments/payments.types"
+} from "@/types/payment-processing/payment-processing.types"
 
 export type CheckoutPaymentMethod = "mercadopago" | "transferencia"
 

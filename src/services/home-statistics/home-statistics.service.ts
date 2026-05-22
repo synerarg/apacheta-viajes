@@ -1,35 +1,35 @@
 import {
-  EstadisticasHomeNotFoundException,
-  EstadisticasHomeServiceException,
-} from "@/exceptions/estadisticas-home/estadisticas-home.exceptions"
-import { EstadisticasHomeRepository } from "@/repositories/estadisticas-home/estadisticas-home.repository"
+  HomeStatisticsNotFoundException,
+  HomeStatisticsServiceException,
+} from "@/exceptions/home-statistics/home-statistics.exceptions"
+import { HomeStatisticsRepository } from "@/repositories/home-statistics/home-statistics.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  EstadisticasHomeRow,
-  EstadisticasHomeUpdate,
-} from "@/types/estadisticas-home/estadisticas-home.types"
+  HomeStatisticsRow,
+  HomeStatisticsUpdate,
+} from "@/types/home-statistics/home-statistics.types"
 
-export class EstadisticasHomeService extends BaseService<"estadisticas_home"> {
-  constructor(repository: EstadisticasHomeRepository) {
+export class HomeStatisticsService extends BaseService<"estadisticas_home"> {
+  constructor(repository: HomeStatisticsRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new EstadisticasHomeServiceException(operation, cause)
+    return new HomeStatisticsServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new EstadisticasHomeNotFoundException(criteria)
+    return new HomeStatisticsNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<EstadisticasHomeRow> {
+  async getById(id: string): Promise<HomeStatisticsRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: EstadisticasHomeUpdate,
-  ): Promise<EstadisticasHomeRow> {
+    payload: HomeStatisticsUpdate,
+  ): Promise<HomeStatisticsRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class EstadisticasHomeService extends BaseService<"estadisticas_home"> {
   }
 }
 
-export function createEstadisticasHomeService(
-  repository: EstadisticasHomeRepository,
+export function createHomeStatisticsService(
+  repository: HomeStatisticsRepository,
 ) {
-  return new EstadisticasHomeService(repository)
+  return new HomeStatisticsService(repository)
 }

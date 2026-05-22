@@ -1,4 +1,4 @@
-export interface EmisivoImagenesRow {
+export interface OutboundImagesRow {
   id: string
   emisivo_destino_id: string
   url: string
@@ -7,7 +7,7 @@ export interface EmisivoImagenesRow {
   created_at: string | null
 }
 
-export interface EmisivoImagenesInsert {
+export interface OutboundImagesInsert {
   id?: string
   emisivo_destino_id: string
   url: string
@@ -16,7 +16,7 @@ export interface EmisivoImagenesInsert {
   created_at?: string | null
 }
 
-export interface EmisivoImagenesUpdate {
+export interface OutboundImagesUpdate {
   id?: string
   emisivo_destino_id?: string
   url?: string

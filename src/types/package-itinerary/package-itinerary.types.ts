@@ -1,4 +1,4 @@
-export interface PaquetesItinerarioRow {
+export interface PackageItineraryRow {
   id: string
   paquete_id: string
   dia_numero: number
@@ -7,7 +7,7 @@ export interface PaquetesItinerarioRow {
   created_at: string | null
 }
 
-export interface PaquetesItinerarioInsert {
+export interface PackageItineraryInsert {
   id?: string
   paquete_id: string
   dia_numero: number
@@ -16,7 +16,7 @@ export interface PaquetesItinerarioInsert {
   created_at?: string | null
 }
 
-export interface PaquetesItinerarioUpdate {
+export interface PackageItineraryUpdate {
   id?: string
   paquete_id?: string
   dia_numero?: number

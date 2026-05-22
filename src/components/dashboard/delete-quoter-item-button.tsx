@@ -18,7 +18,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 
-interface DeleteCotizadorItemButtonProps {
+interface DeleteQuoterItemButtonProps {
   endpoint: string
   label?: string
   confirmMessage?: string
@@ -26,13 +26,13 @@ interface DeleteCotizadorItemButtonProps {
   variant?: "icon" | "button"
 }
 
-export function DeleteCotizadorItemButton({
+export function DeleteQuoterItemButton({
   endpoint,
   label = "Eliminar",
   confirmMessage,
   redirectTo,
   variant = "icon",
-}: DeleteCotizadorItemButtonProps) {
+}: DeleteQuoterItemButtonProps) {
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
   const router = useRouter()

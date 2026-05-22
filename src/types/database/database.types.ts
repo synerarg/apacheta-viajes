@@ -1,60 +1,65 @@
 import type { SupabaseClient } from "@supabase/supabase-js"
 
 import type {
-  OperadoresInsert,
-  OperadoresRow,
-  OperadoresUpdate,
-} from "@/types/operadores/operadores.types"
+  OperatorsInsert,
+  OperatorsRow,
+  OperatorsUpdate,
+} from "@/types/operators/operators.types"
 import type {
-  CategoriasExperienciaInsert,
-  CategoriasExperienciaRow,
-  CategoriasExperienciaUpdate,
-} from "@/types/categorias-experiencia/categorias-experiencia.types"
+  OperatorTypesInsert,
+  OperatorTypesRow,
+  OperatorTypesUpdate,
+} from "@/types/operator-types/operator-types.types"
+import type {
+  ExperienceCategoriesInsert,
+  ExperienceCategoriesRow,
+  ExperienceCategoriesUpdate,
+} from "@/types/experience-categories/experience-categories.types"
 import type {
   CheckoutProfilesInsert,
   CheckoutProfilesRow,
   CheckoutProfilesUpdate,
 } from "@/types/checkout-profiles/checkout-profiles.types"
 import type {
-  DestinosInsert,
-  DestinosRow,
-  DestinosUpdate,
-} from "@/types/destinos/destinos.types"
+  DestinationsInsert,
+  DestinationsRow,
+  DestinationsUpdate,
+} from "@/types/destinations/destinations.types"
 import type {
-  EmisivoDestinosInsert,
-  EmisivoDestinosRow,
-  EmisivoDestinosUpdate,
-} from "@/types/emisivo-destinos/emisivo-destinos.types"
+  OutboundDestinationsInsert,
+  OutboundDestinationsRow,
+  OutboundDestinationsUpdate,
+} from "@/types/outbound-destinations/outbound-destinations.types"
 import type {
-  EmisivoImagenesInsert,
-  EmisivoImagenesRow,
-  EmisivoImagenesUpdate,
-} from "@/types/emisivo-imagenes/emisivo-imagenes.types"
+  OutboundImagesInsert,
+  OutboundImagesRow,
+  OutboundImagesUpdate,
+} from "@/types/outbound-images/outbound-images.types"
 import type {
-  EstadisticasHomeInsert,
-  EstadisticasHomeRow,
-  EstadisticasHomeUpdate,
-} from "@/types/estadisticas-home/estadisticas-home.types"
+  HomeStatisticsInsert,
+  HomeStatisticsRow,
+  HomeStatisticsUpdate,
+} from "@/types/home-statistics/home-statistics.types"
 import type {
-  ExperienciasInsert,
-  ExperienciasRow,
-  ExperienciasUpdate,
-} from "@/types/experiencias/experiencias.types"
+  ExperiencesInsert,
+  ExperiencesRow,
+  ExperiencesUpdate,
+} from "@/types/experiences/experiences.types"
 import type {
-  ExperienciasImagenesInsert,
-  ExperienciasImagenesRow,
-  ExperienciasImagenesUpdate,
-} from "@/types/experiencias-imagenes/experiencias-imagenes.types"
+  ExperienceImagesInsert,
+  ExperienceImagesRow,
+  ExperienceImagesUpdate,
+} from "@/types/experience-images/experience-images.types"
 import type {
-  HotelesInsert,
-  HotelesRow,
-  HotelesUpdate,
-} from "@/types/hoteles/hoteles.types"
+  HotelsInsert,
+  HotelsRow,
+  HotelsUpdate,
+} from "@/types/hotels/hotels.types"
 import type {
-  HotelesImagenesInsert,
-  HotelesImagenesRow,
-  HotelesImagenesUpdate,
-} from "@/types/hoteles-imagenes/hoteles-imagenes.types"
+  HotelImagesInsert,
+  HotelImagesRow,
+  HotelImagesUpdate,
+} from "@/types/hotel-images/hotel-images.types"
 import type {
   HyperGuestBookingIntentsInsert,
   HyperGuestBookingIntentsRow,
@@ -67,110 +72,110 @@ import type {
   HyperGuestHotelMappingsUpdate,
 } from "@/types/hyperguest/hyperguest.types"
 import type {
-  OrdenesInsert,
-  OrdenesRow,
-  OrdenesUpdate,
-} from "@/types/ordenes/ordenes.types"
+  OrdersInsert,
+  OrdersRow,
+  OrdersUpdate,
+} from "@/types/orders/orders.types"
 import type {
-  OrdenesItemsInsert,
-  OrdenesItemsRow,
-  OrdenesItemsUpdate,
-} from "@/types/ordenes-items/ordenes-items.types"
+  OrderItemsInsert,
+  OrderItemsRow,
+  OrderItemsUpdate,
+} from "@/types/order-items/order-items.types"
 import type {
-  PaquetesCategoriasInsert,
-  PaquetesCategoriasRow,
-  PaquetesCategoriasUpdate,
-} from "@/types/paquetes-categorias/paquetes-categorias.types"
+  PackageCategoriesInsert,
+  PackageCategoriesRow,
+  PackageCategoriesUpdate,
+} from "@/types/package-categories/package-categories.types"
 import type {
-  PaquetesFechasInsert,
-  PaquetesFechasRow,
-  PaquetesFechasUpdate,
-} from "@/types/paquetes-fechas/paquetes-fechas.types"
+  PackageDatesInsert,
+  PackageDatesRow,
+  PackageDatesUpdate,
+} from "@/types/package-dates/package-dates.types"
 import type {
-  PaquetesImagenesInsert,
-  PaquetesImagenesRow,
-  PaquetesImagenesUpdate,
-} from "@/types/paquetes-imagenes/paquetes-imagenes.types"
+  PackageImagesInsert,
+  PackageImagesRow,
+  PackageImagesUpdate,
+} from "@/types/package-images/package-images.types"
 import type {
-  PaquetesItinerarioInsert,
-  PaquetesItinerarioRow,
-  PaquetesItinerarioUpdate,
-} from "@/types/paquetes-itinerario/paquetes-itinerario.types"
+  PackageItineraryInsert,
+  PackageItineraryRow,
+  PackageItineraryUpdate,
+} from "@/types/package-itinerary/package-itinerary.types"
 import type {
-  PaquetesInsert,
-  PaquetesRow,
-  PaquetesUpdate,
-} from "@/types/paquetes/paquetes.types"
+  PackagesInsert,
+  PackagesRow,
+  PackagesUpdate,
+} from "@/types/packages/packages.types"
 import type {
-  PagosInsert,
-  PagosRow,
-  PagosUpdate,
-} from "@/types/pagos/pagos.types"
+  PaymentsInsert,
+  PaymentsRow,
+  PaymentsUpdate,
+} from "@/types/payments/payments.types"
 import type {
-  PagosEventosInsert,
-  PagosEventosRow,
-  PagosEventosUpdate,
-} from "@/types/pagos-eventos/pagos-eventos.types"
+  PaymentEventsInsert,
+  PaymentEventsRow,
+  PaymentEventsUpdate,
+} from "@/types/payment-events/payment-events.types"
 import type {
-  ReservasInsert,
-  ReservasRow,
-  ReservasUpdate,
-} from "@/types/reservas/reservas.types"
+  ReservationsInsert,
+  ReservationsRow,
+  ReservationsUpdate,
+} from "@/types/reservations/reservations.types"
 import type {
-  SolicitudesContactoInsert,
-  SolicitudesContactoRow,
-  SolicitudesContactoUpdate,
-} from "@/types/solicitudes-contacto/solicitudes-contacto.types"
+  ContactRequestsInsert,
+  ContactRequestsRow,
+  ContactRequestsUpdate,
+} from "@/types/contact-requests/contact-requests.types"
 import type {
-  SolicitudesOperadorInsert,
-  SolicitudesOperadorRow,
-  SolicitudesOperadorUpdate,
-} from "@/types/solicitudes-operador/solicitudes-operador.types"
+  OperatorRequestsInsert,
+  OperatorRequestsRow,
+  OperatorRequestsUpdate,
+} from "@/types/operator-requests/operator-requests.types"
 import type {
-  CotizadorCategoriasInsert,
-  CotizadorCategoriasRow,
-  CotizadorCategoriasUpdate,
-} from "@/types/cotizador-categorias/cotizador-categorias.types"
+  QuoterCategoriesInsert,
+  QuoterCategoriesRow,
+  QuoterCategoriesUpdate,
+} from "@/types/quoter-categories/quoter-categories.types"
 import type {
-  CotizadorServiciosInsert,
-  CotizadorServiciosRow,
-  CotizadorServiciosUpdate,
-} from "@/types/cotizador-servicios/cotizador-servicios.types"
+  QuoterServicesInsert,
+  QuoterServicesRow,
+  QuoterServicesUpdate,
+} from "@/types/quoter-services/quoter-services.types"
 import type {
-  CotizadorPreciosInsert,
-  CotizadorPreciosRow,
-  CotizadorPreciosUpdate,
-} from "@/types/cotizador-precios/cotizador-precios.types"
+  QuoterPricesInsert,
+  QuoterPricesRow,
+  QuoterPricesUpdate,
+} from "@/types/quoter-prices/quoter-prices.types"
 import type {
-  CotizacionesInsert,
-  CotizacionesRow,
-  CotizacionesUpdate,
-} from "@/types/cotizaciones/cotizaciones.types"
+  QuotesInsert,
+  QuotesRow,
+  QuotesUpdate,
+} from "@/types/quotes/quotes.types"
 import type {
-  CotizacionesItemsInsert,
-  CotizacionesItemsRow,
-  CotizacionesItemsUpdate,
-} from "@/types/cotizaciones-items/cotizaciones-items.types"
+  QuoteItemsInsert,
+  QuoteItemsRow,
+  QuoteItemsUpdate,
+} from "@/types/quote-items/quote-items.types"
 import type {
-  TrasladosInsert,
-  TrasladosRow,
-  TrasladosUpdate,
-} from "@/types/traslados/traslados.types"
+  TransfersInsert,
+  TransfersRow,
+  TransfersUpdate,
+} from "@/types/transfers/transfers.types"
 import type {
-  TrasladosImagenesInsert,
-  TrasladosImagenesRow,
-  TrasladosImagenesUpdate,
-} from "@/types/traslados-imagenes/traslados-imagenes.types"
+  TransferImagesInsert,
+  TransferImagesRow,
+  TransferImagesUpdate,
+} from "@/types/transfer-images/transfer-images.types"
 import type {
-  TrasladosTarifasInsert,
-  TrasladosTarifasRow,
-  TrasladosTarifasUpdate,
-} from "@/types/traslados-tarifas/traslados-tarifas.types"
+  TransferRatesInsert,
+  TransferRatesRow,
+  TransferRatesUpdate,
+} from "@/types/transfer-rates/transfer-rates.types"
 import type {
-  UsuariosInsert,
-  UsuariosRow,
-  UsuariosUpdate,
-} from "@/types/usuarios/usuarios.types"
+  UsersInsert,
+  UsersRow,
+  UsersUpdate,
+} from "@/types/users/users.types"
 
 export type Json =
   | string
@@ -184,9 +189,9 @@ export interface Database {
   public: {
     Tables: {
       operadores: {
-        Row: OperadoresRow
-        Insert: OperadoresInsert
-        Update: OperadoresUpdate
+        Row: OperatorsRow
+        Insert: OperatorsInsert
+        Update: OperatorsUpdate
         Relationships: [
           {
             foreignKeyName: "operadores_usuario_id_fkey"
@@ -195,12 +200,25 @@ export interface Database {
             referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "operadores_tipo_operador_id_fkey"
+            columns: ["tipo_operador_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_operador"
+            referencedColumns: ["id"]
+          },
         ]
       }
+      tipos_operador: {
+        Row: OperatorTypesRow
+        Insert: OperatorTypesInsert
+        Update: OperatorTypesUpdate
+        Relationships: []
+      }
       categorias_experiencia: {
-        Row: CategoriasExperienciaRow
-        Insert: CategoriasExperienciaInsert
-        Update: CategoriasExperienciaUpdate
+        Row: ExperienceCategoriesRow
+        Insert: ExperienceCategoriesInsert
+        Update: ExperienceCategoriesUpdate
         Relationships: []
       }
       checkout_profiles: {
@@ -218,21 +236,21 @@ export interface Database {
         ]
       }
       destinos: {
-        Row: DestinosRow
-        Insert: DestinosInsert
-        Update: DestinosUpdate
+        Row: DestinationsRow
+        Insert: DestinationsInsert
+        Update: DestinationsUpdate
         Relationships: []
       }
       emisivo_destinos: {
-        Row: EmisivoDestinosRow
-        Insert: EmisivoDestinosInsert
-        Update: EmisivoDestinosUpdate
+        Row: OutboundDestinationsRow
+        Insert: OutboundDestinationsInsert
+        Update: OutboundDestinationsUpdate
         Relationships: []
       }
       emisivo_imagenes: {
-        Row: EmisivoImagenesRow
-        Insert: EmisivoImagenesInsert
-        Update: EmisivoImagenesUpdate
+        Row: OutboundImagesRow
+        Insert: OutboundImagesInsert
+        Update: OutboundImagesUpdate
         Relationships: [
           {
             foreignKeyName: "emisivo_imagenes_emisivo_destino_id_fkey"
@@ -244,15 +262,15 @@ export interface Database {
         ]
       }
       estadisticas_home: {
-        Row: EstadisticasHomeRow
-        Insert: EstadisticasHomeInsert
-        Update: EstadisticasHomeUpdate
+        Row: HomeStatisticsRow
+        Insert: HomeStatisticsInsert
+        Update: HomeStatisticsUpdate
         Relationships: []
       }
       experiencias: {
-        Row: ExperienciasRow
-        Insert: ExperienciasInsert
-        Update: ExperienciasUpdate
+        Row: ExperiencesRow
+        Insert: ExperiencesInsert
+        Update: ExperiencesUpdate
         Relationships: [
           {
             foreignKeyName: "experiencias_categoria_id_fkey"
@@ -271,9 +289,9 @@ export interface Database {
         ]
       }
       experiencias_imagenes: {
-        Row: ExperienciasImagenesRow
-        Insert: ExperienciasImagenesInsert
-        Update: ExperienciasImagenesUpdate
+        Row: ExperienceImagesRow
+        Insert: ExperienceImagesInsert
+        Update: ExperienceImagesUpdate
         Relationships: [
           {
             foreignKeyName: "experiencias_imagenes_experiencia_id_fkey"
@@ -285,9 +303,9 @@ export interface Database {
         ]
       }
       hoteles: {
-        Row: HotelesRow
-        Insert: HotelesInsert
-        Update: HotelesUpdate
+        Row: HotelsRow
+        Insert: HotelsInsert
+        Update: HotelsUpdate
         Relationships: [
           {
             foreignKeyName: "hoteles_destino_id_fkey"
@@ -299,9 +317,9 @@ export interface Database {
         ]
       }
       hoteles_imagenes: {
-        Row: HotelesImagenesRow
-        Insert: HotelesImagenesInsert
-        Update: HotelesImagenesUpdate
+        Row: HotelImagesRow
+        Insert: HotelImagesInsert
+        Update: HotelImagesUpdate
         Relationships: [
           {
             foreignKeyName: "hoteles_imagenes_hotel_id_fkey"
@@ -362,9 +380,9 @@ export interface Database {
         ]
       }
       ordenes: {
-        Row: OrdenesRow
-        Insert: OrdenesInsert
-        Update: OrdenesUpdate
+        Row: OrdersRow
+        Insert: OrdersInsert
+        Update: OrdersUpdate
         Relationships: [
           {
             foreignKeyName: "ordenes_usuario_id_fkey"
@@ -376,9 +394,9 @@ export interface Database {
         ]
       }
       ordenes_items: {
-        Row: OrdenesItemsRow
-        Insert: OrdenesItemsInsert
-        Update: OrdenesItemsUpdate
+        Row: OrderItemsRow
+        Insert: OrderItemsInsert
+        Update: OrderItemsUpdate
         Relationships: [
           {
             foreignKeyName: "ordenes_items_orden_id_fkey"
@@ -397,9 +415,9 @@ export interface Database {
         ]
       }
       paquetes: {
-        Row: PaquetesRow
-        Insert: PaquetesInsert
-        Update: PaquetesUpdate
+        Row: PackagesRow
+        Insert: PackagesInsert
+        Update: PackagesUpdate
         Relationships: [
           {
             foreignKeyName: "paquetes_destino_id_fkey"
@@ -411,9 +429,9 @@ export interface Database {
         ]
       }
       paquetes_categorias: {
-        Row: PaquetesCategoriasRow
-        Insert: PaquetesCategoriasInsert
-        Update: PaquetesCategoriasUpdate
+        Row: PackageCategoriesRow
+        Insert: PackageCategoriesInsert
+        Update: PackageCategoriesUpdate
         Relationships: [
           {
             foreignKeyName: "paquetes_categorias_categoria_id_fkey"
@@ -432,9 +450,9 @@ export interface Database {
         ]
       }
       paquetes_fechas: {
-        Row: PaquetesFechasRow
-        Insert: PaquetesFechasInsert
-        Update: PaquetesFechasUpdate
+        Row: PackageDatesRow
+        Insert: PackageDatesInsert
+        Update: PackageDatesUpdate
         Relationships: [
           {
             foreignKeyName: "paquetes_fechas_paquete_id_fkey"
@@ -446,9 +464,9 @@ export interface Database {
         ]
       }
       paquetes_imagenes: {
-        Row: PaquetesImagenesRow
-        Insert: PaquetesImagenesInsert
-        Update: PaquetesImagenesUpdate
+        Row: PackageImagesRow
+        Insert: PackageImagesInsert
+        Update: PackageImagesUpdate
         Relationships: [
           {
             foreignKeyName: "paquetes_imagenes_paquete_id_fkey"
@@ -460,9 +478,9 @@ export interface Database {
         ]
       }
       paquetes_itinerario: {
-        Row: PaquetesItinerarioRow
-        Insert: PaquetesItinerarioInsert
-        Update: PaquetesItinerarioUpdate
+        Row: PackageItineraryRow
+        Insert: PackageItineraryInsert
+        Update: PackageItineraryUpdate
         Relationships: [
           {
             foreignKeyName: "paquetes_itinerario_paquete_id_fkey"
@@ -474,9 +492,9 @@ export interface Database {
         ]
       }
       pagos: {
-        Row: PagosRow
-        Insert: PagosInsert
-        Update: PagosUpdate
+        Row: PaymentsRow
+        Insert: PaymentsInsert
+        Update: PaymentsUpdate
         Relationships: [
           {
             foreignKeyName: "pagos_orden_id_fkey"
@@ -488,9 +506,9 @@ export interface Database {
         ]
       }
       pagos_eventos: {
-        Row: PagosEventosRow
-        Insert: PagosEventosInsert
-        Update: PagosEventosUpdate
+        Row: PaymentEventsRow
+        Insert: PaymentEventsInsert
+        Update: PaymentEventsUpdate
         Relationships: [
           {
             foreignKeyName: "pagos_eventos_pago_id_fkey"
@@ -502,9 +520,9 @@ export interface Database {
         ]
       }
       reservas: {
-        Row: ReservasRow
-        Insert: ReservasInsert
-        Update: ReservasUpdate
+        Row: ReservationsRow
+        Insert: ReservationsInsert
+        Update: ReservationsUpdate
         Relationships: [
           {
             foreignKeyName: "reservas_experiencia_id_fkey"
@@ -530,15 +548,15 @@ export interface Database {
         ]
       }
       solicitudes_contacto: {
-        Row: SolicitudesContactoRow
-        Insert: SolicitudesContactoInsert
-        Update: SolicitudesContactoUpdate
+        Row: ContactRequestsRow
+        Insert: ContactRequestsInsert
+        Update: ContactRequestsUpdate
         Relationships: []
       }
       solicitudes_operador: {
-        Row: SolicitudesOperadorRow
-        Insert: SolicitudesOperadorInsert
-        Update: SolicitudesOperadorUpdate
+        Row: OperatorRequestsRow
+        Insert: OperatorRequestsInsert
+        Update: OperatorRequestsUpdate
         Relationships: [
           {
             foreignKeyName: "solicitudes_operador_usuario_id_fkey"
@@ -554,18 +572,25 @@ export interface Database {
             referencedRelation: "usuarios"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "solicitudes_operador_tipo_operador_id_fkey"
+            columns: ["tipo_operador_id"]
+            isOneToOne: false
+            referencedRelation: "tipos_operador"
+            referencedColumns: ["id"]
+          },
         ]
       }
       cotizador_categorias: {
-        Row: CotizadorCategoriasRow
-        Insert: CotizadorCategoriasInsert
-        Update: CotizadorCategoriasUpdate
+        Row: QuoterCategoriesRow
+        Insert: QuoterCategoriesInsert
+        Update: QuoterCategoriesUpdate
         Relationships: []
       }
       cotizador_servicios: {
-        Row: CotizadorServiciosRow
-        Insert: CotizadorServiciosInsert
-        Update: CotizadorServiciosUpdate
+        Row: QuoterServicesRow
+        Insert: QuoterServicesInsert
+        Update: QuoterServicesUpdate
         Relationships: [
           {
             foreignKeyName: "cotizador_servicios_categoria_id_fkey"
@@ -577,9 +602,9 @@ export interface Database {
         ]
       }
       cotizador_servicio_precios: {
-        Row: CotizadorPreciosRow
-        Insert: CotizadorPreciosInsert
-        Update: CotizadorPreciosUpdate
+        Row: QuoterPricesRow
+        Insert: QuoterPricesInsert
+        Update: QuoterPricesUpdate
         Relationships: [
           {
             foreignKeyName: "cotizador_servicio_precios_servicio_id_fkey"
@@ -591,9 +616,9 @@ export interface Database {
         ]
       }
       cotizaciones: {
-        Row: CotizacionesRow
-        Insert: CotizacionesInsert
-        Update: CotizacionesUpdate
+        Row: QuotesRow
+        Insert: QuotesInsert
+        Update: QuotesUpdate
         Relationships: [
           {
             foreignKeyName: "cotizaciones_operador_id_fkey"
@@ -605,9 +630,9 @@ export interface Database {
         ]
       }
       cotizaciones_items: {
-        Row: CotizacionesItemsRow
-        Insert: CotizacionesItemsInsert
-        Update: CotizacionesItemsUpdate
+        Row: QuoteItemsRow
+        Insert: QuoteItemsInsert
+        Update: QuoteItemsUpdate
         Relationships: [
           {
             foreignKeyName: "cotizaciones_items_cotizacion_id_fkey"
@@ -626,9 +651,9 @@ export interface Database {
         ]
       }
       traslados: {
-        Row: TrasladosRow
-        Insert: TrasladosInsert
-        Update: TrasladosUpdate
+        Row: TransfersRow
+        Insert: TransfersInsert
+        Update: TransfersUpdate
         Relationships: [
           {
             foreignKeyName: "traslados_destino_id_fkey"
@@ -640,9 +665,9 @@ export interface Database {
         ]
       }
       traslados_imagenes: {
-        Row: TrasladosImagenesRow
-        Insert: TrasladosImagenesInsert
-        Update: TrasladosImagenesUpdate
+        Row: TransferImagesRow
+        Insert: TransferImagesInsert
+        Update: TransferImagesUpdate
         Relationships: [
           {
             foreignKeyName: "traslados_imagenes_traslado_id_fkey"
@@ -654,9 +679,9 @@ export interface Database {
         ]
       }
       traslados_tarifas: {
-        Row: TrasladosTarifasRow
-        Insert: TrasladosTarifasInsert
-        Update: TrasladosTarifasUpdate
+        Row: TransferRatesRow
+        Insert: TransferRatesInsert
+        Update: TransferRatesUpdate
         Relationships: [
           {
             foreignKeyName: "traslados_tarifas_traslado_id_fkey"
@@ -668,9 +693,9 @@ export interface Database {
         ]
       }
       usuarios: {
-        Row: UsuariosRow
-        Insert: UsuariosInsert
-        Update: UsuariosUpdate
+        Row: UsersRow
+        Insert: UsersInsert
+        Update: UsersUpdate
         Relationships: []
       }
     }

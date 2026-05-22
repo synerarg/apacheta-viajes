@@ -36,7 +36,7 @@ exceptions/<domain>/    ← typed exception classes that bubble up the layers
 types/<domain>/         ← request/response/domain types (separate from DB types)
 ```
 
-Every domain (e.g. `paquetes`, `experiencias`, `hoteles`, `ordenes`, `pagos`, `reservas`, `usuarios`, `checkout`, `payments`, `auth`, etc.) has its own folder in each layer. Adding a new entity means creating these five folders.
+Every domain (e.g. `packages`, `experiences`, `hotels`, `orders`, `payments`, `reservations`, `users`, `checkout`, `payment-processing`, `auth`, etc.) has its own folder in each layer. Adding a new entity means creating these five folders.
 
 ### Base classes
 
@@ -84,9 +84,9 @@ When changing protected paths, edit the `authRoutes` / `adminRoutes` arrays in `
 
 1. Authenticates user; validates cart with Zod at the route boundary.
 2. Asserts the chosen payment method is configured (`getMercadoPagoConfig` / `getBankTransferConfig` in `src/lib/payments/payments.config.ts`).
-3. Creates `ordenes` row + per-item `ordenes_items` + `reservas` (one per cart item; checks `paquete_fecha.cupo_disponible` or experience `activo`/`precio`).
+3. Creates `ordenes` row + per-item `ordenes_items` + `reservas` (one per cart item; checks `paquete_fecha.cupo_disponible` or experience `activo`/`precio`). Note table names stay Spanish; the TypeScript layer that touches them lives under `orders/`, `order-items/`, `reservations/`, `package-dates/`.
 4. Optionally upserts the user's `checkout_profiles` record.
-5. Dispatches to `PaymentsService` for the chosen method:
+5. Dispatches to `PaymentProcessingService` for the chosen method:
    - `mercadopago` → creates Checkout Pro preference, returns `initPoint` as `redirectUrl`.
    - `transferencia` → creates pending bank-transfer payment + returns bank instructions; redirects to `/checkout/transferencia?orderId=...`.
    - `efectivo` → creates `cash_local` payment placeholder.
@@ -102,8 +102,11 @@ External setup (Google OAuth, email OTP templates, MercadoPago `notification_url
 
 ## Conventions
 
-- Domain folder names and table names are **Spanish** (`paquetes`, `ordenes`, `reservas`, `usuarios`, `solicitudes-contacto`, etc.). Match this when adding new domains.
-- Files inside a domain folder are named `<domain>.<layer>.ts` (e.g. `paquetes.controller.ts`, `paquetes.service.ts`). Each domain has its own exception module `<domain>.exceptions.ts` exporting validation/service/repository exception classes.
+- **Internal code is English; database is Spanish.** Domain folders under `src/{controllers,services,repositories,exceptions,types}` use English kebab-case (`packages`, `orders`, `reservations`, `users`, `contact-requests`, etc.). The Supabase tables they read/write remain Spanish (`paquetes`, `ordenes`, `reservas`, `usuarios`, `solicitudes_contacto`, ...) and column names stay Spanish snake_case (`nombre`, `descripcion`, `paquete_id`). Repositories bridge the two: `BaseRepository<"paquetes">` typed against the Spanish table key.
+- **URL paths are Spanish.** App router routes under `src/app/` and component folders under `src/components/` keep their Spanish names (`/paquetes`, `/experiencias`, `/hoteleria`, `/mis-reservas`) — these are public contract and SEO-sensitive.
+- **MercadoPago is a proper noun.** Never translate `MercadoPago`, `mercadopago` (slug), or related identifiers (`MercadoPagoCheckoutProService`, `getMercadoPagoConfig`, etc.).
+- **Two payment layers, distinct names.** `src/{controllers,services,repositories,exceptions,types}/payments/` is the CRUD layer over the `pagos` table (classes: `PaymentsService`, `PaymentsRepository`, `PaymentsRow`). `src/{...}/payment-processing/` is the orchestrator that dispatches to MercadoPago / bank-transfer / cash-local gateways (classes: `PaymentProcessingService`, `PaymentProcessingRepository`).
+- Files inside a domain folder are named `<domain>.<layer>.ts` (e.g. `packages.controller.ts`, `packages.service.ts`). Each domain has its own exception module `<domain>.exceptions.ts` exporting validation/service/repository exception classes.
 - `src/controllers/index.ts` re-exports every controller; add new controllers there.
 - API routes always validate with Zod before invoking a controller, and translate exceptions to status codes (`AuthenticationException → 401`, `ValidationException / ZodError → 400`, `ServiceException → 500`).
 - Light mode only — recent commits explicitly removed dark-mode classes; do not reintroduce `dark:` variants unless asked.

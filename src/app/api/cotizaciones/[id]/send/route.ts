@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
 import {
-  authorizeCotizacion,
+  authorizeQuote,
   isAuthFailure,
-} from "@/lib/cotizaciones/authorize"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
+} from "@/lib/quotes/authorize"
+import { handleQuoterError } from "@/lib/quotes/errors"
 
 export async function POST(
   _req: Request,
@@ -13,13 +13,13 @@ export async function POST(
 ) {
   try {
     const { id } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     const cotizacion = await controller.markAsSent(id)
     return NextResponse.json({ cotizacion }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

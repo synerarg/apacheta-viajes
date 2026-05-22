@@ -3,7 +3,7 @@ import {
   PageHeaderSkeleton,
 } from "@/components/dashboard/skeletons"
 
-export default function PaquetesLoading() {
+export default function PackagesLoading() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <PageHeaderSkeleton withAction />

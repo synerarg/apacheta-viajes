@@ -1,15 +1,15 @@
 import type {
-  OrdenEstado,
-  OrdenEstadoPago,
-  OrdenMetodoPago,
-  OrdenesRow,
-} from "@/types/ordenes/ordenes.types"
-import type { OrdenesItemsRow } from "@/types/ordenes-items/ordenes-items.types"
-import type { PagoEstado, PagoMetodo, PagosRow } from "@/types/pagos/pagos.types"
-import type { ReservaEstado, ReservasRow } from "@/types/reservas/reservas.types"
-import type { UsuariosRow } from "@/types/usuarios/usuarios.types"
+  OrderStatus,
+  OrderPaymentStatus,
+  OrderPaymentMethod,
+  OrdersRow,
+} from "@/types/orders/orders.types"
+import type { OrderItemsRow } from "@/types/order-items/order-items.types"
+import type { PaymentStatus, PaymentMethod, PaymentsRow } from "@/types/payments/payments.types"
+import type { ReservationStatus, ReservationsRow } from "@/types/reservations/reservations.types"
+import type { UsersRow } from "@/types/users/users.types"
 
-export type SupportedPaymentMethod = Exclude<OrdenMetodoPago, "cash_local">
+export type SupportedPaymentMethod = Exclude<OrderPaymentMethod, "cash_local">
 
 export interface PaymentCustomer {
   email?: string | null
@@ -18,16 +18,16 @@ export interface PaymentCustomer {
 }
 
 export interface ReservationPaymentContext {
-  reservation: ReservasRow
-  user: UsuariosRow | null
+  reservation: ReservationsRow
+  user: UsersRow | null
 }
 
 export interface OrderPaymentContext {
-  order: OrdenesRow
-  items: OrdenesItemsRow[]
-  reservations: ReservasRow[]
-  user: UsuariosRow | null
-  latestPayment: PagosRow | null
+  order: OrdersRow
+  items: OrderItemsRow[]
+  reservations: ReservationsRow[]
+  user: UsersRow | null
+  latestPayment: PaymentsRow | null
 }
 
 export interface PaymentReceiptAccessInput {
@@ -66,8 +66,8 @@ export interface MercadoPagoWebhookResult {
   paymentId: string
   mercadopagoPaymentId: string
   mercadopagoStatus: string
-  paymentStatus: PagoEstado
-  orderStatus: OrdenEstado
+  paymentStatus: PaymentStatus
+  orderStatus: OrderStatus
   alreadyProcessed: boolean
 }
 
@@ -129,7 +129,7 @@ export interface BankTransferPaymentResult {
   currency: string
   expiresAt: string
   reference: string
-  status: PagoEstado
+  status: PaymentStatus
   bankDetails: BankTransferDetails
   instructions: string[]
   receiptReference: string | null
@@ -143,13 +143,13 @@ export interface CashLocalPaymentResult {
   paymentId: string
   amount: number
   currency: string
-  status: PagoEstado
+  status: PaymentStatus
 }
 
 export interface BankTransferConfirmationResult {
   orderId: string
   paymentId: string
-  status: PagoEstado
+  status: PaymentStatus
   confirmedAt: string
   reference: string
 }
@@ -157,7 +157,7 @@ export interface BankTransferConfirmationResult {
 export interface BankTransferReceiptUploadResult {
   orderId: string
   paymentId: string
-  status: PagoEstado
+  status: PaymentStatus
   receiptReference: string | null
   hasReceipt: boolean
   receiptUrl: string | null
@@ -182,7 +182,7 @@ export interface ExpireBankTransferPaymentsResult {
 }
 
 export interface CreatePaymentInput {
-  method: OrdenMetodoPago
+  method: OrderPaymentMethod
   orderId: string
   title?: string
   description?: string
@@ -195,9 +195,9 @@ export interface CreatePaymentInput {
 
 export interface CheckoutPaymentSummary {
   paymentId: string
-  method: PagoMetodo
-  provider: PagosRow["proveedor"]
-  status: PagoEstado
+  method: PaymentMethod
+  provider: PaymentsRow["proveedor"]
+  status: PaymentStatus
   amount: number
   currency: string
   externalReference: string
@@ -211,7 +211,7 @@ export interface CheckoutPaymentSummary {
 export interface CheckoutOrderItemSummary {
   orderItemId: string
   reservationId: string
-  kind: OrdenesItemsRow["tipo"]
+  kind: OrderItemsRow["tipo"]
   name: string
   description: string
   quantity: number
@@ -224,9 +224,9 @@ export interface CheckoutOrderItemSummary {
 export interface CheckoutOrderSummary {
   orderId: string
   reference: string
-  status: OrdenEstado
-  paymentStatus: OrdenEstadoPago
-  paymentMethod: OrdenMetodoPago
+  status: OrderStatus
+  paymentStatus: OrderPaymentStatus
+  paymentMethod: OrderPaymentMethod
   total: number
   currency: string
   createdAt: string | null
@@ -234,8 +234,8 @@ export interface CheckoutOrderSummary {
   payment: CheckoutPaymentSummary | null
   reservations: {
     reservationId: string
-    kind: ReservasRow["tipo"]
-    status: ReservaEstado | null
+    kind: ReservationsRow["tipo"]
+    status: ReservationStatus | null
     quantity: number
     unitPrice: number
     totalPrice: number

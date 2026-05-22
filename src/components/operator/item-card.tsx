@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { Minus, Plus, Trash } from "@phosphor-icons/react"
 
 import { Button } from "@/components/ui/button"
-import type { CotizacionesItemsRow } from "@/types/cotizaciones-items/cotizaciones-items.types"
+import type { QuoteItemsRow } from "@/types/quote-items/quote-items.types"
 import { useDebouncedCallback } from "./use-debounced-callback"
 
 function formatMoney(v: number) {
@@ -67,7 +67,7 @@ export function ItemCard({
   onUpdate,
   onDelete,
 }: {
-  item: CotizacionesItemsRow
+  item: QuoteItemsRow
   readonly?: boolean
   onUpdate: (
     itemId: string,

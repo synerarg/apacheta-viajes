@@ -1,4 +1,4 @@
-import { HotelesNotFoundException, HotelesServiceException } from "@/exceptions/hoteles/hoteles.exceptions"
+import { HotelsNotFoundException, HotelsServiceException } from "@/exceptions/hotels/hotels.exceptions"
 import {
   cancelHyperGuestBooking,
   createHyperGuestBooking,
@@ -10,8 +10,8 @@ import {
 } from "@/lib/hyperguest/client"
 import { assertHyperGuestConfigured } from "@/lib/hyperguest/hyperguest.config"
 import type { HyperGuestRepository } from "@/repositories/hyperguest/hyperguest.repository"
-import type { HotelesRepository } from "@/repositories/hoteles/hoteles.repository"
-import type { HotelesInsert } from "@/types/hoteles/hoteles.types"
+import type { HotelsRepository } from "@/repositories/hotels/hotels.repository"
+import type { HotelsInsert } from "@/types/hotels/hotels.types"
 import type {
   HyperGuestAvailabilityInput,
   HyperGuestBookInput,
@@ -273,7 +273,7 @@ function isCertificationProperty(record: UnknownRecord, propertyId: string) {
   )
 }
 
-function normalizeHotelPayload(record: UnknownRecord, propertyId: string): HotelesInsert {
+function normalizeHotelPayload(record: UnknownRecord, propertyId: string): HotelsInsert {
   const name =
     getFirstString(record, ["name", "hotelName", "hotel_name", "title"]) ??
     `Hotel HyperGuest ${propertyId}`
@@ -859,11 +859,11 @@ function buildGuestPayload(
 export class HyperGuestService {
   constructor(
     private readonly hyperGuestRepository: HyperGuestRepository,
-    private readonly hotelesRepository: HotelesRepository,
+    private readonly hotelsRepository: HotelsRepository,
   ) {}
 
   private createServiceException(operation: string, cause?: unknown) {
-    return new HotelesServiceException(`hyperguest.${operation}`, cause)
+    return new HotelsServiceException(`hyperguest.${operation}`, cause)
   }
 
   private async getPropertyIdForHotel(hotelId?: string, propertyId?: string) {
@@ -991,15 +991,15 @@ export class HyperGuestService {
           config.propertyId,
         )
       const existingHotel = existingMapping?.hotel_id
-        ? await this.hotelesRepository.findById(existingMapping.hotel_id)
-        : await this.hotelesRepository.findOne({ slug: localPayload.slug })
+        ? await this.hotelsRepository.findById(existingMapping.hotel_id)
+        : await this.hotelsRepository.findOne({ slug: localPayload.slug })
       const hotelPayload = {
         ...localPayload,
         activo: shouldPublish,
       }
       const hotel = existingHotel
-        ? await this.hotelesRepository.updateById(existingHotel.id, hotelPayload)
-        : await this.hotelesRepository.create(hotelPayload)
+        ? await this.hotelsRepository.updateById(existingHotel.id, hotelPayload)
+        : await this.hotelsRepository.create(hotelPayload)
 
       if (!hotel) {
         throw new Error("No se pudo sincronizar el hotel local.")
@@ -1111,7 +1111,7 @@ export class HyperGuestService {
       )
 
       if (!intent) {
-        throw new HotelesNotFoundException(`bookingIntent ${input.bookingIntentId}`)
+        throw new HotelsNotFoundException(`bookingIntent ${input.bookingIntentId}`)
       }
 
       const offers = pickSelectedOffers(input)
@@ -1157,7 +1157,7 @@ export class HyperGuestService {
       )
 
       if (!intent) {
-        throw new HotelesNotFoundException(`bookingIntent ${input.bookingIntentId}`)
+        throw new HotelsNotFoundException(`bookingIntent ${input.bookingIntentId}`)
       }
 
       if (intent.usuario_id && input.userId && intent.usuario_id !== input.userId) {
@@ -1276,7 +1276,7 @@ export class HyperGuestService {
       try {
         response = await createHyperGuestBooking(payload)
       } catch (error) {
-        // HG returns 4xx on BN.402 which becomes HotelesServiceException.
+        // HG returns 4xx on BN.402 which becomes HotelsServiceException.
         // Pull the embedded body so we can decide whether a retry helps.
         const cause = isRecord(error) && "cause" in error ? error.cause : null
         const message =
@@ -1362,7 +1362,7 @@ export class HyperGuestService {
       )
 
       if (!intent) {
-        throw new HotelesNotFoundException(`bookingIntent ${input.bookingIntentId}`)
+        throw new HotelsNotFoundException(`bookingIntent ${input.bookingIntentId}`)
       }
 
       if (intent.usuario_id && input.userId && intent.usuario_id !== input.userId) {
@@ -1419,7 +1419,7 @@ export class HyperGuestService {
 
 export function createHyperGuestService(
   hyperGuestRepository: HyperGuestRepository,
-  hotelesRepository: HotelesRepository,
+  hotelsRepository: HotelsRepository,
 ) {
-  return new HyperGuestService(hyperGuestRepository, hotelesRepository)
+  return new HyperGuestService(hyperGuestRepository, hotelsRepository)
 }

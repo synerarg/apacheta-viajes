@@ -1,4 +1,4 @@
-export interface DestinosRow {
+export interface DestinationsRow {
   id: string
   nombre: string
   slug: string
@@ -11,7 +11,7 @@ export interface DestinosRow {
   created_at: string | null
 }
 
-export interface DestinosInsert {
+export interface DestinationsInsert {
   id?: string
   nombre: string
   slug: string
@@ -24,7 +24,7 @@ export interface DestinosInsert {
   created_at?: string | null
 }
 
-export interface DestinosUpdate {
+export interface DestinationsUpdate {
   id?: string
   nombre?: string
   slug?: string

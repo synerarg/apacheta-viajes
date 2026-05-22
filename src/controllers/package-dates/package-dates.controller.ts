@@ -1,21 +1,21 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createPaquetesFechasRepository } from "@/repositories/paquetes-fechas/paquetes-fechas.repository"
+import { createPackageDatesRepository } from "@/repositories/package-dates/package-dates.repository"
 import {
-  createPaquetesFechasService,
-  PaquetesFechasService,
-} from "@/services/paquetes-fechas/paquetes-fechas.service"
+  createPackageDatesService,
+  PackageDatesService,
+} from "@/services/package-dates/package-dates.service"
 
-export class PaquetesFechasController extends BaseIdController<"paquetes_fechas"> {
-  constructor(service: PaquetesFechasService) {
+export class PackageDatesController extends BaseIdController<"paquetes_fechas"> {
+  constructor(service: PackageDatesService) {
     super(service)
   }
 }
 
-export async function createServerPaquetesFechasController() {
+export async function createServerPackageDatesController() {
   const supabase = await createClient()
 
-  return new PaquetesFechasController(
-    createPaquetesFechasService(createPaquetesFechasRepository(supabase)),
+  return new PackageDatesController(
+    createPackageDatesService(createPackageDatesRepository(supabase)),
   )
 }

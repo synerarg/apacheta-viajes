@@ -1,6 +1,6 @@
-import { createServerTrasladosController } from "@/controllers/traslados/traslados.controller"
+import { createServerTransfersController } from "@/controllers/transfers/transfers.controller"
 
-export interface StorefrontTrasladoItem {
+export interface StorefrontTransferItem {
   id: string
   slug: string
   nombre: string
@@ -30,11 +30,11 @@ function withFallbackImage(image: string | null | undefined, fallbackImage: stri
   return image?.trim() || fallbackImage
 }
 
-export async function getTrasladosCatalogData() {
-  const trasladosController = await createServerTrasladosController()
-  const traslados = await trasladosController.list({ activo: true })
+export async function getTransfersCatalogData() {
+  const transfersController = await createServerTransfersController()
+  const traslados = await transfersController.list({ activo: true })
 
-  const items = sortByNullableOrder(traslados).map<StorefrontTrasladoItem>(
+  const items = sortByNullableOrder(traslados).map<StorefrontTransferItem>(
     (traslado) => ({
       id: traslado.id,
       slug: traslado.slug,
@@ -68,11 +68,11 @@ export async function getTrasladosCatalogData() {
   }
 }
 
-export async function getFeaturedTrasladosData(
+export async function getFeaturedTransfersData(
   limit = 3,
-): Promise<StorefrontTrasladoItem[]> {
-  const trasladosController = await createServerTrasladosController()
-  const traslados = await trasladosController.list({ activo: true })
+): Promise<StorefrontTransferItem[]> {
+  const transfersController = await createServerTransfersController()
+  const traslados = await transfersController.list({ activo: true })
 
   return [...traslados]
     .sort((left, right) => {
@@ -82,7 +82,7 @@ export async function getFeaturedTrasladosData(
       return rightDate.localeCompare(leftDate)
     })
     .slice(0, limit)
-    .map<StorefrontTrasladoItem>((traslado) => ({
+    .map<StorefrontTransferItem>((traslado) => ({
       id: traslado.id,
       slug: traslado.slug,
       nombre: traslado.nombre,

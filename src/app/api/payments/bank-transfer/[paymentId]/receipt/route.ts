@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server"
 
-import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
+import { createServerPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptValidationException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
 
@@ -28,7 +28,7 @@ export async function POST(
       )
     }
 
-    const paymentsController = await createServerPaymentsController()
+    const paymentsController = await createServerPaymentProcessingController()
     const contentType = request.headers.get("content-type") ?? ""
     const result = contentType.includes(JSON_CONTENT_TYPE)
       ? await (async () => {

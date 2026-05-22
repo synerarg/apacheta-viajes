@@ -1,6 +1,6 @@
 import { createHmac, timingSafeEqual } from "node:crypto"
 
-import { MercadoPagoConfigurationException } from "@/exceptions/payments/payments.exceptions"
+import { MercadoPagoConfigurationException } from "@/exceptions/payment-processing/payment-processing.exceptions"
 import {
   getMercadoPagoWebhookSecret,
   getMercadoPagoWebhookToleranceMs,

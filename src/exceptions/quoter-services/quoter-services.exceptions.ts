@@ -3,25 +3,25 @@ import { RepositoryException } from "@/exceptions/base/repository.exception"
 import { ServiceException } from "@/exceptions/base/service.exception"
 import { ValidationException } from "@/exceptions/base/validation.exception"
 
-export class CotizadorServiciosRepositoryException extends RepositoryException {
+export class QuoterServicesRepositoryException extends RepositoryException {
   constructor(operation: string, cause?: unknown) {
     super("cotizador_servicios", operation, cause)
   }
 }
 
-export class CotizadorServiciosServiceException extends ServiceException {
+export class QuoterServicesServiceException extends ServiceException {
   constructor(operation: string, cause?: unknown) {
     super("cotizador_servicios", operation, cause)
   }
 }
 
-export class CotizadorServiciosNotFoundException extends NotFoundException {
+export class QuoterServicesNotFoundException extends NotFoundException {
   constructor(criteria: string) {
     super("cotizador_servicios", criteria)
   }
 }
 
-export class CotizadorServiciosValidationException extends ValidationException {
+export class QuoterServicesValidationException extends ValidationException {
   constructor(message: string, details?: Record<string, unknown>) {
     super("cotizador_servicios", message, details)
   }

@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server"
 
 import { createClient } from "@/lib/supabase/server"
-import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
+import type { QuotesRow } from "@/types/quotes/quotes.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
 export type AuthorizedContext = {
@@ -34,16 +34,16 @@ export async function requireAuthenticated(): Promise<AuthorizedContext | AuthFa
   }
 }
 
-export async function authorizeCotizacion(
-  cotizacionId: string,
-): Promise<{ ctx: AuthorizedContext; cotizacion: CotizacionesRow } | AuthFailure> {
+export async function authorizeQuote(
+  quoteId: string,
+): Promise<{ ctx: AuthorizedContext; cotizacion: QuotesRow } | AuthFailure> {
   const ctx = await requireAuthenticated()
   if (ctx instanceof NextResponse) return ctx
 
   const { data, error } = await ctx.supabase
     .from("cotizaciones")
     .select("*")
-    .eq("id", cotizacionId)
+    .eq("id", quoteId)
     .maybeSingle()
 
   if (error || !data) {
@@ -53,7 +53,7 @@ export async function authorizeCotizacion(
     )
   }
 
-  const cotizacion = data as CotizacionesRow
+  const cotizacion = data as QuotesRow
   if (cotizacion.operador_id !== ctx.userId && !ctx.isAdmin) {
     return NextResponse.json(
       { error: "No tenés permisos para esta cotización" },
@@ -64,7 +64,7 @@ export async function authorizeCotizacion(
   return { ctx, cotizacion }
 }
 
-export function ensureEditable(cotizacion: CotizacionesRow): NextResponse | null {
+export function ensureEditable(cotizacion: QuotesRow): NextResponse | null {
   if (cotizacion.estado !== "borrador") {
     return NextResponse.json(
       {

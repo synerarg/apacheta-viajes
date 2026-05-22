@@ -2,10 +2,10 @@ import Link from "next/link"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
 import { createTraslado } from "@/app/dashboard/traslados/actions"
-import { TrasladoForm } from "@/components/dashboard/traslado-form"
+import { TransferForm } from "@/components/dashboard/transfer-form"
 import { adminClient } from "@/lib/supabase/admin-client"
 
-async function getDestinos() {
+async function getDestinations() {
   const { data } = await adminClient
     .from("destinos")
     .select("*")
@@ -15,8 +15,8 @@ async function getDestinos() {
   return data ?? []
 }
 
-export default async function NuevoTrasladoPage() {
-  const destinos = await getDestinos()
+export default async function NuevoTransferPage() {
+  const destinos = await getDestinations()
 
   return (
     <div className="min-h-full bg-neutral-50 pb-16">
@@ -36,7 +36,7 @@ export default async function NuevoTrasladoPage() {
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <TrasladoForm action={createTraslado} destinos={destinos} />
+        <TransferForm action={createTraslado} destinos={destinos} />
       </div>
     </div>
   )

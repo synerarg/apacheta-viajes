@@ -4,8 +4,8 @@ import { z } from "zod"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { adminClient } from "@/lib/supabase/admin-client"
 import { createClient } from "@/lib/supabase/server"
-import { createSolicitudesContactoRepository } from "@/repositories/solicitudes-contacto/solicitudes-contacto.repository"
-import { createSolicitudesContactoService } from "@/services/solicitudes-contacto/solicitudes-contacto.service"
+import { createContactRequestsRepository } from "@/repositories/contact-requests/contact-requests.repository"
+import { createContactRequestsService } from "@/services/contact-requests/contact-requests.service"
 import type { DatabaseClient } from "@/types/database/database.types"
 
 const contactRequestSchema = z.object({
@@ -59,10 +59,10 @@ export async function POST(request: Request) {
       )
     }
 
-    const solicitudesContactoService = createSolicitudesContactoService(
-      createSolicitudesContactoRepository(adminClient as DatabaseClient),
+    const requestsContactoService = createContactRequestsService(
+      createContactRequestsRepository(adminClient as DatabaseClient),
     )
-    const solicitud = await solicitudesContactoService.create({
+    const solicitud = await requestsContactoService.create({
       nombre_completo: payload.nombreCompleto,
       correo_electronico: resolvedEmail,
       tipo_viaje: payload.tipoViaje ?? null,

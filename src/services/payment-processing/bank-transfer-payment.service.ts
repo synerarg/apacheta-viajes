@@ -1,9 +1,9 @@
 import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptValidationException,
-} from "@/exceptions/payments/payments.exceptions"
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import { getBankTransferConfig } from "@/lib/payments/payments.config"
-import type { PaymentsRepository } from "@/repositories/payments/payments.repository"
+import type { PaymentProcessingRepository } from "@/repositories/payment-processing/payment-processing.repository"
 import type { TransactionalEmailService } from "@/services/notifications/transactional-email.service"
 import type {
   AuthorizeBankTransferReceiptUploadInput,
@@ -16,7 +16,7 @@ import type {
   ExpireBankTransferPaymentsResult,
   RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
-} from "@/types/payments/payments.types"
+} from "@/types/payment-processing/payment-processing.types"
 
 const MIME_TYPE_TO_EXTENSIONS: Record<string, string[]> = {
   "application/pdf": [".pdf"],
@@ -58,7 +58,7 @@ function buildPaymentOwnershipPrefix(orderId: string, paymentId: string) {
 
 export class BankTransferPaymentService {
   constructor(
-    private readonly paymentsRepository: PaymentsRepository,
+    private readonly paymentsRepository: PaymentProcessingRepository,
     private readonly transactionalEmailService?: TransactionalEmailService,
   ) {}
 

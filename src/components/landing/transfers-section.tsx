@@ -3,10 +3,10 @@ import Link from "next/link"
 import { ArrowRight, Car, MapPin } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
-import type { StorefrontTrasladoItem } from "@/lib/storefront/traslados.server"
+import type { StorefrontTransferItem } from "@/lib/storefront/traslados.server"
 
-interface TrasladosSectionProps {
-  traslados: StorefrontTrasladoItem[]
+interface TransfersSectionProps {
+  traslados: StorefrontTransferItem[]
 }
 
 const VEHICULO_LABEL: Record<string, string> = {
@@ -21,7 +21,7 @@ function tipoLabel(tipo: "regular" | "privado") {
   return tipo === "regular" ? "Regular" : "Privado"
 }
 
-export function TrasladosSection({ traslados }: TrasladosSectionProps) {
+export function TransfersSection({ traslados }: TransfersSectionProps) {
   return (
     <section id="traslados" className="py-16 md:py-24 bg-stone-50/50">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">

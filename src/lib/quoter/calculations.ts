@@ -41,13 +41,13 @@ export function calcItemSubtotals(input: ItemSubtotalsInput): ItemSubtotalsOutpu
   return { subtotalVenta, subtotalComision, subtotalNeto }
 }
 
-export interface CotizacionTotalsItem {
+export interface QuoteTotalsItem {
   subtotalVenta: number
   subtotalComision: number
   subtotalNeto: number
 }
 
-export interface CotizacionTotalsOutput {
+export interface QuoteTotalsOutput {
   totalVenta: number
   totalComision: number
   totalNeto: number
@@ -55,11 +55,11 @@ export interface CotizacionTotalsOutput {
   totalFinal: number
 }
 
-export function calcCotizacionTotals(
-  items: CotizacionTotalsItem[],
+export function calcQuoteTotals(
+  items: QuoteTotalsItem[],
   aplicaImpuesto: boolean,
   impuestoPct: number,
-): CotizacionTotalsOutput {
+): QuoteTotalsOutput {
   const sums = items.reduce(
     (acc, it) => {
       acc.totalVenta += Number(it.subtotalVenta) || 0

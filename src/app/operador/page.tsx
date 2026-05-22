@@ -8,10 +8,10 @@ import {
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
-import { EliminarCotizacionButton } from "@/components/operador/eliminar-cotizacion-button"
+import { DeleteQuoteButton } from "@/components/operator/delete-quote-button"
 import { createClient } from "@/lib/supabase/server"
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
-import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
+import type { QuotesRow } from "@/types/quotes/quotes.types"
 
 export const dynamic = "force-dynamic"
 
@@ -24,7 +24,7 @@ const TABS = [
 type TabKey = (typeof TABS)[number]["key"]
 
 const ESTADO_META: Record<
-  CotizacionesRow["estado"],
+  QuotesRow["estado"],
   {
     label: string
     dot: string
@@ -69,7 +69,7 @@ function formatMoney(value: number) {
   return `$${Math.round(value || 0).toLocaleString("es-AR")}`
 }
 
-export default async function OperadorPage({
+export default async function OperatorPage({
   searchParams,
 }: {
   searchParams: Promise<{ estado?: string }>
@@ -87,7 +87,7 @@ export default async function OperadorPage({
     redirect("/login?next=/operador")
   }
 
-  const controller = await createServerCotizacionesController()
+  const controller = await createServerQuotesController()
   const all = await controller.listMine(user.id)
   const counts: Record<TabKey, number> = {
     borrador: 0,
@@ -95,7 +95,7 @@ export default async function OperadorPage({
     archivada: 0,
   }
   for (const cot of all) counts[cot.estado] = (counts[cot.estado] ?? 0) + 1
-  const cotizaciones: CotizacionesRow[] = all.filter(
+  const cotizaciones: QuotesRow[] = all.filter(
     (c) => c.estado === activeTab,
   )
 
@@ -121,7 +121,7 @@ export default async function OperadorPage({
           Referencia de estados
         </p>
         <div className="flex flex-wrap gap-3 text-xs text-neutral-600">
-          {(Object.keys(ESTADO_META) as CotizacionesRow["estado"][]).map(
+          {(Object.keys(ESTADO_META) as QuotesRow["estado"][]).map(
             (estado) => {
               const meta = ESTADO_META[estado]
               return (
@@ -217,12 +217,22 @@ export default async function OperadorPage({
                     </Link>
 
                     <div className="flex items-center gap-3 shrink-0">
-                      <div className="text-right">
+                      <div className="hidden text-right sm:block">
                         <p className="text-[10px] uppercase tracking-wider text-neutral-400">
                           Total final
                         </p>
                         <p className="font-semibold text-neutral-900">
                           {formatMoney(cot.total_final)}
+                        </p>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-[10px] uppercase tracking-wider text-neutral-400">
+                          Tu comisión
+                        </p>
+                        <p className="font-semibold text-emerald-700">
+                          {cot.total_comision > 0
+                            ? formatMoney(cot.total_comision)
+                            : "—"}
                         </p>
                       </div>
                       <span
@@ -231,8 +241,8 @@ export default async function OperadorPage({
                         <Icon className="h-3.5 w-3.5" weight="fill" />
                         {meta.label}
                       </span>
-                      <EliminarCotizacionButton
-                        cotizacionId={cot.id}
+                      <DeleteQuoteButton
+                        quoteId={cot.id}
                         clienteNombre={cot.cliente_nombre}
                         variant="icon"
                       />

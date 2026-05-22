@@ -1,4 +1,4 @@
-export interface HotelesImagenesRow {
+export interface HotelImagesRow {
   id: string
   hotel_id: string
   url: string
@@ -7,7 +7,7 @@ export interface HotelesImagenesRow {
   created_at: string | null
 }
 
-export interface HotelesImagenesInsert {
+export interface HotelImagesInsert {
   id?: string
   hotel_id: string
   url: string
@@ -16,7 +16,7 @@ export interface HotelesImagenesInsert {
   created_at?: string | null
 }
 
-export interface HotelesImagenesUpdate {
+export interface HotelImagesUpdate {
   id?: string
   hotel_id?: string
   url?: string

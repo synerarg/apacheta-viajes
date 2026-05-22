@@ -2,8 +2,8 @@ import { redirect } from "next/navigation"
 
 import { DashboardSidebarClient } from "@/components/dashboard/dashboard-sidebar-client"
 import { createClient } from "@/lib/supabase/server"
-import { createUsuariosRepository } from "@/repositories/usuarios/usuarios.repository"
-import { createUsuariosService } from "@/services/usuarios/usuarios.service"
+import { createUsersRepository } from "@/repositories/users/users.repository"
+import { createUsersService } from "@/services/users/users.service"
 
 export default async function DashboardLayout({
   children,
@@ -19,10 +19,10 @@ export default async function DashboardLayout({
     redirect("/login")
   }
 
-  const usuariosService = createUsuariosService(
-    createUsuariosRepository(supabase),
+  const usersService = createUsersService(
+    createUsersRepository(supabase),
   )
-  const profile = await usuariosService.get({ id: user.id })
+  const profile = await usersService.get({ id: user.id })
 
   if (profile?.tipo !== "admin") {
     redirect("/")

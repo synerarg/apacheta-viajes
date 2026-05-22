@@ -1,35 +1,35 @@
 import {
-  ExperienciasNotFoundException,
-  ExperienciasServiceException,
-} from "@/exceptions/experiencias/experiencias.exceptions"
-import { ExperienciasRepository } from "@/repositories/experiencias/experiencias.repository"
+  ExperiencesNotFoundException,
+  ExperiencesServiceException,
+} from "@/exceptions/experiences/experiences.exceptions"
+import { ExperiencesRepository } from "@/repositories/experiences/experiences.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  ExperienciasRow,
-  ExperienciasUpdate,
-} from "@/types/experiencias/experiencias.types"
+  ExperiencesRow,
+  ExperiencesUpdate,
+} from "@/types/experiences/experiences.types"
 
-export class ExperienciasService extends BaseService<"experiencias"> {
-  constructor(repository: ExperienciasRepository) {
+export class ExperiencesService extends BaseService<"experiencias"> {
+  constructor(repository: ExperiencesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new ExperienciasServiceException(operation, cause)
+    return new ExperiencesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new ExperienciasNotFoundException(criteria)
+    return new ExperiencesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<ExperienciasRow> {
+  async getById(id: string): Promise<ExperiencesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: ExperienciasUpdate,
-  ): Promise<ExperienciasRow> {
+    payload: ExperiencesUpdate,
+  ): Promise<ExperiencesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,6 +38,6 @@ export class ExperienciasService extends BaseService<"experiencias"> {
   }
 }
 
-export function createExperienciasService(repository: ExperienciasRepository) {
-  return new ExperienciasService(repository)
+export function createExperiencesService(repository: ExperiencesRepository) {
+  return new ExperiencesService(repository)
 }

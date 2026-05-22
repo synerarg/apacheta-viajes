@@ -1,5 +1,5 @@
-export type { OrdenEstado, PagoEstado, MetodoPago } from "@/types/shared/enums"
-import type { OrdenEstado, PagoEstado, MetodoPago, Moneda } from "@/types/shared/enums"
+export type { OrderStatus, PaymentStatus, PaymentMethod } from "@/types/shared/enums"
+import type { OrderStatus, PaymentStatus, PaymentMethod, Moneda } from "@/types/shared/enums"
 
 type DatabaseJson =
   | string
@@ -10,16 +10,16 @@ type DatabaseJson =
   | DatabaseJson[]
 
 // Re-export legacy aliases for backwards compatibility
-export type OrdenEstadoPago = PagoEstado
-export type OrdenMetodoPago = MetodoPago
+export type OrderPaymentStatus = PaymentStatus
+export type OrderPaymentMethod = PaymentMethod
 
-export interface OrdenesRow {
+export interface OrdersRow {
   id: string
   usuario_id: string
   codigo_referencia: string
-  estado: OrdenEstado
-  estado_pago: PagoEstado
-  metodo_pago: MetodoPago
+  estado: OrderStatus
+  estado_pago: PaymentStatus
+  metodo_pago: PaymentMethod
   total: number
   moneda: Moneda
   contacto: DatabaseJson | null
@@ -29,13 +29,13 @@ export interface OrdenesRow {
   updated_at: string | null
 }
 
-export interface OrdenesInsert {
+export interface OrdersInsert {
   id?: string
   usuario_id: string
   codigo_referencia: string
-  estado?: OrdenEstado
-  estado_pago?: PagoEstado
-  metodo_pago: MetodoPago
+  estado?: OrderStatus
+  estado_pago?: PaymentStatus
+  metodo_pago: PaymentMethod
   total: number
   moneda?: Moneda
   contacto?: DatabaseJson | null
@@ -45,13 +45,13 @@ export interface OrdenesInsert {
   updated_at?: string | null
 }
 
-export interface OrdenesUpdate {
+export interface OrdersUpdate {
   id?: string
   usuario_id?: string
   codigo_referencia?: string
-  estado?: OrdenEstado
-  estado_pago?: PagoEstado
-  metodo_pago?: MetodoPago
+  estado?: OrderStatus
+  estado_pago?: PaymentStatus
+  metodo_pago?: PaymentMethod
   total?: number
   moneda?: Moneda
   contacto?: DatabaseJson | null

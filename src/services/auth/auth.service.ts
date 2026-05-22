@@ -2,19 +2,19 @@ import type { Session, User } from "@supabase/supabase-js"
 
 import { AuthServiceException } from "@/exceptions/auth/auth.exceptions"
 import { createAuthRepository, type AuthRepository } from "@/repositories/auth/auth.repository"
-import { createUsuariosRepository } from "@/repositories/usuarios/usuarios.repository"
-import type { UsuariosService } from "@/services/usuarios/usuarios.service"
-import { createUsuariosService } from "@/services/usuarios/usuarios.service"
+import { createUsersRepository } from "@/repositories/users/users.repository"
+import type { UsersService } from "@/services/users/users.service"
+import { createUsersService } from "@/services/users/users.service"
 import type { DatabaseClient } from "@/types/database/database.types"
 import type {
-  UsuariosInsert,
-  UsuariosRow,
-  UsuariosUpdate,
-} from "@/types/usuarios/usuarios.types"
+  UsersInsert,
+  UsersRow,
+  UsersUpdate,
+} from "@/types/users/users.types"
 
 interface CreateAuthServiceOptions {
   authRepository: AuthRepository
-  usuariosService: UsuariosService
+  usersService: UsersService
 }
 
 function getMetadataValue(
@@ -29,15 +29,15 @@ function getMetadataValue(
 export class AuthService {
   constructor(
     private readonly authRepository: AuthRepository,
-    private readonly usuariosService: UsuariosService,
+    private readonly usersService: UsersService,
   ) {}
 
-  private buildUsuariosPayload(user: User): UsuariosInsert {
+  private buildUsersPayload(user: User): UsersInsert {
     const email = user.email
 
     if (!email) {
       throw new AuthServiceException(
-        "buildUsuariosPayload",
+        "buildUsersPayload",
         new Error("No pudimos recuperar el correo de la cuenta autenticada."),
       )
     }
@@ -66,10 +66,10 @@ export class AuthService {
     }
   }
 
-  private buildUsuariosUpdate(
-    currentUser: UsuariosRow,
-    payload: UsuariosInsert,
-  ): UsuariosUpdate {
+  private buildUsersUpdate(
+    currentUser: UsersRow,
+    payload: UsersInsert,
+  ): UsersUpdate {
     return {
       email: payload.email,
       nombre: payload.nombre ?? currentUser.nombre,
@@ -78,7 +78,7 @@ export class AuthService {
     }
   }
 
-  async syncAuthenticatedUser(): Promise<UsuariosRow | null> {
+  async syncAuthenticatedUser(): Promise<UsersRow | null> {
     try {
       const user = await this.authRepository.getAuthenticatedUser()
 
@@ -106,18 +106,18 @@ export class AuthService {
     }
   }
 
-  async syncProfile(user: User): Promise<UsuariosRow> {
+  async syncProfile(user: User): Promise<UsersRow> {
     try {
-      const payload = this.buildUsuariosPayload(user)
-      const currentProfile = await this.usuariosService.get({ id: user.id })
+      const payload = this.buildUsersPayload(user)
+      const currentProfile = await this.usersService.get({ id: user.id })
 
       if (!currentProfile) {
-        return await this.usuariosService.create(payload)
+        return await this.usersService.create(payload)
       }
 
-      return await this.usuariosService.updateById(
+      return await this.usersService.updateById(
         user.id,
-        this.buildUsuariosUpdate(currentProfile, payload),
+        this.buildUsersUpdate(currentProfile, payload),
       )
     } catch (error) {
       throw new AuthServiceException("syncProfile", error)
@@ -127,14 +127,14 @@ export class AuthService {
 
 export function createAuthService({
   authRepository,
-  usuariosService,
+  usersService,
 }: CreateAuthServiceOptions) {
-  return new AuthService(authRepository, usuariosService)
+  return new AuthService(authRepository, usersService)
 }
 
 export function createServerAuthService(supabase: DatabaseClient) {
   return createAuthService({
     authRepository: createAuthRepository(supabase),
-    usuariosService: createUsuariosService(createUsuariosRepository(supabase)),
+    usersService: createUsersService(createUsersRepository(supabase)),
   })
 }

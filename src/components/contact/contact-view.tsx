@@ -4,7 +4,7 @@ import { MapPin, Mail, Phone } from "lucide-react"
 
 import { TravelInquiryForm } from "@/components/shared/travel-inquiry-form"
 
-export function ContactoView() {
+export function ContactView() {
   return (
     <main className="min-h-screen bg-off-white pt-28 pb-20">
       <div className="mx-auto w-[calc(100%-1rem)] max-w-[1440px]">

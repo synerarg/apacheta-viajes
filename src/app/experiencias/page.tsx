@@ -1,5 +1,5 @@
 import type { Metadata } from "next"
-import { CatalogoExperiencias } from "@/components/experiencias/catalogo-experiencias"
+import { CatalogExperiences } from "@/components/experiences/catalog-experiences"
 import { getExperiencesCatalogData } from "@/lib/storefront/storefront.server"
 
 export const metadata: Metadata = {
@@ -8,15 +8,15 @@ export const metadata: Metadata = {
     "Experiencias únicas en el Norte Argentino: cultura andina, trekking, vinos de altura, safaris fotográficos y más.",
 }
 
-interface ExperienciasPageProps {
+interface ExperiencesPageProps {
   searchParams: Promise<{
     categoria?: string
   }>
 }
 
-export default async function ExperienciasPage({
+export default async function ExperiencesPage({
   searchParams,
-}: ExperienciasPageProps) {
+}: ExperiencesPageProps) {
   const [{ items, categories }, resolvedSearchParams] = await Promise.all([
     getExperiencesCatalogData(),
     searchParams,
@@ -28,7 +28,7 @@ export default async function ExperienciasPage({
       : "Todos"
 
   return (
-    <CatalogoExperiencias
+    <CatalogExperiences
       experiencias={items}
       categorias={categories}
       initialCategoria={initialCategoria}

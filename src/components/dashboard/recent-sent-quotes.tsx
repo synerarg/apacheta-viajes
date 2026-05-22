@@ -1,12 +1,12 @@
 import Link from "next/link"
 
 import { Card, CardContent } from "@/components/ui/card"
-import type { CotizacionesRow } from "@/types/cotizaciones/cotizaciones.types"
-import type { OperadoresRow } from "@/types/operadores/operadores.types"
+import type { QuotesRow } from "@/types/quotes/quotes.types"
+import type { OperatorsRow } from "@/types/operators/operators.types"
 
-interface CotizacionesEnviadasRecientesProps {
-  cotizaciones: CotizacionesRow[]
-  operadoresMap: Map<string, OperadoresRow>
+interface RecentSentQuotesProps {
+  cotizaciones: QuotesRow[]
+  operatorsMap: Map<string, OperatorsRow>
   formatCurrency: (value: number) => string
   formatRelative: (iso: string | null) => string
 }
@@ -21,12 +21,12 @@ function formatDateRange(inicio: string | null, fin: string | null) {
   return `${start} → ${end}`
 }
 
-export function CotizacionesEnviadasRecientes({
+export function RecentSentQuotes({
   cotizaciones,
-  operadoresMap,
+  operatorsMap,
   formatCurrency,
   formatRelative,
-}: CotizacionesEnviadasRecientesProps) {
+}: RecentSentQuotesProps) {
   if (cotizaciones.length === 0) {
     return (
       <Card>
@@ -41,8 +41,8 @@ export function CotizacionesEnviadasRecientes({
   return (
     <div className="space-y-2">
       {cotizaciones.map((cot) => {
-        const operador = operadoresMap.get(cot.operador_id)
-        const operadorLabel =
+        const operador = operatorsMap.get(cot.operador_id)
+        const operatorLabel =
           operador?.nombre_comercial ?? operador?.nombre ?? "Operador desconocido"
         const cliente = cot.cliente_nombre ?? "Cliente sin nombre"
 
@@ -57,7 +57,7 @@ export function CotizacionesEnviadasRecientes({
                 <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                     <p className="truncate font-semibold text-neutral-900">
-                      {operadorLabel}
+                      {operatorLabel}
                     </p>
                     <span className="inline-flex items-center rounded-full bg-emerald-100 px-2 py-0.5 text-[11px] font-medium text-emerald-800">
                       Enviada

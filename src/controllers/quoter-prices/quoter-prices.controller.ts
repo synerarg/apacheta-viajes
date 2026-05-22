@@ -1,31 +1,31 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createCotizadorPreciosRepository } from "@/repositories/cotizador-precios/cotizador-precios.repository"
+import { createQuoterPricesRepository } from "@/repositories/quoter-prices/quoter-prices.repository"
 import {
-  CotizadorPreciosService,
-  createCotizadorPreciosService,
-} from "@/services/cotizador-precios/cotizador-precios.service"
+  QuoterPricesService,
+  createQuoterPricesService,
+} from "@/services/quoter-prices/quoter-prices.service"
 
-export class CotizadorPreciosController extends BaseIdController<
+export class QuoterPricesController extends BaseIdController<
   "cotizador_servicio_precios",
-  CotizadorPreciosService
+  QuoterPricesService
 > {
-  constructor(service: CotizadorPreciosService) {
+  constructor(service: QuoterPricesService) {
     super(service)
   }
 
-  findByServicio(servicioId: string) {
-    return this.service.findByServicio(servicioId)
+  findByService(serviceId: string) {
+    return this.service.findByService(serviceId)
   }
 
-  findActiveForDate(servicioId: string, date: string) {
-    return this.service.findActiveForDate(servicioId, date)
+  findActiveForDate(serviceId: string, date: string) {
+    return this.service.findActiveForDate(serviceId, date)
   }
 }
 
-export async function createServerCotizadorPreciosController() {
+export async function createServerQuoterPricesController() {
   const supabase = await createClient()
-  return new CotizadorPreciosController(
-    createCotizadorPreciosService(createCotizadorPreciosRepository(supabase)),
+  return new QuoterPricesController(
+    createQuoterPricesService(createQuoterPricesRepository(supabase)),
   )
 }

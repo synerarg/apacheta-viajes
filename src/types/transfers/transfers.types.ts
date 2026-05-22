@@ -1,15 +1,15 @@
 import type { Moneda } from "@/types/shared/enums"
 
-export type TrasladoTipoServicio = "regular" | "privado"
-export type TrasladoModalidad = "ida" | "ida_vuelta" | "punto_a_punto"
-export type TrasladoVehiculoTipo =
+export type TransferServiceType = "regular" | "privado"
+export type TransferModality = "ida" | "ida_vuelta" | "punto_a_punto"
+export type TransferVehicleType =
   | "auto"
   | "combi"
   | "minibus"
   | "camioneta_4x4"
   | "bus"
 
-export interface TrasladosRow {
+export interface TransfersRow {
   id: string
   nombre: string
   slug: string
@@ -17,9 +17,9 @@ export interface TrasladosRow {
   descripcion_corta: string | null
   origen: string
   destino: string
-  tipo_servicio: TrasladoTipoServicio
-  modalidad: TrasladoModalidad
-  vehiculo_tipo: TrasladoVehiculoTipo | null
+  tipo_servicio: TransferServiceType
+  modalidad: TransferModality
+  vehiculo_tipo: TransferVehicleType | null
   capacidad_max: number | null
   base_minima_pax: number
   precio_desde: number
@@ -37,7 +37,7 @@ export interface TrasladosRow {
   updated_at: string | null
 }
 
-export interface TrasladosInsert {
+export interface TransfersInsert {
   id?: string
   nombre: string
   slug: string
@@ -45,9 +45,9 @@ export interface TrasladosInsert {
   descripcion_corta?: string | null
   origen: string
   destino: string
-  tipo_servicio?: TrasladoTipoServicio
-  modalidad?: TrasladoModalidad
-  vehiculo_tipo?: TrasladoVehiculoTipo | null
+  tipo_servicio?: TransferServiceType
+  modalidad?: TransferModality
+  vehiculo_tipo?: TransferVehicleType | null
   capacidad_max?: number | null
   base_minima_pax?: number
   precio_desde?: number
@@ -65,7 +65,7 @@ export interface TrasladosInsert {
   updated_at?: string | null
 }
 
-export interface TrasladosUpdate {
+export interface TransfersUpdate {
   id?: string
   nombre?: string
   slug?: string
@@ -73,9 +73,9 @@ export interface TrasladosUpdate {
   descripcion_corta?: string | null
   origen?: string
   destino?: string
-  tipo_servicio?: TrasladoTipoServicio
-  modalidad?: TrasladoModalidad
-  vehiculo_tipo?: TrasladoVehiculoTipo | null
+  tipo_servicio?: TransferServiceType
+  modalidad?: TransferModality
+  vehiculo_tipo?: TransferVehicleType | null
   capacidad_max?: number | null
   base_minima_pax?: number
   precio_desde?: number

@@ -1,4 +1,4 @@
-import { HotelesServiceException } from "@/exceptions/hoteles/hoteles.exceptions"
+import { HotelsServiceException } from "@/exceptions/hotels/hotels.exceptions"
 
 function getEnvironmentVariable(name: string) {
   return process.env[name]?.trim() ?? null
@@ -8,7 +8,7 @@ function getRequiredEnvironmentVariable(name: string) {
   const value = getEnvironmentVariable(name)
 
   if (!value) {
-    throw new HotelesServiceException(
+    throw new HotelsServiceException(
       "getRequiredHyperGuestEnvironmentVariable",
       new Error(`Missing environment variable: ${name}`),
     )

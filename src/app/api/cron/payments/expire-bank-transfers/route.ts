@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-import { createAdminPaymentsController } from "@/controllers/payments/payments.controller"
+import { createAdminPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 
 function isAuthorized(request: Request) {
   const cronSecret = process.env.CRON_SECRET?.trim()
@@ -23,7 +23,7 @@ async function handleCronRequest(request: Request) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
     }
 
-    const paymentsController = createAdminPaymentsController()
+    const paymentsController = createAdminPaymentProcessingController()
     const result = await paymentsController.expireOpenBankTransfers()
 
     return NextResponse.json(

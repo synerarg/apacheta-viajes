@@ -1,12 +1,12 @@
 import { render } from "@react-email/components"
 
-import { SolicitudOperadorEmail } from "@/emails/solicitud-operador.email"
+import { OperatorRequestEmail } from "@/emails/solicitud-operador.email"
 import {
   getTransactionalEmailConfig,
   isTransactionalEmailEnabled,
 } from "@/lib/email/email.config"
 import { sendTransactionalEmail } from "@/lib/email/resend.client"
-import type { SolicitudesOperadorRow } from "@/types/solicitudes-operador/solicitudes-operador.types"
+import type { OperatorRequestsRow } from "@/types/operator-requests/operator-requests.types"
 
 type RecipientInfo = {
   email: string
@@ -37,7 +37,7 @@ async function dispatch(input: {
 
   const config = getTransactionalEmailConfig()
   const html = await render(
-    SolicitudOperadorEmail({
+    OperatorRequestEmail({
       previewText: input.previewText,
       eyebrow: input.eyebrow,
       title: input.title,
@@ -65,8 +65,8 @@ function appBaseUrl(): string {
   return getTransactionalEmailConfig().historyUrl.replace(/\/mis-reservas$/, "")
 }
 
-export async function sendSolicitudOperadorRecibida(
-  solicitud: SolicitudesOperadorRow,
+export async function sendOperatorRequestRecibida(
+  solicitud: OperatorRequestsRow,
   recipient: RecipientInfo,
 ) {
   return dispatch({
@@ -98,8 +98,8 @@ export async function sendSolicitudOperadorRecibida(
   })
 }
 
-export async function sendSolicitudOperadorAprobada(
-  solicitud: SolicitudesOperadorRow,
+export async function sendOperatorRequestAprobada(
+  solicitud: OperatorRequestsRow,
   recipient: RecipientInfo,
 ) {
   return dispatch({
@@ -125,8 +125,8 @@ export async function sendSolicitudOperadorAprobada(
   })
 }
 
-export async function sendSolicitudOperadorRechazada(
-  solicitud: SolicitudesOperadorRow,
+export async function sendOperatorRequestRechazada(
+  solicitud: OperatorRequestsRow,
   recipient: RecipientInfo,
 ) {
   const motivo = solicitud.motivo_rechazo?.trim()

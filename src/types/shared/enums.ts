@@ -1,8 +1,8 @@
 // Enums compartidos — espejo de los tipos de base de datos de PostgreSQL
 
-export type UsuarioTipo = "cliente" | "operador" | "admin"
+export type UserType = "cliente" | "operador" | "admin"
 
-export type OrdenEstado =
+export type OrderStatus =
   | "pendiente"
   | "pago_pendiente"
   | "pago_reportado"
@@ -11,7 +11,7 @@ export type OrdenEstado =
   | "cancelada"
   | "completada"
 
-export type PagoEstado =
+export type PaymentStatus =
   | "pending"
   | "requires_action"
   | "reported"
@@ -20,32 +20,32 @@ export type PagoEstado =
   | "cancelled"
   | "expired"
 
-export type MetodoPago =
+export type PaymentMethod =
   | "mercadopago_checkout_pro"
   | "bank_transfer"
   | "cash_local"
 
-export type PagoProveedor = "mercadopago" | "bank_transfer" | "cash_local"
+export type PaymentProvider = "mercadopago" | "bank_transfer" | "cash_local"
 
-export type ReservaTipo = "paquete" | "experiencia"
+export type ReservationType = "paquete" | "experiencia"
 
-export type ReservaEstado =
+export type ReservationStatus =
   | "pendiente"
   | "confirmada"
   | "pagada"
   | "completada"
   | "cancelada"
 
-export type SolicitudEstado = "nuevo" | "en_proceso" | "respondido" | "cerrado"
+export type RequestStatus = "nuevo" | "en_proceso" | "respondido" | "cerrado"
 
-export type SolicitudOperadorEstado =
+export type OperatorRequestStatus =
   | "pendiente"
   | "en_revision"
   | "aprobada"
   | "rechazada"
   | "cancelada"
 
-export type RegimenAlimentario =
+export type MealPlan =
   | "desayuno"
   | "media_pension"
   | "pension_completa"

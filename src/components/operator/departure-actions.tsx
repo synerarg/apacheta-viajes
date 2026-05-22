@@ -15,7 +15,7 @@ import {
   SheetDescription,
 } from "@/components/ui/sheet"
 
-export function SalidaActions({
+export function DepartureActions({
   text,
   publicUrl,
   clienteTelefono,

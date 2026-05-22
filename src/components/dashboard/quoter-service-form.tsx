@@ -17,12 +17,12 @@ import {
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
-import type { CotizadorCategoriasRow } from "@/types/cotizador-categorias/cotizador-categorias.types"
-import type { CotizadorServiciosRow } from "@/types/cotizador-servicios/cotizador-servicios.types"
+import type { QuoterCategoriesRow } from "@/types/quoter-categories/quoter-categories.types"
+import type { QuoterServicesRow } from "@/types/quoter-services/quoter-services.types"
 
-interface CotizadorServicioFormProps {
-  categorias: CotizadorCategoriasRow[]
-  initialData?: Partial<CotizadorServiciosRow>
+interface QuoterServiceFormProps {
+  categorias: QuoterCategoriesRow[]
+  initialData?: Partial<QuoterServicesRow>
   isEdit?: boolean
 }
 
@@ -30,15 +30,15 @@ type FieldErrors = Partial<
   Record<"nombre" | "categoria_id" | "comision_pct" | "orden", string>
 >
 
-export function CotizadorServicioForm({
+export function QuoterServiceForm({
   categorias,
   initialData,
   isEdit = false,
-}: CotizadorServicioFormProps) {
+}: QuoterServiceFormProps) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
 
-  const [categoriaId, setCategoriaId] = useState<string>(
+  const [categoryId, setCategoriaId] = useState<string>(
     initialData?.categoria_id ?? "__none__",
   )
   const [nombre, setNombre] = useState(initialData?.nombre ?? "")
@@ -66,7 +66,7 @@ export function CotizadorServicioForm({
 
     const errors: FieldErrors = {}
     if (!nombre.trim()) errors.nombre = "El nombre es requerido"
-    if (categoriaId === "__none__") {
+    if (categoryId === "__none__") {
       errors.categoria_id = "Seleccioná una categoría"
     }
     const parsedComision = Number(comisionPct)
@@ -83,7 +83,7 @@ export function CotizadorServicioForm({
     startTransition(async () => {
       try {
         const payload = {
-          categoria_id: categoriaId === "__none__" ? null : categoriaId,
+          categoria_id: categoryId === "__none__" ? null : categoryId,
           nombre: nombre.trim(),
           descripcion: descripcion.trim() || null,
           comision_pct: parsedComision,
@@ -138,7 +138,7 @@ export function CotizadorServicioForm({
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div className="space-y-1.5">
               <Label>Categoría</Label>
-              <Select value={categoriaId} onValueChange={setCategoriaId}>
+              <Select value={categoryId} onValueChange={setCategoriaId}>
                 <SelectTrigger className="w-full">
                   <SelectValue placeholder="Seleccionar categoría" />
                 </SelectTrigger>

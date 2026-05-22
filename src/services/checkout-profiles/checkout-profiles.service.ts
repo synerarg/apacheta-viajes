@@ -22,39 +22,39 @@ export class CheckoutProfilesService extends BaseService<"checkout_profiles"> {
     return new CheckoutProfilesNotFoundException(criteria)
   }
 
-  async getByUsuarioId(usuarioId: string): Promise<CheckoutProfilesRow | null> {
-    return this.get({ usuario_id: usuarioId })
+  async getByUserId(userId: string): Promise<CheckoutProfilesRow | null> {
+    return this.get({ usuario_id: userId })
   }
 
-  async upsertByUsuarioId(
-    usuarioId: string,
+  async upsertByUserId(
+    userId: string,
     payload: CheckoutProfilesUpdate,
   ): Promise<CheckoutProfilesRow> {
     try {
       const profile = await (
         this.repository as CheckoutProfilesRepository
-      ).upsertByUsuarioId(usuarioId, {
+      ).upsertByUserId(userId, {
         ...payload,
         updated_at: new Date().toISOString(),
       })
 
       if (!profile) {
-        throw new CheckoutProfilesNotFoundException(`usuario_id ${usuarioId}`)
+        throw new CheckoutProfilesNotFoundException(`usuario_id ${userId}`)
       }
 
       return profile
     } catch (error) {
-      this.handleServiceError("upsertByUsuarioId", error)
+      this.handleServiceError("upsertByUserId", error)
     }
   }
 
-  async deleteByUsuarioId(usuarioId: string): Promise<void> {
+  async deleteByUserId(userId: string): Promise<void> {
     try {
       await (
         this.repository as CheckoutProfilesRepository
-      ).deleteByUsuarioId(usuarioId)
+      ).deleteByUserId(userId)
     } catch (error) {
-      this.handleServiceError("deleteByUsuarioId", error)
+      this.handleServiceError("deleteByUserId", error)
     }
   }
 }

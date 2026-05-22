@@ -1,7 +1,7 @@
 import Link from "next/link"
 import { CaretLeft } from "@phosphor-icons/react/dist/ssr"
 
-import { CotizadorCategoriaForm } from "@/components/dashboard/cotizador-categoria-form"
+import { QuoterCategoryForm } from "@/components/dashboard/quoter-category-form"
 
 export default function NuevaCategoriaPage() {
   return (
@@ -20,7 +20,7 @@ export default function NuevaCategoriaPage() {
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <CotizadorCategoriaForm />
+        <QuoterCategoryForm />
       </div>
     </div>
   )

@@ -1,34 +1,34 @@
-export type { UsuarioTipo } from "@/types/shared/enums"
-import type { UsuarioTipo } from "@/types/shared/enums"
+export type { UserType } from "@/types/shared/enums"
+import type { UserType } from "@/types/shared/enums"
 
-export interface UsuariosRow {
+export interface UsersRow {
   id: string
   nombre: string | null
   apellido: string | null
   email: string
-  tipo: UsuarioTipo | null
+  tipo: UserType | null
   avatar_url: string | null
   created_at: string | null
   updated_at: string | null
 }
 
-export interface UsuariosInsert {
+export interface UsersInsert {
   id: string
   nombre?: string | null
   apellido?: string | null
   email: string
-  tipo?: UsuarioTipo | null
+  tipo?: UserType | null
   avatar_url?: string | null
   created_at?: string | null
   updated_at?: string | null
 }
 
-export interface UsuariosUpdate {
+export interface UsersUpdate {
   id?: string
   nombre?: string | null
   apellido?: string | null
   email?: string
-  tipo?: UsuarioTipo | null
+  tipo?: UserType | null
   avatar_url?: string | null
   created_at?: string | null
   updated_at?: string | null

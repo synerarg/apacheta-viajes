@@ -1,7 +1,7 @@
-import { HeroSection } from "@/components/para-agencias/hero-section"
-import { ServicesSection } from "@/components/para-agencias/services-section"
-import { WhyChooseSection } from "@/components/para-agencias/why-choose-section"
-import { ContactSection } from "@/components/para-agencias/contact-section"
+import { HeroSection } from "@/components/for-agencies/hero-section"
+import { ServicesSection } from "@/components/for-agencies/services-section"
+import { WhyChooseSection } from "@/components/for-agencies/why-choose-section"
+import { ContactSection } from "@/components/for-agencies/contact-section"
 
 export default function ParaAgenciasPage() {
   return (

@@ -1,22 +1,22 @@
-import { EmisivoDestinosRepositoryException } from "@/exceptions/emisivo-destinos/emisivo-destinos.exceptions"
+import { OutboundDestinationsRepositoryException } from "@/exceptions/outbound-destinations/outbound-destinations.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { EmisivoDestinosUpdate } from "@/types/emisivo-destinos/emisivo-destinos.types"
+import type { OutboundDestinationsUpdate } from "@/types/outbound-destinations/outbound-destinations.types"
 
-export class EmisivoDestinosRepository extends BaseRepository<"emisivo_destinos"> {
+export class OutboundDestinationsRepository extends BaseRepository<"emisivo_destinos"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "emisivo_destinos")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new EmisivoDestinosRepositoryException(operation, cause)
+    return new OutboundDestinationsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: EmisivoDestinosUpdate) {
+  async updateById(id: string, payload: OutboundDestinationsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class EmisivoDestinosRepository extends BaseRepository<"emisivo_destinos"
   }
 }
 
-export function createEmisivoDestinosRepository(supabase: DatabaseClient) {
-  return new EmisivoDestinosRepository(supabase)
+export function createOutboundDestinationsRepository(supabase: DatabaseClient) {
+  return new OutboundDestinationsRepository(supabase)
 }

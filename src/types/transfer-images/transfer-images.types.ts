@@ -1,4 +1,4 @@
-export interface TrasladosImagenesRow {
+export interface TransferImagesRow {
   id: string
   traslado_id: string
   url: string
@@ -6,7 +6,7 @@ export interface TrasladosImagenesRow {
   created_at: string | null
 }
 
-export interface TrasladosImagenesInsert {
+export interface TransferImagesInsert {
   id?: string
   traslado_id: string
   url: string
@@ -14,7 +14,7 @@ export interface TrasladosImagenesInsert {
   created_at?: string | null
 }
 
-export interface TrasladosImagenesUpdate {
+export interface TransferImagesUpdate {
   id?: string
   traslado_id?: string
   url?: string

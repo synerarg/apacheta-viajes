@@ -1,4 +1,4 @@
-export interface ExperienciaMock {
+export interface ExperienceMock {
   id: number
   nombre: string
   slug: string
@@ -21,7 +21,7 @@ export interface ExperienciaMock {
   galeria?: string[]
 }
 
-export const experienciasMock: ExperienciaMock[] = [
+export const experiencesMock: ExperienceMock[] = [
   {
     id: 1,
     nombre: "Caminata con Llamas",
@@ -188,7 +188,7 @@ export const experienciasMock: ExperienciaMock[] = [
   },
 ]
 
-export const categoriasExperiencias = [
+export const categoriasExperiences = [
   "Todos",
   "Cultura",
   "Paisaje",

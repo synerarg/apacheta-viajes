@@ -12,7 +12,7 @@ export const INITIAL_AUTH_ACTION_STATE: AuthActionState = {
   email: "",
 }
 
-import type { UsuarioTipo } from "@/types/shared/enums"
+import type { UserType } from "@/types/shared/enums"
 
 export interface AuthenticatedNavbarUser {
   id: string
@@ -20,5 +20,5 @@ export interface AuthenticatedNavbarUser {
   nombre: string | null
   apellido: string | null
   avatarUrl: string | null
-  tipo: UsuarioTipo | null
+  tipo: UserType | null
 }

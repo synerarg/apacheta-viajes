@@ -38,16 +38,42 @@ const bottomItems = [
   { href: "/", label: "Ir al sitio web", icon: Globe },
 ]
 
+type OperatorTier = { nombre: string; comisionPct: number } | null
+
+function formatCommission(value: number) {
+  return new Intl.NumberFormat("es-AR", {
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 2,
+  }).format(value)
+}
+
+function TierBadge({ tier }: { tier: OperatorTier }) {
+  if (!tier) return null
+  return (
+    <div className="mx-3 mb-4 rounded-md bg-white/5 px-3 py-2.5 ring-1 ring-white/10">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-white/40">
+        Tu categoría
+      </p>
+      <p className="mt-1 text-sm font-semibold text-white">{tier.nombre}</p>
+      <p className="mt-0.5 text-xs text-emerald-300">
+        Comisión base {formatCommission(tier.comisionPct)}%
+      </p>
+    </div>
+  )
+}
+
 function SidebarContent({
   pathname,
   isSigningOut,
   handleSignOut,
   onClose,
+  tier,
 }: {
   pathname: string
   isSigningOut: boolean
   handleSignOut: () => void
   onClose?: () => void
+  tier: OperatorTier
 }) {
   function isActive(href: string, exact: boolean) {
     return exact ? pathname === href : pathname.startsWith(href)
@@ -82,6 +108,8 @@ function SidebarContent({
           Panel de operador
         </p>
       </div>
+
+      <TierBadge tier={tier} />
 
       <nav className="flex flex-1 flex-col gap-1 px-3 pt-1">
         {navItems.map(({ href, label, icon: Icon, exact }) => {
@@ -133,7 +161,11 @@ function SidebarContent({
   )
 }
 
-export function OperadorSidebarClient() {
+export function OperatorSidebarClient({
+  tier = null,
+}: {
+  tier?: OperatorTier
+}) {
   const pathname = usePathname()
   const router = useRouter()
   const [isSigningOut, startSignOut] = useTransition()
@@ -153,6 +185,7 @@ export function OperadorSidebarClient() {
           pathname={pathname}
           isSigningOut={isSigningOut}
           handleSignOut={handleSignOut}
+          tier={tier}
         />
       </aside>
 
@@ -193,6 +226,7 @@ export function OperadorSidebarClient() {
           isSigningOut={isSigningOut}
           handleSignOut={handleSignOut}
           onClose={() => setIsOpen(false)}
+          tier={tier}
         />
       </div>
     </>

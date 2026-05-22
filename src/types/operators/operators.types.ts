@@ -1,4 +1,4 @@
-export interface OperadoresRow {
+export interface OperatorsRow {
   id: string
   nombre: string
   email: string
@@ -15,11 +15,12 @@ export interface OperadoresRow {
   experiencia_descripcion: string | null
   zona_operacion: string | null
   documentacion_urls: string[] | null
+  tipo_operador_id: string | null
   created_at: string | null
   updated_at: string | null
 }
 
-export interface OperadoresInsert {
+export interface OperatorsInsert {
   id?: string
   nombre: string
   email: string
@@ -36,11 +37,22 @@ export interface OperadoresInsert {
   experiencia_descripcion?: string | null
   zona_operacion?: string | null
   documentacion_urls?: string[] | null
+  tipo_operador_id?: string | null
   created_at?: string | null
   updated_at?: string | null
 }
 
-export interface OperadoresUpdate {
+export interface OperatorTierSummary {
+  id: string
+  nombre: string
+  comision_pct: number
+}
+
+export type OperatorWithTier = OperatorsRow & {
+  tipo_operador: OperatorTierSummary | null
+}
+
+export interface OperatorsUpdate {
   id?: string
   nombre?: string
   email?: string
@@ -57,6 +69,7 @@ export interface OperadoresUpdate {
   experiencia_descripcion?: string | null
   zona_operacion?: string | null
   documentacion_urls?: string[] | null
+  tipo_operador_id?: string | null
   created_at?: string | null
   updated_at?: string | null
 }

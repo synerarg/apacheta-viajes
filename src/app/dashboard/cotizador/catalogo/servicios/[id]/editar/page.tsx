@@ -2,10 +2,10 @@ import Link from "next/link"
 import { notFound } from "next/navigation"
 import { CaretLeft, CurrencyDollar } from "@phosphor-icons/react/dist/ssr"
 
-import { CotizadorServicioForm } from "@/components/dashboard/cotizador-servicio-form"
-import { DeleteCotizadorItemButton } from "@/components/dashboard/delete-cotizador-item-button"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
-import { createServerCotizadorServiciosController } from "@/controllers/cotizador-servicios/cotizador-servicios.controller"
+import { QuoterServiceForm } from "@/components/dashboard/quoter-service-form"
+import { DeleteQuoterItemButton } from "@/components/dashboard/delete-quoter-item-button"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
+import { createServerQuoterServicesController } from "@/controllers/quoter-services/quoter-services.controller"
 
 export const dynamic = "force-dynamic"
 
@@ -18,21 +18,21 @@ export default async function EditarServicioPage({
 }: EditarServicioPageProps) {
   const { id } = await params
 
-  const [categoriasController, serviciosController] = await Promise.all([
-    createServerCotizadorCategoriasController(),
-    createServerCotizadorServiciosController(),
+  const [categoriesController, servicesController] = await Promise.all([
+    createServerQuoterCategoriesController(),
+    createServerQuoterServicesController(),
   ])
 
   let servicio
   try {
-    servicio = await serviciosController.getById(id)
+    servicio = await servicesController.getById(id)
   } catch {
     notFound()
   }
 
   if (!servicio) notFound()
 
-  const categorias = await categoriasController.list()
+  const categorias = await categoriesController.list()
 
   return (
     <div className="min-h-full bg-neutral-50 pb-16">
@@ -56,7 +56,7 @@ export default async function EditarServicioPage({
               <CurrencyDollar className="h-4 w-4" />
               Precios
             </Link>
-            <DeleteCotizadorItemButton
+            <DeleteQuoterItemButton
               endpoint={`/api/dashboard/cotizador-servicios/${servicio.id}`}
               label="Eliminar servicio"
               redirectTo="/dashboard/cotizador/catalogo/servicios"
@@ -66,7 +66,7 @@ export default async function EditarServicioPage({
       </div>
 
       <div className="px-4 sm:px-6 lg:px-8 pt-4 sm:pt-6">
-        <CotizadorServicioForm
+        <QuoterServiceForm
           categorias={categorias}
           initialData={servicio}
           isEdit

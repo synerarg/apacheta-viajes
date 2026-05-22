@@ -5,10 +5,10 @@ import Image from "next/image"
 import Link from "next/link"
 import { ArrowRight, Car, Clock, MapPin, Users } from "lucide-react"
 
-import type { StorefrontTrasladoItem } from "@/lib/storefront/traslados.server"
+import type { StorefrontTransferItem } from "@/lib/storefront/traslados.server"
 
-interface CatalogoTrasladosProps {
-  traslados: StorefrontTrasladoItem[]
+interface CatalogTransfersProps {
+  traslados: StorefrontTransferItem[]
   origenes: string[]
   tipos: ("regular" | "privado")[]
 }
@@ -21,7 +21,7 @@ const VEHICULO_LABEL: Record<string, string> = {
   bus: "Bus",
 }
 
-const MODALIDAD_LABEL: Record<StorefrontTrasladoItem["modalidad"], string> = {
+const MODALIDAD_LABEL: Record<StorefrontTransferItem["modalidad"], string> = {
   ida: "Ida",
   ida_vuelta: "Ida y vuelta",
   punto_a_punto: "Punto a punto",
@@ -40,11 +40,11 @@ function tipoLabel(tipo: "regular" | "privado") {
   return tipo === "regular" ? "Regular" : "Privado"
 }
 
-export function CatalogoTraslados({
+export function CatalogTransfers({
   traslados,
   origenes,
   tipos,
-}: CatalogoTrasladosProps) {
+}: CatalogTransfersProps) {
   const [activeOrigen, setActiveOrigen] = useState<string>("Todos")
   const [activeTipo, setActiveTipo] = useState<"todos" | "regular" | "privado">(
     "todos",

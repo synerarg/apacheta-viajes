@@ -3,14 +3,15 @@ import { notFound } from "next/navigation"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { SolicitudOperadorActions } from "@/components/dashboard/solicitud-operador-actions"
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
-import { SolicitudesOperadorNotFoundException } from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
-import type { SolicitudesOperadorRow } from "@/types/solicitudes-operador/solicitudes-operador.types"
+import { OperatorRequestActions } from "@/components/dashboard/operator-request-actions"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
+import { createServerOperatorTypesController } from "@/controllers/operator-types/operator-types.controller"
+import { OperatorRequestsNotFoundException } from "@/exceptions/operator-requests/operator-requests.exceptions"
+import type { OperatorRequestsRow } from "@/types/operator-requests/operator-requests.types"
 
 export const dynamic = "force-dynamic"
 
-const statusStyles: Record<SolicitudesOperadorRow["estado"], string> = {
+const statusStyles: Record<OperatorRequestsRow["estado"], string> = {
   pendiente: "bg-amber-100 text-amber-800",
   en_revision: "bg-blue-100 text-blue-800",
   aprobada: "bg-emerald-100 text-emerald-800",
@@ -18,7 +19,7 @@ const statusStyles: Record<SolicitudesOperadorRow["estado"], string> = {
   cancelada: "bg-neutral-200 text-neutral-700",
 }
 
-const statusLabels: Record<SolicitudesOperadorRow["estado"], string> = {
+const statusLabels: Record<OperatorRequestsRow["estado"], string> = {
   pendiente: "Pendiente",
   en_revision: "En revisión",
   aprobada: "Aprobada",
@@ -41,23 +42,32 @@ function Field({ label, value }: { label: string; value: string | null | undefin
   )
 }
 
-export default async function SolicitudOperadorDetallePage({
+export default async function OperatorRequestDetallePage({
   params,
 }: {
   params: Promise<{ id: string }>
 }) {
   const { id } = await params
 
-  let solicitud: SolicitudesOperadorRow
+  let solicitud: OperatorRequestsRow
   try {
-    const controller = await createServerSolicitudesOperadorController()
+    const controller = await createServerOperatorRequestsController()
     solicitud = await controller.getById(id)
   } catch (error) {
-    if (error instanceof SolicitudesOperadorNotFoundException) {
+    if (error instanceof OperatorRequestsNotFoundException) {
       notFound()
     }
     throw error
   }
+
+  const tipo = solicitud.tipo_operador_id
+    ? await (await createServerOperatorTypesController())
+        .getById(solicitud.tipo_operador_id)
+        .catch(() => null)
+    : null
+  const tipoLabel = tipo
+    ? `${tipo.nombre} · ${Number(tipo.comision_pct).toFixed(2).replace(/\.?0+$/, "")}% comisión`
+    : "No especificado"
 
   return (
     <div className="p-3 sm:p-6 lg:p-8 space-y-4 sm:space-y-6 lg:space-y-8">
@@ -84,6 +94,7 @@ export default async function SolicitudOperadorDetallePage({
         </CardHeader>
         <CardContent className="space-y-6">
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <Field label="Tipo de operador" value={tipoLabel} />
             <Field label="Email de contacto" value={solicitud.email_contacto} />
             <Field label="Teléfono" value={solicitud.telefono_contacto} />
             <Field label="Documento / CUIT" value={solicitud.documento} />
@@ -113,7 +124,7 @@ export default async function SolicitudOperadorDetallePage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <SolicitudOperadorActions solicitudId={solicitud.id} estado={solicitud.estado} />
+          <OperatorRequestActions requestId={solicitud.id} estado={solicitud.estado} />
         </CardContent>
       </Card>
     </div>

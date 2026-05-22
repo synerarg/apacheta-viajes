@@ -1,6 +1,6 @@
 import type { Moneda } from "@/types/shared/enums"
 
-export interface ExperienciasRow {
+export interface ExperiencesRow {
   id: string
   nombre: string
   slug: string
@@ -23,7 +23,7 @@ export interface ExperienciasRow {
   updated_at: string | null
 }
 
-export interface ExperienciasInsert {
+export interface ExperiencesInsert {
   id?: string
   nombre: string
   slug: string
@@ -46,7 +46,7 @@ export interface ExperienciasInsert {
   updated_at?: string | null
 }
 
-export interface ExperienciasUpdate {
+export interface ExperiencesUpdate {
   id?: string
   nombre?: string
   slug?: string

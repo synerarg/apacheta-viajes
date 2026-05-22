@@ -17,21 +17,21 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 
-interface EliminarCotizacionButtonProps {
-  cotizacionId: string
+interface DeleteQuoteButtonProps {
+  quoteId: string
   clienteNombre?: string | null
   variant?: "icon" | "full"
   redirectTo?: string
   disabled?: boolean
 }
 
-export function EliminarCotizacionButton({
-  cotizacionId,
+export function DeleteQuoteButton({
+  quoteId,
   clienteNombre,
   variant = "full",
   redirectTo,
   disabled,
-}: EliminarCotizacionButtonProps) {
+}: DeleteQuoteButtonProps) {
   const router = useRouter()
   const [open, setOpen] = useState(false)
   const [isPending, startTransition] = useTransition()
@@ -43,7 +43,7 @@ export function EliminarCotizacionButton({
   function handleConfirm() {
     startTransition(async () => {
       try {
-        const res = await fetch(`/api/cotizaciones/${cotizacionId}`, {
+        const res = await fetch(`/api/cotizaciones/${quoteId}`, {
           method: "DELETE",
         })
         if (!res.ok) {

@@ -10,9 +10,9 @@ import {
   isTransactionalEmailEnabled,
 } from "@/lib/email/email.config"
 import { sendTransactionalEmail } from "@/lib/email/resend.client"
-import { createPaymentsRepository } from "@/repositories/payments/payments.repository"
+import { createPaymentProcessingRepository } from "@/repositories/payment-processing/payment-processing.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { OrderPaymentContext } from "@/types/payments/payments.types"
+import type { OrderPaymentContext } from "@/types/payment-processing/payment-processing.types"
 
 type ContactSnapshot = {
   firstName?: string | null
@@ -111,7 +111,7 @@ export class TransactionalEmailService {
   private readonly paymentsRepository
 
   constructor(private readonly supabase: DatabaseClient) {
-    this.paymentsRepository = createPaymentsRepository(supabase)
+    this.paymentsRepository = createPaymentProcessingRepository(supabase)
   }
 
   async sendOrderCreated(orderId: string) {

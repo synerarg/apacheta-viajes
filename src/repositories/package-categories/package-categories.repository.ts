@@ -1,46 +1,46 @@
-import { PaquetesCategoriasRepositoryException } from "@/exceptions/paquetes-categorias/paquetes-categorias.exceptions"
+import { PackageCategoriesRepositoryException } from "@/exceptions/package-categories/package-categories.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { PaquetesCategoriasUpdate } from "@/types/paquetes-categorias/paquetes-categorias.types"
+import type { PackageCategoriesUpdate } from "@/types/package-categories/package-categories.types"
 
-export class PaquetesCategoriasRepository extends BaseRepository<"paquetes_categorias"> {
+export class PackageCategoriesRepository extends BaseRepository<"paquetes_categorias"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "paquetes_categorias")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new PaquetesCategoriasRepositoryException(operation, cause)
+    return new PackageCategoriesRepositoryException(operation, cause)
   }
 
-  async findByCompositeKey(paqueteId: string, categoriaId: string) {
+  async findByCompositeKey(packageId: string, categoryId: string) {
     return this.findOne({
-      paquete_id: paqueteId,
-      categoria_id: categoriaId,
+      paquete_id: packageId,
+      categoria_id: categoryId,
     })
   }
 
   async updateByCompositeKey(
-    paqueteId: string,
-    categoriaId: string,
-    payload: PaquetesCategoriasUpdate,
+    packageId: string,
+    categoryId: string,
+    payload: PackageCategoriesUpdate,
   ) {
     return this.update(
       {
-        paquete_id: paqueteId,
-        categoria_id: categoriaId,
+        paquete_id: packageId,
+        categoria_id: categoryId,
       },
       payload,
     )
   }
 
-  async deleteByCompositeKey(paqueteId: string, categoriaId: string) {
+  async deleteByCompositeKey(packageId: string, categoryId: string) {
     return this.delete({
-      paquete_id: paqueteId,
-      categoria_id: categoriaId,
+      paquete_id: packageId,
+      categoria_id: categoryId,
     })
   }
 }
 
-export function createPaquetesCategoriasRepository(supabase: DatabaseClient) {
-  return new PaquetesCategoriasRepository(supabase)
+export function createPackageCategoriesRepository(supabase: DatabaseClient) {
+  return new PackageCategoriesRepository(supabase)
 }

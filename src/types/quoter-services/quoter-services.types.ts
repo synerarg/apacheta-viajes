@@ -1,4 +1,4 @@
-export interface CotizadorServiciosRow {
+export interface QuoterServicesRow {
   id: string
   categoria_id: string | null
   nombre: string
@@ -12,7 +12,7 @@ export interface CotizadorServiciosRow {
   updated_at: string | null
 }
 
-export interface CotizadorServiciosInsert {
+export interface QuoterServicesInsert {
   id?: string
   categoria_id?: string | null
   nombre: string
@@ -26,7 +26,7 @@ export interface CotizadorServiciosInsert {
   updated_at?: string | null
 }
 
-export interface CotizadorServiciosUpdate {
+export interface QuoterServicesUpdate {
   id?: string
   categoria_id?: string | null
   nombre?: string

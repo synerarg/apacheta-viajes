@@ -3,7 +3,7 @@ import {
   TableSkeleton,
 } from "@/components/dashboard/skeletons"
 
-export default function TrasladosLoading() {
+export default function TransfersLoading() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <PageHeaderSkeleton withAction />

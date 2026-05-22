@@ -1,25 +1,25 @@
-import { CotizacionesRepositoryException } from "@/exceptions/cotizaciones/cotizaciones.exceptions"
+import { QuotesRepositoryException } from "@/exceptions/quotes/quotes.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type {
-  CotizacionesRow,
-  CotizacionesUpdate,
-} from "@/types/cotizaciones/cotizaciones.types"
+  QuotesRow,
+  QuotesUpdate,
+} from "@/types/quotes/quotes.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
-export class CotizacionesRepository extends BaseRepository<"cotizaciones"> {
+export class QuotesRepository extends BaseRepository<"cotizaciones"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "cotizaciones")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new CotizacionesRepositoryException(operation, cause)
+    return new QuotesRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: CotizacionesUpdate) {
+  async updateById(id: string, payload: QuotesUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -27,28 +27,28 @@ export class CotizacionesRepository extends BaseRepository<"cotizaciones"> {
     return this.delete({ id })
   }
 
-  async listByOperador(operadorId: string): Promise<CotizacionesRow[]> {
+  async listByOperador(operatorId: string): Promise<QuotesRow[]> {
     const { data, error } = await this.supabase
       .from("cotizaciones")
       .select("*")
-      .eq("operador_id", operadorId)
+      .eq("operador_id", operatorId)
       .order("created_at", { ascending: false })
 
     if (error) throw this.createRepositoryException("listByOperador", error)
-    return (data as CotizacionesRow[]) ?? []
+    return (data as QuotesRow[]) ?? []
   }
 
-  async listAll(): Promise<CotizacionesRow[]> {
+  async listAll(): Promise<QuotesRow[]> {
     const { data, error } = await this.supabase
       .from("cotizaciones")
       .select("*")
       .order("created_at", { ascending: false })
 
     if (error) throw this.createRepositoryException("listAll", error)
-    return (data as CotizacionesRow[]) ?? []
+    return (data as QuotesRow[]) ?? []
   }
 
-  async findByToken(token: string): Promise<CotizacionesRow | null> {
+  async findByToken(token: string): Promise<QuotesRow | null> {
     const { data, error } = await this.supabase
       .from("cotizaciones")
       .select("*")
@@ -56,10 +56,10 @@ export class CotizacionesRepository extends BaseRepository<"cotizaciones"> {
       .maybeSingle()
 
     if (error) throw this.createRepositoryException("findByToken", error)
-    return (data as CotizacionesRow | null) ?? null
+    return (data as QuotesRow | null) ?? null
   }
 }
 
-export function createCotizacionesRepository(supabase: DatabaseClient) {
-  return new CotizacionesRepository(supabase)
+export function createQuotesRepository(supabase: DatabaseClient) {
+  return new QuotesRepository(supabase)
 }

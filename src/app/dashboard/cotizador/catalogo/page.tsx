@@ -1,21 +1,21 @@
 import Link from "next/link"
 import { CaretLeft, Pencil } from "@phosphor-icons/react/dist/ssr"
 
-import { DeleteCotizadorItemButton } from "@/components/dashboard/delete-cotizador-item-button"
-import { createServerCotizadorCategoriasController } from "@/controllers/cotizador-categorias/cotizador-categorias.controller"
-import { createServerCotizadorServiciosController } from "@/controllers/cotizador-servicios/cotizador-servicios.controller"
+import { DeleteQuoterItemButton } from "@/components/dashboard/delete-quoter-item-button"
+import { createServerQuoterCategoriesController } from "@/controllers/quoter-categories/quoter-categories.controller"
+import { createServerQuoterServicesController } from "@/controllers/quoter-services/quoter-services.controller"
 
 export const dynamic = "force-dynamic"
 
 export default async function CotizadorCatalogoPage() {
-  const [categoriasController, serviciosController] = await Promise.all([
-    createServerCotizadorCategoriasController(),
-    createServerCotizadorServiciosController(),
+  const [categoriesController, servicesController] = await Promise.all([
+    createServerQuoterCategoriesController(),
+    createServerQuoterServicesController(),
   ])
 
   const [categorias, servicios] = await Promise.all([
-    categoriasController.list(),
-    serviciosController.list(),
+    categoriesController.list(),
+    servicesController.list(),
   ])
 
   const serviciosPorCategoria = new Map<string, number>()
@@ -29,9 +29,9 @@ export default async function CotizadorCatalogoPage() {
   })
 
   const sorted = [...categorias].sort((a, b) => {
-    const ordenA = a.orden ?? 0
-    const ordenB = b.orden ?? 0
-    if (ordenA !== ordenB) return ordenA - ordenB
+    const orderA = a.orden ?? 0
+    const orderB = b.orden ?? 0
+    if (orderA !== orderB) return orderA - orderB
     return a.nombre.localeCompare(b.nombre)
   })
 
@@ -150,7 +150,7 @@ export default async function CotizadorCatalogoPage() {
                           >
                             <Pencil className="h-4 w-4" />
                           </Link>
-                          <DeleteCotizadorItemButton
+                          <DeleteQuoterItemButton
                             endpoint={`/api/dashboard/cotizador-categorias/${categoria.id}`}
                             label="Eliminar categoría"
                           />

@@ -7,15 +7,15 @@ import type { StorefrontPackageItem } from "@/types/storefront/storefront.types"
 
 const ITEMS_PER_PAGE = 3
 
-interface CatalogoPaquetesProps {
+interface CatalogPackagesProps {
   paquetes: StorefrontPackageItem[]
   categorias: string[]
 }
 
-export function CatalogoPaquetes({
+export function CatalogPackages({
   paquetes,
   categorias,
-}: CatalogoPaquetesProps) {
+}: CatalogPackagesProps) {
   const [activeCategoria, setActiveCategoria] = useState("Todos")
   const [visibleCount, setVisibleCount] = useState(ITEMS_PER_PAGE)
 

@@ -1,13 +1,13 @@
-export type { ReservaTipo, ReservaEstado } from "@/types/shared/enums"
-import type { ReservaTipo, ReservaEstado, Moneda } from "@/types/shared/enums"
+export type { ReservationType, ReservationStatus } from "@/types/shared/enums"
+import type { ReservationType, ReservationStatus, Moneda } from "@/types/shared/enums"
 
-export interface ReservasRow {
+export interface ReservationsRow {
   id: string
   usuario_id: string
   paquete_fecha_id: string | null
   experiencia_id: string | null
-  tipo: ReservaTipo
-  estado: ReservaEstado | null
+  tipo: ReservationType
+  estado: ReservationStatus | null
   cantidad_pasajeros: number
   precio_unitario: number
   precio_total: number
@@ -17,13 +17,13 @@ export interface ReservasRow {
   updated_at: string | null
 }
 
-export interface ReservasInsert {
+export interface ReservationsInsert {
   id?: string
   usuario_id: string
   paquete_fecha_id?: string | null
   experiencia_id?: string | null
-  tipo: ReservaTipo
-  estado?: ReservaEstado | null
+  tipo: ReservationType
+  estado?: ReservationStatus | null
   cantidad_pasajeros?: number
   precio_unitario: number
   precio_total: number
@@ -33,13 +33,13 @@ export interface ReservasInsert {
   updated_at?: string | null
 }
 
-export interface ReservasUpdate {
+export interface ReservationsUpdate {
   id?: string
   usuario_id?: string
   paquete_fecha_id?: string | null
   experiencia_id?: string | null
-  tipo?: ReservaTipo
-  estado?: ReservaEstado | null
+  tipo?: ReservationType
+  estado?: ReservationStatus | null
   cantidad_pasajeros?: number
   precio_unitario?: number
   precio_total?: number

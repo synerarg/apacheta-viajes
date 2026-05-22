@@ -2,7 +2,7 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 
 import { createServerCheckoutController } from "@/controllers/checkout/checkout.controller"
-import { createServerPaymentsController } from "@/controllers/payments/payments.controller"
+import { createServerPaymentProcessingController } from "@/controllers/payment-processing/payment-processing.controller"
 import { CheckoutAuthenticationException, CheckoutValidationException } from "@/exceptions/checkout/checkout.exceptions"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
 import { createClient } from "@/lib/supabase/server"
@@ -45,7 +45,7 @@ export async function POST(request: Request) {
       email: user.email ?? null,
     })
 
-    const paymentsController = await createServerPaymentsController()
+    const paymentsController = await createServerPaymentProcessingController()
     const result = await paymentsController.createMercadoPagoCheckoutPro(payload)
 
     return NextResponse.json(result, { status: 200 })

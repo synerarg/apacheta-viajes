@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
 import {
-  authorizeCotizacion,
+  authorizeQuote,
   ensureEditable,
   isAuthFailure,
-} from "@/lib/cotizaciones/authorize"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
-import { cotizacionHeaderSchema } from "@/lib/cotizaciones/schemas"
+} from "@/lib/quotes/authorize"
+import { handleQuoterError } from "@/lib/quotes/errors"
+import { quoteHeaderSchema } from "@/lib/quotes/schemas"
 
 export async function GET(
   _req: Request,
@@ -15,14 +15,14 @@ export async function GET(
 ) {
   try {
     const { id } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     const cotizacion = await controller.getWithItems(id)
     return NextResponse.json({ cotizacion }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -32,20 +32,20 @@ export async function PATCH(
 ) {
   try {
     const { id } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
     const blocked = ensureEditable(auth.cotizacion)
     if (blocked) return blocked
 
     const body = await request.json()
-    const payload = cotizacionHeaderSchema.parse(body)
-    const controller = await createServerCotizacionesController()
+    const payload = quoteHeaderSchema.parse(body)
+    const controller = await createServerQuotesController()
     await controller.updateHeader(id, payload)
     const cotizacion = await controller.getWithItems(id)
     return NextResponse.json({ cotizacion }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }
 
@@ -55,13 +55,13 @@ export async function DELETE(
 ) {
   try {
     const { id } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     await controller.deleteById(id)
     return NextResponse.json({ ok: true }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

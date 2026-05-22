@@ -1,22 +1,22 @@
-import { PaquetesImagenesRepositoryException } from "@/exceptions/paquetes-imagenes/paquetes-imagenes.exceptions"
+import { PackageImagesRepositoryException } from "@/exceptions/package-images/package-images.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { PaquetesImagenesUpdate } from "@/types/paquetes-imagenes/paquetes-imagenes.types"
+import type { PackageImagesUpdate } from "@/types/package-images/package-images.types"
 
-export class PaquetesImagenesRepository extends BaseRepository<"paquetes_imagenes"> {
+export class PackageImagesRepository extends BaseRepository<"paquetes_imagenes"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "paquetes_imagenes")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new PaquetesImagenesRepositoryException(operation, cause)
+    return new PackageImagesRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: PaquetesImagenesUpdate) {
+  async updateById(id: string, payload: PackageImagesUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class PaquetesImagenesRepository extends BaseRepository<"paquetes_imagene
   }
 }
 
-export function createPaquetesImagenesRepository(supabase: DatabaseClient) {
-  return new PaquetesImagenesRepository(supabase)
+export function createPackageImagesRepository(supabase: DatabaseClient) {
+  return new PackageImagesRepository(supabase)
 }

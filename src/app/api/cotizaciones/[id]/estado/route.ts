@@ -1,13 +1,13 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 
-import { createServerCotizacionesController } from "@/controllers/cotizaciones/cotizaciones.controller"
+import { createServerQuotesController } from "@/controllers/quotes/quotes.controller"
 import {
-  authorizeCotizacion,
+  authorizeQuote,
   isAuthFailure,
-} from "@/lib/cotizaciones/authorize"
-import { CotizacionesValidationException } from "@/exceptions/cotizaciones/cotizaciones.exceptions"
-import { handleCotizadorError } from "@/lib/cotizaciones/errors"
+} from "@/lib/quotes/authorize"
+import { QuotesValidationException } from "@/exceptions/quotes/quotes.exceptions"
+import { handleQuoterError } from "@/lib/quotes/errors"
 
 const bodySchema = z.object({
   estado: z.enum(["borrador", "archivada"]),
@@ -25,7 +25,7 @@ export async function POST(
 ) {
   try {
     const { id } = await context.params
-    const auth = await authorizeCotizacion(id)
+    const auth = await authorizeQuote(id)
     if (isAuthFailure(auth)) return auth
 
     const body = await request.json()
@@ -33,12 +33,12 @@ export async function POST(
 
     const allowed = ALLOWED_TRANSITIONS[auth.cotizacion.estado] ?? []
     if (!allowed.includes(estado)) {
-      throw new CotizacionesValidationException(
+      throw new QuotesValidationException(
         `Transición de "${auth.cotizacion.estado}" a "${estado}" no permitida.`,
       )
     }
 
-    const controller = await createServerCotizacionesController()
+    const controller = await createServerQuotesController()
     const cotizacion =
       estado === "archivada"
         ? await controller.archive(id)
@@ -46,6 +46,6 @@ export async function POST(
 
     return NextResponse.json({ cotizacion }, { status: 200 })
   } catch (error) {
-    return handleCotizadorError(error)
+    return handleQuoterError(error)
   }
 }

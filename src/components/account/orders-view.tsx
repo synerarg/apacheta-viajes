@@ -1,6 +1,6 @@
 import Link from "next/link"
 
-import type { CheckoutOrderSummary } from "@/types/payments/payments.types"
+import type { CheckoutOrderSummary } from "@/types/payment-processing/payment-processing.types"
 
 interface OrdersViewProps {
   orders: CheckoutOrderSummary[]

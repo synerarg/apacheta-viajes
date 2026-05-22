@@ -1,22 +1,22 @@
-import { ReservasRepositoryException } from "@/exceptions/reservas/reservas.exceptions"
+import { ReservationsRepositoryException } from "@/exceptions/reservations/reservations.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { ReservasUpdate } from "@/types/reservas/reservas.types"
+import type { ReservationsUpdate } from "@/types/reservations/reservations.types"
 
-export class ReservasRepository extends BaseRepository<"reservas"> {
+export class ReservationsRepository extends BaseRepository<"reservas"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "reservas")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new ReservasRepositoryException(operation, cause)
+    return new ReservationsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: ReservasUpdate) {
+  async updateById(id: string, payload: ReservationsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,6 +25,6 @@ export class ReservasRepository extends BaseRepository<"reservas"> {
   }
 }
 
-export function createReservasRepository(supabase: DatabaseClient) {
-  return new ReservasRepository(supabase)
+export function createReservationsRepository(supabase: DatabaseClient) {
+  return new ReservationsRepository(supabase)
 }

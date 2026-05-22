@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server"
 
-import { createServerSolicitudesOperadorController } from "@/controllers/solicitudes-operador/solicitudes-operador.controller"
+import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
 import {
-  SolicitudesOperadorNotFoundException,
-  SolicitudesOperadorServiceException,
-  SolicitudesOperadorValidationException,
-} from "@/exceptions/solicitudes-operador/solicitudes-operador.exceptions"
+  OperatorRequestsNotFoundException,
+  OperatorRequestsServiceException,
+  OperatorRequestsValidationException,
+} from "@/exceptions/operator-requests/operator-requests.exceptions"
 import { createClient } from "@/lib/supabase/server"
 
 export async function PATCH(
@@ -23,18 +23,18 @@ export async function PATCH(
       return NextResponse.json({ error: "No autenticado" }, { status: 401 })
     }
 
-    const controller = await createServerSolicitudesOperadorController()
+    const controller = await createServerOperatorRequestsController()
     const solicitud = await controller.cancel(id, user.id)
 
     return NextResponse.json({ solicitud }, { status: 200 })
   } catch (error) {
-    if (error instanceof SolicitudesOperadorNotFoundException) {
+    if (error instanceof OperatorRequestsNotFoundException) {
       return NextResponse.json({ error: error.message }, { status: 404 })
     }
-    if (error instanceof SolicitudesOperadorValidationException) {
+    if (error instanceof OperatorRequestsValidationException) {
       return NextResponse.json({ error: error.message }, { status: 400 })
     }
-    if (error instanceof SolicitudesOperadorServiceException) {
+    if (error instanceof OperatorRequestsServiceException) {
       console.error("cancel solicitud failed", error)
       return NextResponse.json({ error: "No se pudo cancelar la solicitud" }, { status: 500 })
     }

@@ -1,25 +1,25 @@
-import { CotizadorPreciosRepositoryException } from "@/exceptions/cotizador-precios/cotizador-precios.exceptions"
+import { QuoterPricesRepositoryException } from "@/exceptions/quoter-prices/quoter-prices.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type {
-  CotizadorPreciosRow,
-  CotizadorPreciosUpdate,
-} from "@/types/cotizador-precios/cotizador-precios.types"
+  QuoterPricesRow,
+  QuoterPricesUpdate,
+} from "@/types/quoter-prices/quoter-prices.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
-export class CotizadorPreciosRepository extends BaseRepository<"cotizador_servicio_precios"> {
+export class QuoterPricesRepository extends BaseRepository<"cotizador_servicio_precios"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "cotizador_servicio_precios")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new CotizadorPreciosRepositoryException(operation, cause)
+    return new QuoterPricesRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: CotizadorPreciosUpdate) {
+  async updateById(id: string, payload: QuoterPricesUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -27,27 +27,27 @@ export class CotizadorPreciosRepository extends BaseRepository<"cotizador_servic
     return this.delete({ id })
   }
 
-  async findByServicio(servicioId: string): Promise<CotizadorPreciosRow[]> {
+  async findByService(serviceId: string): Promise<QuoterPricesRow[]> {
     const { data, error } = await this.supabase
       .from("cotizador_servicio_precios")
       .select("*")
-      .eq("servicio_id", servicioId)
+      .eq("servicio_id", serviceId)
 
-    if (error) throw this.createRepositoryException("findByServicio", error)
-    return (data as CotizadorPreciosRow[]) ?? []
+    if (error) throw this.createRepositoryException("findByService", error)
+    return (data as QuoterPricesRow[]) ?? []
   }
 
   async findActiveForDate(
-    servicioId: string,
+    serviceId: string,
     date: string,
-  ): Promise<CotizadorPreciosRow | null> {
+  ): Promise<QuoterPricesRow | null> {
     const { data, error } = await this.supabase
       .from("cotizador_servicio_precios")
       .select("*")
-      .eq("servicio_id", servicioId)
+      .eq("servicio_id", serviceId)
 
     if (error) throw this.createRepositoryException("findActiveForDate", error)
-    const rows = (data as CotizadorPreciosRow[]) ?? []
+    const rows = (data as QuoterPricesRow[]) ?? []
     const match = rows.find(
       (r) =>
         r.vigencia_desde &&
@@ -58,22 +58,22 @@ export class CotizadorPreciosRepository extends BaseRepository<"cotizador_servic
     return match ?? null
   }
 
-  async findByServicioTemporada(
-    servicioId: string,
+  async findByServiceSeason(
+    serviceId: string,
     temporada: string,
-  ): Promise<CotizadorPreciosRow | null> {
+  ): Promise<QuoterPricesRow | null> {
     const { data, error } = await this.supabase
       .from("cotizador_servicio_precios")
       .select("*")
-      .eq("servicio_id", servicioId)
+      .eq("servicio_id", serviceId)
       .eq("temporada", temporada)
       .maybeSingle()
 
-    if (error) throw this.createRepositoryException("findByServicioTemporada", error)
-    return (data as CotizadorPreciosRow | null) ?? null
+    if (error) throw this.createRepositoryException("findByServiceSeason", error)
+    return (data as QuoterPricesRow | null) ?? null
   }
 }
 
-export function createCotizadorPreciosRepository(supabase: DatabaseClient) {
-  return new CotizadorPreciosRepository(supabase)
+export function createQuoterPricesRepository(supabase: DatabaseClient) {
+  return new QuoterPricesRepository(supabase)
 }

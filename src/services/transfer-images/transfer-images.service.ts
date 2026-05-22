@@ -1,35 +1,35 @@
 import {
-  TrasladosImagenesNotFoundException,
-  TrasladosImagenesServiceException,
-} from "@/exceptions/traslados-imagenes/traslados-imagenes.exceptions"
-import { TrasladosImagenesRepository } from "@/repositories/traslados-imagenes/traslados-imagenes.repository"
+  TransferImagesNotFoundException,
+  TransferImagesServiceException,
+} from "@/exceptions/transfer-images/transfer-images.exceptions"
+import { TransferImagesRepository } from "@/repositories/transfer-images/transfer-images.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  TrasladosImagenesRow,
-  TrasladosImagenesUpdate,
-} from "@/types/traslados-imagenes/traslados-imagenes.types"
+  TransferImagesRow,
+  TransferImagesUpdate,
+} from "@/types/transfer-images/transfer-images.types"
 
-export class TrasladosImagenesService extends BaseService<"traslados_imagenes"> {
-  constructor(repository: TrasladosImagenesRepository) {
+export class TransferImagesService extends BaseService<"traslados_imagenes"> {
+  constructor(repository: TransferImagesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new TrasladosImagenesServiceException(operation, cause)
+    return new TransferImagesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new TrasladosImagenesNotFoundException(criteria)
+    return new TransferImagesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<TrasladosImagenesRow> {
+  async getById(id: string): Promise<TransferImagesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: TrasladosImagenesUpdate,
-  ): Promise<TrasladosImagenesRow> {
+    payload: TransferImagesUpdate,
+  ): Promise<TransferImagesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class TrasladosImagenesService extends BaseService<"traslados_imagenes"> 
   }
 }
 
-export function createTrasladosImagenesService(
-  repository: TrasladosImagenesRepository,
+export function createTransferImagesService(
+  repository: TransferImagesRepository,
 ) {
-  return new TrasladosImagenesService(repository)
+  return new TransferImagesService(repository)
 }

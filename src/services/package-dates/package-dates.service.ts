@@ -1,35 +1,35 @@
 import {
-  PaquetesFechasNotFoundException,
-  PaquetesFechasServiceException,
-} from "@/exceptions/paquetes-fechas/paquetes-fechas.exceptions"
-import { PaquetesFechasRepository } from "@/repositories/paquetes-fechas/paquetes-fechas.repository"
+  PackageDatesNotFoundException,
+  PackageDatesServiceException,
+} from "@/exceptions/package-dates/package-dates.exceptions"
+import { PackageDatesRepository } from "@/repositories/package-dates/package-dates.repository"
 import { BaseService } from "@/services/base/base.service"
 import type {
-  PaquetesFechasRow,
-  PaquetesFechasUpdate,
-} from "@/types/paquetes-fechas/paquetes-fechas.types"
+  PackageDatesRow,
+  PackageDatesUpdate,
+} from "@/types/package-dates/package-dates.types"
 
-export class PaquetesFechasService extends BaseService<"paquetes_fechas"> {
-  constructor(repository: PaquetesFechasRepository) {
+export class PackageDatesService extends BaseService<"paquetes_fechas"> {
+  constructor(repository: PackageDatesRepository) {
     super(repository)
   }
 
   protected createServiceException(operation: string, cause?: unknown) {
-    return new PaquetesFechasServiceException(operation, cause)
+    return new PackageDatesServiceException(operation, cause)
   }
 
   protected createNotFoundException(criteria: string) {
-    return new PaquetesFechasNotFoundException(criteria)
+    return new PackageDatesNotFoundException(criteria)
   }
 
-  async getById(id: string): Promise<PaquetesFechasRow> {
+  async getById(id: string): Promise<PackageDatesRow> {
     return this.getOrThrow({ id }, `id ${id}`)
   }
 
   async updateById(
     id: string,
-    payload: PaquetesFechasUpdate,
-  ): Promise<PaquetesFechasRow> {
+    payload: PackageDatesUpdate,
+  ): Promise<PackageDatesRow> {
     return this.updateByFilters({ id }, payload, `id ${id}`)
   }
 
@@ -38,8 +38,8 @@ export class PaquetesFechasService extends BaseService<"paquetes_fechas"> {
   }
 }
 
-export function createPaquetesFechasService(
-  repository: PaquetesFechasRepository,
+export function createPackageDatesService(
+  repository: PackageDatesRepository,
 ) {
-  return new PaquetesFechasService(repository)
+  return new PackageDatesService(repository)
 }

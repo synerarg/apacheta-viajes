@@ -1,6 +1,6 @@
 import { ChartBar } from "@phosphor-icons/react/dist/ssr"
 
-interface OperadorActivityChartProps {
+interface OperatorActivityChartProps {
   buckets: Array<{ key: string; label: string; count: number }>
 }
 
@@ -45,7 +45,7 @@ export function buildMonthlyBuckets(
   return buckets
 }
 
-export function OperadorActivityChart({ buckets }: OperadorActivityChartProps) {
+export function OperatorActivityChart({ buckets }: OperatorActivityChartProps) {
   const total = buckets.reduce((acc, b) => acc + b.count, 0)
   const hasActivity = total > 0
   const max = Math.max(1, ...buckets.map((b) => b.count))

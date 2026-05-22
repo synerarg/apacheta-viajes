@@ -12,7 +12,7 @@ export interface ItineraryItem {
   is_special?: boolean
 }
 
-export interface ItineraryCotizacion {
+export interface ItineraryQuote {
   cliente_nombre: string | null
   cliente_email: string | null
   cliente_telefono: string | null
@@ -58,7 +58,7 @@ function formatWeekday(d: Date): string {
 }
 
 export function generateItineraryText(
-  cotizacion: ItineraryCotizacion,
+  cotizacion: ItineraryQuote,
   publicUrl?: string,
 ): string {
   const inicio = toDate(cotizacion.fecha_inicio)

@@ -2,12 +2,12 @@ import Link from "next/link"
 
 import { PackageCard } from "@/components/dashboard/package-card"
 import { createClient } from "@/lib/supabase/server"
-import { createPaquetesRepository } from "@/repositories/paquetes/paquetes.repository"
+import { createPackagesRepository } from "@/repositories/packages/packages.repository"
 
-export default async function DashboardPaquetesPage() {
+export default async function DashboardPackagesPage() {
   const supabase = await createClient()
-  const paquetesRepo = createPaquetesRepository(supabase)
-  const paquetes = await paquetesRepo.findAll()
+  const packagesRepo = createPackagesRepository(supabase)
+  const paquetes = await packagesRepo.findAll()
 
   const sorted = [...paquetes].sort(
     (a, b) =>

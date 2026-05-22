@@ -2,10 +2,10 @@ import {
   PaymentReceiptAccessDeniedException,
   PaymentReceiptUnavailableException,
   PaymentReceiptValidationException,
-  PaymentsServiceException,
-} from "@/exceptions/payments/payments.exceptions"
+  PaymentProcessingServiceException,
+} from "@/exceptions/payment-processing/payment-processing.exceptions"
 import { getBankTransferConfig } from "@/lib/payments/payments.config"
-import { createPaymentsRepository } from "@/repositories/payments/payments.repository"
+import { createPaymentProcessingRepository } from "@/repositories/payment-processing/payment-processing.repository"
 import type {
   AuthorizeBankTransferReceiptUploadInput,
   BankTransferConfirmationResult,
@@ -24,11 +24,11 @@ import type {
   PaymentReceiptDownloadResult,
   RegisterBankTransferReceiptInput,
   UploadBankTransferReceiptInput,
-} from "@/types/payments/payments.types"
+} from "@/types/payment-processing/payment-processing.types"
 import type { DatabaseClient } from "@/types/database/database.types"
 
-import { BankTransferPaymentService } from "@/services/payments/bank-transfer-payment.service"
-import { MercadoPagoCheckoutProService } from "@/services/payments/mercadopago-checkout-pro.service"
+import { BankTransferPaymentService } from "@/services/payment-processing/bank-transfer-payment.service"
+import { MercadoPagoCheckoutProService } from "@/services/payment-processing/mercadopago-checkout-pro.service"
 import { createTransactionalEmailService } from "@/services/notifications/transactional-email.service"
 
 function mapOrderSummary(context: OrderPaymentContext): CheckoutOrderSummary {
@@ -115,14 +115,14 @@ function mapOrderSummary(context: OrderPaymentContext): CheckoutOrderSummary {
   }
 }
 
-export class PaymentsService {
+export class PaymentProcessingService {
   readonly mercadopagoCheckoutProService
   readonly bankTransferPaymentService
   readonly paymentsRepository
   readonly transactionalEmailService
 
   constructor(supabase: DatabaseClient) {
-    this.paymentsRepository = createPaymentsRepository(supabase)
+    this.paymentsRepository = createPaymentProcessingRepository(supabase)
     this.transactionalEmailService = createTransactionalEmailService(supabase)
 
     this.mercadopagoCheckoutProService = new MercadoPagoCheckoutProService(
@@ -152,7 +152,7 @@ export class PaymentsService {
       return this.createCashLocalPayment(input.orderId, input.note)
     }
 
-    throw new PaymentsServiceException(
+    throw new PaymentProcessingServiceException(
       "createPayment",
       new Error(`Unsupported payment method: ${String(input.method)}`),
     )
@@ -308,6 +308,6 @@ export class PaymentsService {
   }
 }
 
-export function createPaymentsService(supabase: DatabaseClient) {
-  return new PaymentsService(supabase)
+export function createPaymentProcessingService(supabase: DatabaseClient) {
+  return new PaymentProcessingService(supabase)
 }

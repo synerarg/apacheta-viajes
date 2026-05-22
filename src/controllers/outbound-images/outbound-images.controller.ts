@@ -1,23 +1,23 @@
 import { BaseIdController } from "@/controllers/base/base.controller"
 import { createClient } from "@/lib/supabase/server"
-import { createEmisivoImagenesRepository } from "@/repositories/emisivo-imagenes/emisivo-imagenes.repository"
+import { createOutboundImagesRepository } from "@/repositories/outbound-images/outbound-images.repository"
 import {
-  createEmisivoImagenesService,
-  EmisivoImagenesService,
-} from "@/services/emisivo-imagenes/emisivo-imagenes.service"
+  createOutboundImagesService,
+  OutboundImagesService,
+} from "@/services/outbound-images/outbound-images.service"
 
-export class EmisivoImagenesController extends BaseIdController<"emisivo_imagenes"> {
-  constructor(service: EmisivoImagenesService) {
+export class OutboundImagesController extends BaseIdController<"emisivo_imagenes"> {
+  constructor(service: OutboundImagesService) {
     super(service)
   }
 }
 
-export async function createServerEmisivoImagenesController() {
+export async function createServerOutboundImagesController() {
   const supabase = await createClient()
 
-  return new EmisivoImagenesController(
-    createEmisivoImagenesService(
-      createEmisivoImagenesRepository(supabase),
+  return new OutboundImagesController(
+    createOutboundImagesService(
+      createOutboundImagesRepository(supabase),
     ),
   )
 }

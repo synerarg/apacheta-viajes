@@ -4,7 +4,7 @@ import {
   StatsCardSkeleton,
 } from "@/components/dashboard/skeletons"
 
-export default function OperadoresLoading() {
+export default function OperatorsLoading() {
   return (
     <div className="p-4 sm:p-6 lg:p-8">
       <PageHeaderSkeleton />

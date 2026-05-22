@@ -1,5 +1,5 @@
-export type { PagoEstado, MetodoPago, PagoProveedor } from "@/types/shared/enums"
-import type { PagoEstado, MetodoPago, PagoProveedor, Moneda } from "@/types/shared/enums"
+export type { PaymentStatus, PaymentMethod, PaymentProvider } from "@/types/shared/enums"
+import type { PaymentStatus, PaymentMethod, PaymentProvider, Moneda } from "@/types/shared/enums"
 
 type DatabaseJson =
   | string
@@ -9,15 +9,12 @@ type DatabaseJson =
   | { [key: string]: DatabaseJson | undefined }
   | DatabaseJson[]
 
-// Re-export legacy aliases for backwards compatibility
-export type PagoMetodo = MetodoPago
-
-export interface PagosRow {
+export interface PaymentsRow {
   id: string
   orden_id: string
-  metodo: MetodoPago
-  proveedor: PagoProveedor
-  estado: PagoEstado
+  metodo: PaymentMethod
+  proveedor: PaymentProvider
+  estado: PaymentStatus
   monto: number
   moneda: Moneda
   external_reference: string
@@ -33,12 +30,12 @@ export interface PagosRow {
   updated_at: string | null
 }
 
-export interface PagosInsert {
+export interface PaymentsInsert {
   id?: string
   orden_id: string
-  metodo: MetodoPago
-  proveedor: PagoProveedor
-  estado?: PagoEstado
+  metodo: PaymentMethod
+  proveedor: PaymentProvider
+  estado?: PaymentStatus
   monto: number
   moneda?: Moneda
   external_reference: string
@@ -54,12 +51,12 @@ export interface PagosInsert {
   updated_at?: string | null
 }
 
-export interface PagosUpdate {
+export interface PaymentsUpdate {
   id?: string
   orden_id?: string
-  metodo?: MetodoPago
-  proveedor?: PagoProveedor
-  estado?: PagoEstado
+  metodo?: PaymentMethod
+  proveedor?: PaymentProvider
+  estado?: PaymentStatus
   monto?: number
   moneda?: Moneda
   external_reference?: string

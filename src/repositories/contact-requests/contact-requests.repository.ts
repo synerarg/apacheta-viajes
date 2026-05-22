@@ -1,22 +1,22 @@
-import { SolicitudesContactoRepositoryException } from "@/exceptions/solicitudes-contacto/solicitudes-contacto.exceptions"
+import { ContactRequestsRepositoryException } from "@/exceptions/contact-requests/contact-requests.exceptions"
 import { BaseRepository } from "@/repositories/base/base.repository"
 import type { DatabaseClient } from "@/types/database/database.types"
-import type { SolicitudesContactoUpdate } from "@/types/solicitudes-contacto/solicitudes-contacto.types"
+import type { ContactRequestsUpdate } from "@/types/contact-requests/contact-requests.types"
 
-export class SolicitudesContactoRepository extends BaseRepository<"solicitudes_contacto"> {
+export class ContactRequestsRepository extends BaseRepository<"solicitudes_contacto"> {
   constructor(supabase: DatabaseClient) {
     super(supabase, "solicitudes_contacto")
   }
 
   protected createRepositoryException(operation: string, cause?: unknown) {
-    return new SolicitudesContactoRepositoryException(operation, cause)
+    return new ContactRequestsRepositoryException(operation, cause)
   }
 
   async findById(id: string) {
     return this.findOne({ id })
   }
 
-  async updateById(id: string, payload: SolicitudesContactoUpdate) {
+  async updateById(id: string, payload: ContactRequestsUpdate) {
     return this.update({ id }, payload)
   }
 
@@ -25,8 +25,8 @@ export class SolicitudesContactoRepository extends BaseRepository<"solicitudes_c
   }
 }
 
-export function createSolicitudesContactoRepository(
+export function createContactRequestsRepository(
   supabase: DatabaseClient,
 ) {
-  return new SolicitudesContactoRepository(supabase)
+  return new ContactRequestsRepository(supabase)
 }

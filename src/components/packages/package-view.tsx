@@ -1,17 +1,17 @@
 import Image from "next/image"
 import { BedDouble, Car, UtensilsCrossed, User, Ticket, MapPin } from "lucide-react"
 import { ImageGallery } from "@/components/product/image-gallery"
-import { SidebarCotizacionCart } from "@/components/product/sidebar-cotizacion-cart"
-import { UbicacionMap } from "@/components/product/ubicacion-map"
-import type { Moneda, RegimenAlimentario } from "@/types/shared/enums"
+import { SidebarQuoteCart } from "@/components/product/sidebar-quote-cart"
+import { LocationMap } from "@/components/product/location-map"
+import type { Moneda, MealPlan } from "@/types/shared/enums"
 
-export interface PaqueteRoomPricing {
+export interface PackageRoomPricing {
   single: number | null
   doble: number | null
   triple: number | null
 }
 
-export interface PaqueteViewData {
+export interface PackageViewData {
   id: string
   nombre: string
   descripcion_corta: string
@@ -22,10 +22,10 @@ export interface PaqueteViewData {
   lugar_inicio: string | null
   incluye_alojamiento: boolean
   incluye_traslado: boolean
-  regimen: RegimenAlimentario | null
+  regimen: MealPlan | null
   incluye_guia: boolean
   incluye_entradas: boolean
-  habitaciones: PaqueteRoomPricing
+  habitaciones: PackageRoomPricing
   categoria: string
   fecha_salida?: string
   itinerario: Array<{
@@ -37,21 +37,21 @@ export interface PaqueteViewData {
   ubicacion: string
   latitud: number
   longitud: number
-  paqueteFechaId: string | null
+  packageFechaId: string | null
 }
 
-interface PaqueteViewProps {
-  paquete: PaqueteViewData
+interface PackageViewProps {
+  paquete: PackageViewData
 }
 
-const REGIMEN_LABEL: Record<RegimenAlimentario, string> = {
+const REGIMEN_LABEL: Record<MealPlan, string> = {
   desayuno: "Desayuno",
   media_pension: "Media pensión",
   pension_completa: "Pensión completa",
   all_inclusive: "All inclusive",
 }
 
-const incluyeItems = (paquete: PaqueteViewData) => {
+const incluyeItems = (paquete: PackageViewData) => {
   const items: Array<{ icon: React.ReactNode; label: string; incluye: boolean }> = [
     {
       icon: <BedDouble className="w-5 h-5 text-primary" />,
@@ -91,7 +91,7 @@ function formatRoomPrice(price: number | null, moneda: Moneda) {
   }).format(price)
 }
 
-export function PaqueteView({ paquete }: PaqueteViewProps) {
+export function PackageView({ paquete }: PackageViewProps) {
   const duracion = `${paquete.duracion_dias} ${paquete.duracion_dias === 1 ? "día" : "días"}`
 
   const roomPricingRows: Array<{ label: string; price: number | null }> = paquete.incluye_alojamiento
@@ -251,7 +251,7 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
                   {paquete.ubicacion}
                 </span>
               </div>
-              <UbicacionMap
+              <LocationMap
                 nombre={paquete.nombre}
                 latitud={paquete.latitud}
                 longitud={paquete.longitud}
@@ -262,16 +262,16 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
           {/* Right Sidebar */}
           <div className="lg:w-[380px] flex-shrink-0">
             <div className="sticky top-28">
-              <SidebarCotizacionCart
+              <SidebarQuoteCart
                 precio={paquete.precio_desde}
                 moneda={paquete.moneda}
                 fecha={paquete.fecha_salida}
                 duracion={duracion}
                 tipo="paquete"
                 cartItem={
-                  paquete.paqueteFechaId
+                  paquete.packageFechaId
                     ? {
-                        id: `paquete:${paquete.paqueteFechaId}`,
+                        id: `paquete:${paquete.packageFechaId}`,
                         kind: "paquete",
                         category: paquete.categoria,
                         name: paquete.nombre,
@@ -280,8 +280,8 @@ export function PaqueteView({ paquete }: PaqueteViewProps) {
                         quantity: 1,
                         image: paquete.imagen_url,
                         moneda: paquete.moneda,
-                        paqueteFechaId: paquete.paqueteFechaId,
-                        experienciaId: null,
+                        packageFechaId: paquete.packageFechaId,
+                        experienceId: null,
                         incluyeAlojamiento: paquete.incluye_alojamiento,
                         incluyeTraslado: paquete.incluye_traslado,
                       }
