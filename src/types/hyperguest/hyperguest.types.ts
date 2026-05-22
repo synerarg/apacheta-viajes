@@ -214,6 +214,17 @@ export interface HyperGuestGuestDetails {
   contact?: HyperGuestGuestContact | null
 }
 
+export interface HyperGuestCardDetails {
+  number: string
+  cvv: string
+  expiry: { month: string; year: string }
+}
+
+export interface HyperGuestPaymentDetails {
+  type: "credit_card" | "external"
+  details?: HyperGuestCardDetails
+}
+
 export interface HyperGuestBookInput {
   bookingIntentId: string
   guest: HyperGuestGuestDetails & {
@@ -223,6 +234,7 @@ export interface HyperGuestBookInput {
   roomGuests?: HyperGuestGuestDetails[][]
   specialRequests?: string[]
   meta?: Array<{ key: string; value: string }>
+  paymentDetails?: HyperGuestPaymentDetails
   providerPayload?: Record<string, unknown>
   userId?: string | null
 }
