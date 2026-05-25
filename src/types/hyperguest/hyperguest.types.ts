@@ -246,3 +246,22 @@ export interface HyperGuestCancelInput {
   providerPayload?: Record<string, unknown>
   userId?: string | null
 }
+
+export interface HyperGuestReservationSummary {
+  bookingIntentId: string
+  status: HyperGuestBookingStatus
+  providerBookingId: string | null
+  providerReference: string | null
+  hotelName: string
+  hotelSlug: string | null
+  hotelLocation: string | null
+  checkIn: string | null
+  checkOut: string | null
+  rooms: number | null
+  adults: number | null
+  children: number | null
+  totalAmount: number | null
+  currency: string | null
+  createdAt: string | null
+  canCancel: boolean
+}

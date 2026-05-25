@@ -20,6 +20,7 @@ import type {
   HyperGuestGuestDetails,
   HyperGuestJson,
   HyperGuestPrebookInput,
+  HyperGuestReservationSummary,
   HyperGuestRoomOccupancy,
 } from "@/types/hyperguest/hyperguest.types"
 
@@ -1472,6 +1473,44 @@ export class HyperGuestService {
       return await listHyperGuestBookings(query)
     } catch (error) {
       throw this.createServiceException("listProviderBookings", error)
+    }
+  }
+
+  async listUserReservations(
+    userId: string,
+  ): Promise<HyperGuestReservationSummary[]> {
+    try {
+      const rows = await this.hyperGuestRepository.findReservationsByUserId(
+        userId,
+      )
+
+      return rows.map<HyperGuestReservationSummary>((row) => {
+        const hotel = row.hotel
+        const location = hotel
+          ? [hotel.ciudad, hotel.provincia].filter(Boolean).join(", ") || null
+          : null
+
+        return {
+          bookingIntentId: row.id,
+          status: row.status,
+          providerBookingId: row.provider_booking_id,
+          providerReference: row.provider_reference,
+          hotelName: hotel?.nombre ?? "Reserva de hotel",
+          hotelSlug: hotel?.slug ?? null,
+          hotelLocation: location,
+          checkIn: row.check_in,
+          checkOut: row.check_out,
+          rooms: row.rooms,
+          adults: row.adults,
+          children: row.children,
+          totalAmount: row.total_amount,
+          currency: row.currency,
+          createdAt: row.created_at,
+          canCancel: row.status === "booked" && Boolean(row.provider_booking_id),
+        }
+      })
+    } catch (error) {
+      throw this.createServiceException("listUserReservations", error)
     }
   }
 }

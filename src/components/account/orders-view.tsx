@@ -81,8 +81,8 @@ export function OrdersView({
   highlightedOrderId = null,
 }: OrdersViewProps) {
   return (
-    <main className="min-h-screen bg-off-white pb-16 pt-28">
-      <div className="mx-auto w-[calc(100%-2rem)] max-w-[960px] text-center">
+    <section className="text-center">
+      <div>
         <p className="mb-3 font-sans text-xs uppercase tracking-[0.16em] text-subtle">
           Mi cuenta
         </p>
@@ -240,6 +240,6 @@ export function OrdersView({
           </div>
         )}
       </div>
-    </main>
+    </section>
   )
 }

@@ -90,6 +90,31 @@ export class HyperGuestRepository {
     return data as HyperGuestBookingIntentsRow | null
   }
 
+  async findReservationsByUserId(userId: string) {
+    const { data, error } = await this.supabase
+      .from("hyperguest_booking_intents")
+      .select("*, hotel:hoteles(id, nombre, slug, ciudad, provincia)")
+      .eq("usuario_id", userId)
+      .in("status", ["booked", "cancel_started", "cancelled"])
+      .order("created_at", { ascending: false })
+
+    if (error) {
+      throw this.createRepositoryException("findReservationsByUserId", error)
+    }
+
+    return (data ?? []) as Array<
+      HyperGuestBookingIntentsRow & {
+        hotel: {
+          id: string
+          nombre: string
+          slug: string
+          ciudad: string | null
+          provincia: string | null
+        } | null
+      }
+    >
+  }
+
   async updateBookingIntent(
     id: string,
     payload: HyperGuestBookingIntentsUpdate,

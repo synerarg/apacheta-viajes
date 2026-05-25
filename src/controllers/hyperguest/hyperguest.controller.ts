@@ -47,6 +47,10 @@ export class HyperGuestController {
     return this.hyperGuestService.listProviderBookings(query)
   }
 
+  async listUserReservations(userId: string) {
+    return this.hyperGuestService.listUserReservations(userId)
+  }
+
   async getMappingByHotelId(hotelId: string) {
     return this.hyperGuestRepository.findHotelMappingByHotelId(hotelId)
   }
