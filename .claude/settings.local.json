@@ -26,8 +26,18 @@
       "Bash(node *)",
       "Bash(echo \"EXIT:$?\")",
       "Bash(pnpm dev *)",
-      "Read(//c/Users/valen/AppData/Local/Temp/claude/D--valentin-gonzalez-dev-apacheta-viajes/a0f830df-8111-4681-b891-1415de5b98a0/tasks/**)"
+      "Read(//c/Users/valen/AppData/Local/Temp/claude/D--valentin-gonzalez-dev-apacheta-viajes/a0f830df-8111-4681-b891-1415de5b98a0/tasks/**)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm build *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git push *)",
+      "Bash(git fetch *)",
+      "Bash(git pull *)",
+      "Bash(git stash *)"
     ]
   },
-  "enabledMcpjsonServers": ["supabase"]
+  "enabledMcpjsonServers": [
+    "supabase"
+  ]
 }
