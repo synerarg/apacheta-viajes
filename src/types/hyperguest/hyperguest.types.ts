@@ -194,6 +194,7 @@ export interface HyperGuestPrebookInput {
   providerPayload?: Record<string, unknown>
   selectedOffer?: Record<string, unknown>
   selectedOffers?: Record<string, unknown>[]
+  userId?: string | null
 }
 
 export interface HyperGuestGuestContact {

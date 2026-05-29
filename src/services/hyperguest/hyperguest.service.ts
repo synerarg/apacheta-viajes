@@ -1150,6 +1150,20 @@ export class HyperGuestService {
         throw new HotelsNotFoundException(`bookingIntent ${input.bookingIntentId}`)
       }
 
+      // Reject if the intent belongs to a different user. Intents with a null
+      // owner (anonymous searches) can only be continued by the same session
+      // that will book them — enforce that the caller is authenticated and
+      // either owns the intent or the intent is unclaimed (will be claimed at
+      // book time). An unauthenticated caller is already blocked by the route
+      // handler returning 401 before reaching this method.
+      if (
+        intent.usuario_id !== null &&
+        intent.usuario_id !== undefined &&
+        intent.usuario_id !== input.userId
+      ) {
+        throw new Error("No tenes permiso para pre-reservar esta habitacion.")
+      }
+
       const offers = pickSelectedOffers(input)
       const payload = {
         search: buildSearchObjectFromIntent(intent),
@@ -1196,7 +1210,11 @@ export class HyperGuestService {
         throw new HotelsNotFoundException(`bookingIntent ${input.bookingIntentId}`)
       }
 
-      if (intent.usuario_id && input.userId && intent.usuario_id !== input.userId) {
+      if (
+        intent.usuario_id !== null &&
+        intent.usuario_id !== undefined &&
+        intent.usuario_id !== input.userId
+      ) {
         throw new Error("No tenes permiso para completar esta reserva.")
       }
 
@@ -1286,6 +1304,11 @@ export class HyperGuestService {
         roomsForRequest: Record<string, unknown>[],
       ): Record<string, unknown> => {
         const payload: Record<string, unknown> = {
+          // providerPayload extension fields come first so that critical fields
+          // set below cannot be overridden by caller-supplied keys. This
+          // prevents authenticated users from injecting isTest, paymentDetails,
+          // leadGuest, or other security-sensitive fields via this escape hatch.
+          ...input.providerPayload,
           dates: {
             from: intent.check_in,
             to: intent.check_out,
@@ -1299,7 +1322,6 @@ export class HyperGuestService {
           rooms: roomsForRequest,
           isTest: intent.hyperguest_property_id === "19912",
           groupBooking: false,
-          ...input.providerPayload,
         }
 
         if (input.specialRequests && input.specialRequests.length > 0) {
@@ -1425,7 +1447,11 @@ export class HyperGuestService {
         throw new HotelsNotFoundException(`bookingIntent ${input.bookingIntentId}`)
       }
 
-      if (intent.usuario_id && input.userId && intent.usuario_id !== input.userId) {
+      if (
+        intent.usuario_id !== null &&
+        intent.usuario_id !== undefined &&
+        intent.usuario_id !== input.userId
+      ) {
         throw new Error("No tenes permiso para cancelar esta reserva.")
       }
 
@@ -1437,9 +1463,10 @@ export class HyperGuestService {
       }
 
       const payload = {
+        // providerPayload first: prevents callers from overriding simulation or reason.
+        ...input.providerPayload,
         reason: input.reason ?? "Cancelacion solicitada por el usuario.",
         simulation: false,
-        ...input.providerPayload,
       }
 
       await this.hyperGuestRepository.updateBookingIntent(intent.id, {

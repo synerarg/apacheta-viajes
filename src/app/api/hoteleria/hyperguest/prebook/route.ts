@@ -3,6 +3,7 @@ import { z } from "zod"
 
 import { createAdminHyperGuestController } from "@/controllers/hyperguest/hyperguest.controller"
 import { getUserFacingErrorMessage } from "@/lib/errors/user-facing-error"
+import { createClient } from "@/lib/supabase/server"
 
 const providerPayloadSchema = z.record(z.string(), z.unknown()).optional()
 const offerSchema = z.record(z.string(), z.unknown())
@@ -16,10 +17,22 @@ const prebookSchema = z.object({
 
 export async function POST(request: Request) {
   try {
+    const supabase = await createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+      return NextResponse.json(
+        { error: "Necesitas iniciar sesion para pre-reservar." },
+        { status: 401 },
+      )
+    }
+
     const body = await request.json()
     const payload = prebookSchema.parse(body)
     const controller = createAdminHyperGuestController()
-    const result = await controller.prebook(payload)
+    const result = await controller.prebook({ ...payload, userId: user.id })
 
     return NextResponse.json(result, { status: 200 })
   } catch (error) {

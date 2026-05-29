@@ -48,7 +48,7 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isApiRoute = pathname.startsWith("/api/")
 
-  const authRoutes = ["/checkout", "/account"]
+  const authRoutes = ["/checkout", "/account", "/mis-reservas"]
   const needsAuth = authRoutes.some((route) => pathname.startsWith(route))
 
   const adminRoutes = ["/dashboard", "/api/dashboard"]
