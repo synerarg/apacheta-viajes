@@ -34,8 +34,8 @@ export class OperatorRequestsController extends BaseIdController<
     return this.service.markInReview(requestId, adminId)
   }
 
-  approve(requestId: string, adminId: string) {
-    return this.service.approve(requestId, adminId)
+  approve(requestId: string, adminId: string, tipoOperadorId?: string) {
+    return this.service.approve(requestId, adminId, tipoOperadorId)
   }
 
   reject(requestId: string, adminId: string, motivo: string) {

@@ -60,10 +60,11 @@ export default async function OperatorRequestDetallePage({
     throw error
   }
 
+  const tiposController = await createServerOperatorTypesController()
+  const tipos = await tiposController.listActiveOrdered()
   const tipo = solicitud.tipo_operador_id
-    ? await (await createServerOperatorTypesController())
-        .getById(solicitud.tipo_operador_id)
-        .catch(() => null)
+    ? tipos.find((t) => t.id === solicitud.tipo_operador_id) ??
+      (await tiposController.getById(solicitud.tipo_operador_id).catch(() => null))
     : null
   const tipoLabel = tipo
     ? `${tipo.nombre} · ${Number(tipo.comision_pct).toFixed(2).replace(/\.?0+$/, "")}% comisión`
@@ -124,7 +125,12 @@ export default async function OperatorRequestDetallePage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <OperatorRequestActions requestId={solicitud.id} estado={solicitud.estado} />
+          <OperatorRequestActions
+            requestId={solicitud.id}
+            estado={solicitud.estado}
+            tipos={tipos.map((t) => ({ id: t.id, nombre: t.nombre }))}
+            currentTipoId={solicitud.tipo_operador_id}
+          />
         </CardContent>
       </Card>
     </div>
