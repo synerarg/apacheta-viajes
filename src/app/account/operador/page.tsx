@@ -19,7 +19,6 @@ import { OperatorRequestCancelButton } from "@/components/account/operator-reque
 import { OperatorRequestForm } from "@/components/account/operator-request-form"
 import { Button } from "@/components/ui/button"
 import { createServerOperatorRequestsController } from "@/controllers/operator-requests/operator-requests.controller"
-import { createServerOperatorTypesController } from "@/controllers/operator-types/operator-types.controller"
 import { createClient } from "@/lib/supabase/server"
 import type { OperatorRequestsRow } from "@/types/operator-requests/operator-requests.types"
 
@@ -211,11 +210,7 @@ export default async function CuentaOperatorPage() {
   }
 
   const controller = await createServerOperatorRequestsController()
-  const tiposController = await createServerOperatorTypesController()
-  const [solicitudes, tipos] = await Promise.all([
-    controller.listMine(user.id),
-    tiposController.listActiveOrdered(),
-  ])
+  const solicitudes = await controller.listMine(user.id)
   const active = solicitudes.find((s) =>
     s.estado === "pendiente" || s.estado === "en_revision",
   )
@@ -364,7 +359,6 @@ export default async function CuentaOperatorPage() {
                     <OperatorRequestForm
                       defaultEmail={profile?.email ?? user.email ?? null}
                       defaultName={[profile?.nombre, profile?.apellido].filter(Boolean).join(" ") || null}
-                      tipos={tipos}
                     />
                   </CardContent>
                 </Card>

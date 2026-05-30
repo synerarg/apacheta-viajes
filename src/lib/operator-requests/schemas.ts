@@ -26,13 +26,16 @@ export const submitOperatorRequestSchema = z.object({
   zona_operacion: optionalString,
   motivacion: optionalString,
   documentacion_urls: z.array(z.string().url()).optional().nullable(),
-  tipo_operador_id: z
-    .string({ message: "Elegí un tipo de operador" })
-    .uuid("Tipo de operador inválido"),
 })
 
 export type SubmitOperatorRequestInput = z.infer<typeof submitOperatorRequestSchema>
 
 export const rejectRequestSchema = z.object({
   motivo: z.string().trim().min(3).max(1000),
+})
+
+// El tipo de operador lo asigna exclusivamente el administrador al aprobar la
+// solicitud; el operador ya no lo elige en el registro.
+export const approveRequestSchema = z.object({
+  tipo_operador_id: z.string().uuid("Tipo de operador inválido").optional(),
 })

@@ -87,7 +87,28 @@ export class OperatorRequestsService extends BaseService<"solicitudes_operador">
     )
   }
 
-  async approve(requestId: string, adminId: string): Promise<OperatorRequestsRow> {
+  async approve(
+    requestId: string,
+    adminId: string,
+    tipoOperadorId?: string,
+  ): Promise<OperatorRequestsRow> {
+    const solicitud = await this.getById(requestId)
+    // El tipo de operador lo define el administrador al aprobar. Si llega uno
+    // nuevo lo persistimos en la solicitud para que el RPC lo copie al operador.
+    const tipo = tipoOperadorId ?? solicitud.tipo_operador_id
+    if (!tipo) {
+      throw new OperatorRequestsValidationException(
+        "Asigná un tipo de operador antes de aprobar la solicitud.",
+      )
+    }
+    if (tipo !== solicitud.tipo_operador_id) {
+      await this.updateByFilters(
+        { id: requestId },
+        { tipo_operador_id: tipo },
+        `id ${requestId}`,
+      )
+    }
+
     try {
       return await this.requestsRepository.callApproveRpc(requestId, adminId)
     } catch (error) {

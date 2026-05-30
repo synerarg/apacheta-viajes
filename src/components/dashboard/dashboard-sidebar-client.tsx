@@ -18,31 +18,57 @@ import {
   UserPlus,
   Calculator,
   Tag,
+  Stack,
+  CaretDown,
 } from "@phosphor-icons/react"
 
 import { createClient } from "@/lib/supabase/client"
 
 const supabase = createClient()
 
-const navItems = [
+type IconComponent = React.ComponentType<{
+  className?: string
+  weight?: "regular" | "fill"
+}>
+
+type NavLink = {
+  href: string
+  label: string
+  icon: IconComponent
+  exact: boolean
+}
+
+type NavGroup = {
+  label: string
+  icon: IconComponent
+  items: NavLink[]
+}
+
+type NavEntry = NavLink | NavGroup
+
+function isGroup(entry: NavEntry): entry is NavGroup {
+  return "items" in entry
+}
+
+function isActive(pathname: string, href: string, exact: boolean) {
+  return exact ? pathname === href : pathname.startsWith(href)
+}
+
+const navItems: NavEntry[] = [
   { href: "/dashboard", label: "Dashboard", icon: SquaresFour, exact: true },
   {
-    href: "/dashboard/paquetes",
-    label: "Paquetes",
-    icon: Suitcase,
-    exact: false,
-  },
-  {
-    href: "/dashboard/experiencias",
-    label: "Experiencias",
-    icon: Star,
-    exact: false,
-  },
-  {
-    href: "/dashboard/traslados",
-    label: "Traslados",
-    icon: Van,
-    exact: false,
+    label: "Catálogo",
+    icon: Stack,
+    items: [
+      { href: "/dashboard/paquetes", label: "Paquetes", icon: Suitcase, exact: false },
+      {
+        href: "/dashboard/experiencias",
+        label: "Experiencias",
+        icon: Star,
+        exact: false,
+      },
+      { href: "/dashboard/traslados", label: "Traslados", icon: Van, exact: false },
+    ],
   },
   {
     href: "/dashboard/cotizador",
@@ -51,24 +77,121 @@ const navItems = [
     exact: false,
   },
   {
-    href: "/dashboard/operadores",
     label: "Operadores",
     icon: UsersFour,
-    exact: true,
-  },
-  {
-    href: "/dashboard/operadores/solicitudes",
-    label: "Solicitudes",
-    icon: UserPlus,
-    exact: false,
-  },
-  {
-    href: "/dashboard/operadores/tipos",
-    label: "Tipos de operador",
-    icon: Tag,
-    exact: false,
+    items: [
+      {
+        href: "/dashboard/operadores",
+        label: "Operadores",
+        icon: UsersFour,
+        exact: true,
+      },
+      {
+        href: "/dashboard/operadores/solicitudes",
+        label: "Solicitudes",
+        icon: UserPlus,
+        exact: false,
+      },
+      {
+        href: "/dashboard/operadores/tipos",
+        label: "Tipos de operador",
+        icon: Tag,
+        exact: false,
+      },
+    ],
   },
 ]
+
+function NavItemLink({
+  item,
+  active,
+  nested,
+  onNavigate,
+}: {
+  item: NavLink
+  active: boolean
+  nested?: boolean
+  onNavigate?: () => void
+}) {
+  const Icon = item.icon
+  const padding = nested
+    ? active
+      ? "border-l-2 border-primary pl-[34px] pr-3"
+      : "pl-9 pr-3"
+    : active
+    ? "border-l-2 border-primary pl-[10px] pr-3"
+    : "px-3"
+  const colors = active
+    ? "bg-white/5 text-white"
+    : "text-white/60 hover:bg-white/5 hover:text-white/90"
+
+  return (
+    <Link
+      href={item.href}
+      onClick={onNavigate}
+      className={`flex items-center gap-3 rounded-sm py-2.5 text-sm transition-colors ${padding} ${colors}`}
+    >
+      <Icon className="h-4 w-4 shrink-0" weight={active ? "fill" : "regular"} />
+      {item.label}
+    </Link>
+  )
+}
+
+function NavGroupItem({
+  group,
+  pathname,
+  onNavigate,
+}: {
+  group: NavGroup
+  pathname: string
+  onNavigate?: () => void
+}) {
+  const Icon = group.icon
+  const hasActiveChild = group.items.some((item) =>
+    isActive(pathname, item.href, item.exact),
+  )
+  const [open, setOpen] = useState(hasActiveChild)
+  const expanded = open || hasActiveChild
+
+  return (
+    <div>
+      <button
+        type="button"
+        onClick={() => setOpen((prev) => !prev)}
+        aria-expanded={expanded}
+        className={`flex w-full cursor-pointer items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors ${
+          hasActiveChild
+            ? "text-white"
+            : "text-white/60 hover:bg-white/5 hover:text-white/90"
+        }`}
+      >
+        <Icon
+          className="h-4 w-4 shrink-0"
+          weight={hasActiveChild ? "fill" : "regular"}
+        />
+        <span className="flex-1 text-left">{group.label}</span>
+        <CaretDown
+          className={`h-3.5 w-3.5 shrink-0 transition-transform ${
+            expanded ? "rotate-180" : ""
+          }`}
+        />
+      </button>
+      {expanded ? (
+        <div className="mt-1 flex flex-col gap-1">
+          {group.items.map((item) => (
+            <NavItemLink
+              key={item.href}
+              item={item}
+              active={isActive(pathname, item.href, item.exact)}
+              nested
+              onNavigate={onNavigate}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  )
+}
 
 function SidebarContent({
   pathname,
@@ -81,10 +204,6 @@ function SidebarContent({
   handleSignOut: () => void
   onClose?: () => void
 }) {
-  function isActive(href: string, exact: boolean) {
-    return exact ? pathname === href : pathname.startsWith(href)
-  }
-
   return (
     <>
       {/* Logo + close button */}
@@ -112,27 +231,23 @@ function SidebarContent({
 
       {/* Nav items */}
       <nav className="flex flex-1 flex-col gap-1 px-3 pt-2">
-        {navItems.map(({ href, label, icon: Icon, exact }) => {
-          const active = isActive(href, exact)
-          return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onClose}
-              className={`flex items-center gap-3 rounded-sm px-3 py-2.5 text-sm transition-colors ${
-                active
-                  ? "border-l-2 border-primary bg-white/5 pl-[10px] text-white"
-                  : "text-white/60 hover:bg-white/5 hover:text-white/90"
-              }`}
-            >
-              <Icon
-                className="h-4 w-4 shrink-0"
-                weight={active ? "fill" : "regular"}
-              />
-              {label}
-            </Link>
-          )
-        })}
+        {navItems.map((entry) =>
+          isGroup(entry) ? (
+            <NavGroupItem
+              key={entry.label}
+              group={entry}
+              pathname={pathname}
+              onNavigate={onClose}
+            />
+          ) : (
+            <NavItemLink
+              key={entry.href}
+              item={entry}
+              active={isActive(pathname, entry.href, entry.exact)}
+              onNavigate={onClose}
+            />
+          ),
+        )}
       </nav>
 
       {/* Bottom actions */}
