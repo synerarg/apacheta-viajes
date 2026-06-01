@@ -25,7 +25,7 @@ interface OperatorTypeFormProps {
   isEdit?: boolean
 }
 
-type FieldErrors = Partial<Record<"nombre" | "comision_pct" | "orden", string>>
+type FieldErrors = Partial<Record<"nombre" | "comision_pct", string>>
 
 export function OperatorTypeForm({
   initialData,
@@ -41,11 +41,6 @@ export function OperatorTypeForm({
       : "0",
   )
   const [descripcion, setDescripcion] = useState(initialData?.descripcion ?? "")
-  const [orden, setOrden] = useState<string>(
-    initialData?.orden !== undefined && initialData?.orden !== null
-      ? String(initialData.orden)
-      : "0",
-  )
   const [activo, setActivo] = useState<string>(
     initialData?.activo === false ? "false" : "true",
   )
@@ -73,7 +68,6 @@ export function OperatorTypeForm({
           nombre: nombre.trim(),
           comision_pct: comisionNum,
           descripcion: descripcion.trim() || null,
-          orden: orden ? Number(orden) : 0,
           activo: activo === "true",
         }
 
@@ -129,40 +123,26 @@ export function OperatorTypeForm({
             )}
           </div>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <div className="space-y-1.5">
-              <Label htmlFor="comision_pct">Comisión (%)</Label>
-              <Input
-                id="comision_pct"
-                name="comision_pct"
-                type="number"
-                step="0.01"
-                min={0}
-                max={100}
-                value={comisionPct}
-                onChange={(event) => setComisionPct(event.target.value)}
-                placeholder="Ej: 12.5"
-              />
-              {fieldErrors.comision_pct ? (
-                <p className="text-xs text-destructive">{fieldErrors.comision_pct}</p>
-              ) : (
-                <p className="text-xs text-neutral-500">
-                  Porcentaje de comisión que aplica a operadores de este tipo.
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-1.5">
-              <Label htmlFor="orden">Orden</Label>
-              <Input
-                id="orden"
-                name="orden"
-                type="number"
-                min={0}
-                value={orden}
-                onChange={(event) => setOrden(event.target.value)}
-              />
-            </div>
+          <div className="space-y-1.5 md:w-1/2">
+            <Label htmlFor="comision_pct">Comisión (%)</Label>
+            <Input
+              id="comision_pct"
+              name="comision_pct"
+              type="number"
+              step="0.01"
+              min={0}
+              max={100}
+              value={comisionPct}
+              onChange={(event) => setComisionPct(event.target.value)}
+              placeholder="Ej: 12.5"
+            />
+            {fieldErrors.comision_pct ? (
+              <p className="text-xs text-destructive">{fieldErrors.comision_pct}</p>
+            ) : (
+              <p className="text-xs text-neutral-500">
+                Porcentaje de comisión que aplica a operadores de este tipo.
+              </p>
+            )}
           </div>
 
           <div className="space-y-1.5">
