@@ -20,6 +20,8 @@ import {
   Tag,
   Stack,
   CaretDown,
+  FileText,
+  BookOpen,
 } from "@phosphor-icons/react"
 
 import { createClient } from "@/lib/supabase/client"
@@ -71,10 +73,22 @@ const navItems: NavEntry[] = [
     ],
   },
   {
-    href: "/dashboard/cotizador",
     label: "Cotizador",
     icon: Calculator,
-    exact: false,
+    items: [
+      {
+        href: "/dashboard/cotizador/cotizaciones",
+        label: "Cotizaciones",
+        icon: FileText,
+        exact: false,
+      },
+      {
+        href: "/dashboard/cotizador/catalogo",
+        label: "Catálogo",
+        icon: BookOpen,
+        exact: false,
+      },
+    ],
   },
   {
     label: "Gestión de Operadores",
