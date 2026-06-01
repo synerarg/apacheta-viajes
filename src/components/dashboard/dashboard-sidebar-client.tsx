@@ -77,7 +77,7 @@ const navItems: NavEntry[] = [
     exact: false,
   },
   {
-    label: "Operadores",
+    label: "Gestión de Operadores",
     icon: UsersFour,
     items: [
       {
