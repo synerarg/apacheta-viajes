@@ -374,6 +374,7 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
     if (missingField) { setErrorMessage(`Completá el campo "${missingField[0]}".`); return }
     if (!/^\S+@\S+\.\S+$/.test(guestEmail)) { setErrorMessage("Ingresá un email válido."); return }
+    if (!guestBirthDate) { setErrorMessage("La fecha de nacimiento es requerida."); return }
 
     if (!cardNumber.replace(/\s+/g, "")) { setErrorMessage("Ingresá el número de tarjeta."); return }
     if (!cardCvv) { setErrorMessage("Ingresá el CVV."); return }
@@ -848,13 +849,25 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
             </div>
           </div>
 
+          <div>
+            <label className={labelClass}>Fecha de nacimiento <span className="normal-case text-primary/70">*</span></label>
+            <input
+              type="date"
+              value={guestBirthDate}
+              onChange={e => setGuestBirthDate(e.target.value)}
+              autoComplete="bday"
+              className={inputClass}
+              required
+            />
+          </div>
+
           <button
             type="button"
             onClick={() => setShowExtraContact(v => !v)}
             className="flex items-center gap-1 font-sans text-xs text-subtle hover:text-dark-brown"
           >
             {showExtraContact ? <ChevronUp className="h-3 w-3" /> : <ChevronDown className="h-3 w-3" />}
-            {showExtraContact ? "Ocultar datos adicionales" : "Agregar dirección y fecha de nacimiento"}
+            {showExtraContact ? "Ocultar datos de contacto adicionales" : "Agregar dirección de contacto"}
           </button>
 
           {showExtraContact ? (
@@ -902,15 +915,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
                 <input
                   value={guestZip}
                   onChange={e => setGuestZip(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-              <div className="sm:col-span-2">
-                <label className={labelClass}>Fecha de nacimiento</label>
-                <input
-                  type="date"
-                  value={guestBirthDate}
-                  onChange={e => setGuestBirthDate(e.target.value)}
                   className={inputClass}
                 />
               </div>

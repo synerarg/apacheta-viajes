@@ -879,10 +879,8 @@ function buildGuestPayload(
   const payload: Record<string, unknown> = {
     name: { first: guest.firstName, last: guest.lastName },
     title: guest.title ?? "MR",
-  }
-
-  if (guest.birthDate) {
-    payload.birthDate = guest.birthDate
+    // HyperGuest requires birthDate on all guest objects for LIVE properties.
+    birthDate: guest.birthDate ?? "1990-01-01",
   }
 
   if (includeContact) {
