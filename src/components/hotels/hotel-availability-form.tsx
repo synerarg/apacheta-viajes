@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState, type FormEvent } from "react"
 import { ChevronDown, ChevronUp, Minus, Plus } from "lucide-react"
+import { toast } from "sonner"
 
 import {
   extractOfferDetails,
@@ -149,8 +150,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
   const [expandedOffer, setExpandedOffer] = useState<string | null>(null)
   const [hasPrebooked, setHasPrebooked] = useState(false)
   const [bookResult, setBookResult] = useState<BookResult | null>(null)
-  const [statusMessage, setStatusMessage] = useState<string | null>(null)
-  const [errorMessage, setErrorMessage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(false)
 
   const [guestFirstName, setGuestFirstName] = useState("")
@@ -185,8 +184,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
     setSelectedOfferIds([])
     setHasPrebooked(false)
     setBookResult(null)
-    setStatusMessage(null)
-    setErrorMessage(null)
     setShowAllOffers(false)
     setExpandedOffer(null)
   }, [checkIn, checkOut, occupancy, hotelId])
@@ -278,16 +275,14 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
   async function handleSearch(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (!checkIn || !checkOut) { setErrorMessage("Indicá fechas de check-in y check-out."); return }
-    if (isDateInPast(checkIn)) { setErrorMessage("La fecha de check-in no puede ser anterior a hoy."); return }
-    if (checkOut <= checkIn) { setErrorMessage("El check-out debe ser posterior al check-in."); return }
+    if (!checkIn || !checkOut) { toast.error("Indicá fechas de check-in y check-out."); return }
+    if (isDateInPast(checkIn)) { toast.error("La fecha de check-in no puede ser anterior a hoy."); return }
+    if (checkOut <= checkIn) { toast.error("El check-out debe ser posterior al check-in."); return }
 
     abortRef.current?.abort()
     const controller = new AbortController()
     abortRef.current = controller
     setIsLoading(true)
-    setErrorMessage(null)
-    setStatusMessage(null)
     setAvailability(null)
     setShowAllOffers(false)
     setExpandedOffer(null)
@@ -317,12 +312,12 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
         payload.offers[0] ? offerKey(payload.offers[0], 0) : "",
       ))
       if (payload.offers.length === 0) {
-        setStatusMessage("No encontramos tarifas para esas fechas. Probá con otras.")
+        toast.info("No encontramos tarifas para esas fechas. Probá con otras.")
       }
     } catch (error) {
       if (error instanceof DOMException && error.name === "AbortError") return
       if (controller.signal.aborted) return
-      setErrorMessage(error instanceof Error ? error.message : "No se pudo consultar la disponibilidad.")
+      toast.error(error instanceof Error ? error.message : "No se pudo consultar la disponibilidad.")
     } finally {
       if (abortRef.current === controller) {
         abortRef.current = null
@@ -335,12 +330,10 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
     if (!availability || isLoading) return
     const selected = getSelectedOffers()
     if (selected.length < occupancy.length) {
-      setErrorMessage("Seleccioná una tarifa para cada habitación antes de continuar.")
+      toast.error("Seleccioná una tarifa para cada habitación antes de continuar.")
       return
     }
     setIsLoading(true)
-    setErrorMessage(null)
-    setStatusMessage(null)
     try {
       const response = await fetch("/api/hoteleria/hyperguest/prebook", {
         method: "POST",
@@ -352,9 +345,8 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       })
       await readJsonResponse<PrebookResult>(response)
       setHasPrebooked(true)
-      setStatusMessage(null)
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "No se pudo iniciar la pre-reserva.")
+      toast.error(error instanceof Error ? error.message : "No se pudo iniciar la pre-reserva.")
     } finally {
       setIsLoading(false)
     }
@@ -372,23 +364,21 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
       ] as const
     ).find(([, value]) => value.trim().length === 0)
 
-    if (missingField) { setErrorMessage(`Completá el campo "${missingField[0]}".`); return }
-    if (!/^\S+@\S+\.\S+$/.test(guestEmail)) { setErrorMessage("Ingresá un email válido."); return }
-    if (!guestBirthDate) { setErrorMessage("La fecha de nacimiento es requerida."); return }
+    if (missingField) { toast.error(`Completá el campo "${missingField[0]}".`); return }
+    if (!/^\S+@\S+\.\S+$/.test(guestEmail)) { toast.error("Ingresá un email válido."); return }
+    if (!guestBirthDate) { toast.error("La fecha de nacimiento es requerida."); return }
 
-    if (!cardNumber.replace(/\s+/g, "")) { setErrorMessage("Ingresá el número de tarjeta."); return }
-    if (!cardCvv) { setErrorMessage("Ingresá el CVV."); return }
-    if (!cardExpiryMonth || !cardExpiryYear) { setErrorMessage("Ingresá la fecha de vencimiento."); return }
+    if (!cardNumber.replace(/\s+/g, "")) { toast.error("Ingresá el número de tarjeta."); return }
+    if (!cardCvv) { toast.error("Ingresá el CVV."); return }
+    if (!cardExpiryMonth || !cardExpiryYear) { toast.error("Ingresá la fecha de vencimiento."); return }
 
     const selectedForBook = getSelectedOffers()
     if (selectedForBook.length < occupancy.length) {
-      setErrorMessage("Volvé a seleccionar una tarifa.")
+      toast.error("Volvé a seleccionar una tarifa.")
       return
     }
 
     setIsLoading(true)
-    setErrorMessage(null)
-    setStatusMessage(null)
 
     try {
       const refreshResponse = await fetch("/api/hoteleria/hyperguest/prebook", {
@@ -440,13 +430,14 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
       const payload = await readJsonResponse<BookResult>(response)
       setBookResult(payload)
-      setStatusMessage(
+      toast.success(
         payload.bookingIntent.provider_booking_id
           ? `Reserva confirmada. Código: ${payload.bookingIntent.provider_booking_id}`
           : "Reserva enviada. En breve recibirás la confirmación.",
+        { duration: 8000 },
       )
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "No se pudo confirmar la reserva.")
+      toast.error(error instanceof Error ? error.message : "No se pudo confirmar la reserva.")
     } finally {
       setIsLoading(false)
     }
@@ -455,8 +446,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
   async function handleCancel() {
     if (!availability) return
     setIsLoading(true)
-    setErrorMessage(null)
-    setStatusMessage(null)
     try {
       const response = await fetch("/api/hoteleria/hyperguest/cancel", {
         method: "POST",
@@ -467,10 +456,10 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
         }),
       })
       await readJsonResponse<CancelResult>(response)
-      setStatusMessage("Reserva cancelada correctamente.")
+      toast.success("Reserva cancelada correctamente.")
       setBookResult(null)
     } catch (error) {
-      setErrorMessage(error instanceof Error ? error.message : "No se pudo cancelar la reserva.")
+      toast.error(error instanceof Error ? error.message : "No se pudo cancelar la reserva.")
     } finally {
       setIsLoading(false)
     }
@@ -482,12 +471,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
 
   return (
     <div className="space-y-5">
-      {errorMessage ? (
-        <p className="border border-primary/20 bg-primary/5 px-4 py-3 font-sans text-sm text-primary">
-          {errorMessage}
-        </p>
-      ) : null}
-
       {/* Search form */}
       {!bookResult ? (
         <form className="space-y-4" onSubmit={handleSearch}>
@@ -785,11 +768,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
         </div>
       ) : null}
 
-      {/* Status after search / no offers */}
-      {statusMessage && !bookResult && !hasPrebooked ? (
-        <p className="font-sans text-sm text-subtle">{statusMessage}</p>
-      ) : null}
-
       {/* Guest form */}
       {hasPrebooked && !bookResult ? (
         <div className="space-y-5 border border-dark-brown/15 bg-white/60 p-5">
@@ -1011,7 +989,7 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
               </svg>
             </div>
             <div>
-              <p className="font-sans text-sm font-bold text-dark-brown">{statusMessage ?? "Reserva confirmada"}</p>
+              <p className="font-sans text-sm font-bold text-dark-brown">Reserva confirmada</p>
               {bookResult.bookingIntent.provider_booking_id ? (
                 <p className="mt-0.5 font-sans text-xs text-subtle">
                   Referencia HyperGuest: #{bookResult.bookingIntent.provider_booking_id}
@@ -1030,10 +1008,6 @@ export function HotelAvailabilityForm({ hotelId }: HotelAvailabilityFormProps) {
         </div>
       ) : null}
 
-      {/* Final status after cancel */}
-      {statusMessage && (bookResult === null && hasPrebooked) ? (
-        <p className="font-sans text-sm text-subtle">{statusMessage}</p>
-      ) : null}
     </div>
   )
 }
